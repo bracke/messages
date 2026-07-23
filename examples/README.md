@@ -1,7 +1,7 @@
 # Examples
 
 This directory contains small, standalone programs that demonstrate the sealed
-v1.1.0 public API.
+v0.1.0 public API.
 
 ## Start here
 
@@ -33,12 +33,12 @@ from the repository root because the examples use relative catalog paths such as
 Examples intended for application code must only import:
 
 ```ada
-with I18N;
-with I18N.Arguments;
-with I18N.Diagnostics;
+with Messages;
+with Messages.Arguments;
+with Messages.Diagnostics;
 with I18N.Locales;
-with I18N.Result;
-with I18N.Runtime;
+with Messages.Result;
+with Messages.Runtime;
 ```
 
 Private implementation packages are intentionally not used by examples. See

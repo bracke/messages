@@ -1,6 +1,6 @@
 # Examples Index
 
-All examples in this directory use the stable public v1.1.0 API only, unless a
+All examples in this directory use the stable public v0.1.0 API only, unless a
 file is explicitly identified as support code.
 
 Build the example project with:

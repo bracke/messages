@@ -20,4 +20,4 @@ i18n = { path = "../i18n" }
 
 [[actions]]
 type = "test"
-command = ["sh", "-c", "(cd tests && alr -n build && ./bin/tests) && (cd conformance && alr -n build) && ./conformance/bin/check_conformance"]
+command = ["sh", "-c", "cd check_messages && alr -n build && ./bin/check_messages"]
