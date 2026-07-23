@@ -17,3 +17,7 @@ i18n = ">=1.1.0"
 
 [[pins]]
 i18n = { path = "../i18n" }
+
+[[actions]]
+type = "test"
+command = ["sh", "-c", "cd tests && alr -n build && ./bin/tests"]
