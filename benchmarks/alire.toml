@@ -1,0 +1,26 @@
+name = "messages_benchmarks"
+description = "Rendering benchmarks for the messages crate"
+version = "0.1.0"
+authors = ["Bent Bracke"]
+maintainers = ["Bent Bracke <bent@bracke.dk>"]
+maintainers-logins = ["bracke"]
+licenses = "MIT"
+website = "https://github.com/bracke/messages"
+tags = ["messages", "benchmarks", "performance"]
+project-files = ["benchmarks.gpr"]
+executables = ["render_benchmarks"]
+
+[[depends-on]]
+gnat_native = "=15.2.1"
+
+[[depends-on]]
+messages = "*"
+
+[[pins]]
+messages = { path = ".." }
+
+# Build dependencies in the development profile (-Og) too, not the default
+# release (-O3), so this root and the parent share object files rather than
+# forcing each other into full rebuilds.
+[build-profiles]
+"*" = "development"
