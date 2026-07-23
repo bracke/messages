@@ -1,0 +1,12 @@
+# GNAT/GPRbuild output
+obj/
+lib/
+/*.ali
+/*.o
+
+# Alire/local tool state
+alire/
+.alire/
+
+# Alire-generated crate config
+config/messages_config.gpr

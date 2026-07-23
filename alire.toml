@@ -1,0 +1,19 @@
+name = "messages"
+description = "ICU-style message formatting over the i18n platform"
+version = "0.1.0"
+authors = ["Bent Bracke"]
+maintainers = ["Bent Bracke <bent@bracke.dk>"]
+maintainers-logins = ["bracke"]
+licenses = "MIT"
+website = "https://github.com/bracke/messages"
+tags = ["messages", "i18n", "icu"]
+project-files = ["messages.gpr"]
+
+[[depends-on]]
+gnat = ">=12"
+
+[[depends-on]]
+i18n = ">=1.1.0"
+
+[[pins]]
+i18n = { path = "../i18n" }
