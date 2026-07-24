@@ -1,4 +1,5 @@
 with I18N.CLDR_Data;
+with I18N.Relative_Format;
 with I18N.Plurals;
 with I18N.Runtime_Data;
 
@@ -1399,7 +1400,7 @@ package body Messages.Extra_Format is
    begin
       return
         (if Found then Value
-         else I18N.CLDR_Data.Relative_Current_Name (Locale, Base, Width));
+         else I18N.Relative_Format.Current_Name (Locale, Base, Width));
    end Relative_Current;
 
    function Relative_Exact
@@ -1435,7 +1436,7 @@ package body Messages.Extra_Format is
    begin
       return
         (if Found then Value
-         else I18N.CLDR_Data.Relative_Unit_Display_Name
+         else I18N.Relative_Format.Unit_Display_Name
            (Locale, Base, Singular));
    end Relative_Unit_Name;
 
@@ -1460,7 +1461,7 @@ package body Messages.Extra_Format is
         I18N.Runtime_Data.Locale_Text
           (Locale, "relative_unit." & Base & "." & Category_Name, Found);
       Generated : constant String :=
-        I18N.CLDR_Data.Relative_Unit_Category_Name
+        I18N.Relative_Format.Unit_Category_Name
           (Locale, Base, Category_Name);
    begin
       if Found then
@@ -1474,7 +1475,7 @@ package body Messages.Extra_Format is
       if Category /= I18N.Plurals.Other then
          declare
             Other : constant String :=
-              I18N.CLDR_Data.Relative_Unit_Category_Name
+              I18N.Relative_Format.Unit_Category_Name
                 (Locale, Base, "other");
          begin
             if Other /= "" then
@@ -1501,7 +1502,7 @@ package body Messages.Extra_Format is
    begin
       return
         (if Found then Value
-         else I18N.CLDR_Data.Relative_Offset_Prefix (Locale, Future));
+         else I18N.Relative_Format.Offset_Prefix (Locale, Future));
    end Relative_Offset_Prefix;
 
    function Relative_Offset_Suffix
@@ -1518,7 +1519,7 @@ package body Messages.Extra_Format is
    begin
       return
         (if Found then Value
-         else I18N.CLDR_Data.Relative_Offset_Suffix (Locale, Future));
+         else I18N.Relative_Format.Offset_Suffix (Locale, Future));
    end Relative_Offset_Suffix;
 
    function Runtime_Relative_Override_Present
@@ -1940,7 +1941,7 @@ package body Messages.Extra_Format is
         I18N.Plurals.Cardinal (Locale, Long_Long_Integer (Amount));
       Category_Name : constant String := Plural_Category_Name (Category);
       Pattern : constant String :=
-        I18N.CLDR_Data.Relative_Time_Pattern
+        I18N.Relative_Format.Time_Pattern
           (Locale, Base, Width, Category_Name, Future);
       Relative_Unit : constant String :=
         Relative_Unit_Name (Locale, Base, Amount);
