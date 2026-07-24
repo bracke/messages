@@ -212,25 +212,6 @@ procedure Check_Messages is
             Error ("example failed: " & Name);
       end Expect_Example;
    begin
-      --  project_tools' output-capturing Spawn reports a spurious non-zero
-      --  status on the first invocation in a process; every later call is
-      --  correct. Absorb that first call with a throwaway run so the real
-      --  example checks below all execute on a warmed spawn path.
-      declare
-         Warm : Project_Tools.Processes.Unbounded_String;
-      begin
-         Project_Tools.Processes.Run
-           (Label   => "warm up example runner",
-            Dir     => Root,
-            Program => Root & "/examples/bin/hello_world",
-            Args    => No_Args,
-            Output  => Warm,
-            Quiet   => True);
-      exception
-         when others =>
-            null;
-      end;
-
       Expect_Example
         ("hello_world",
          "hello world: Hello, Ada!" & LF);
