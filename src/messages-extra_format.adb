@@ -1,5 +1,6 @@
 with I18N.CLDR_Data;
 with I18N.Relative_Format;
+with I18N.Unit_Format;
 with I18N.Plurals;
 with I18N.Runtime_Data;
 
@@ -1105,7 +1106,7 @@ package body Messages.Extra_Format is
       end Fallback_Name;
 
       Generated : constant String :=
-        I18N.CLDR_Data.Unit_Display_Name
+        I18N.Unit_Format.Display_Name
           ("en", Base, Width, (if Singular then "one" else "other"));
    begin
       if Width /= "unit-width-full-name"
@@ -1140,7 +1141,7 @@ package body Messages.Extra_Format is
    begin
       return
         (if Found then Value
-         else I18N.CLDR_Data.Unit_Display_Name
+         else I18N.Unit_Format.Display_Name
            (Locale, Base, Width, (if Singular then "one" else "other")));
    end Locale_Unit_Name;
 
@@ -1195,7 +1196,7 @@ package body Messages.Extra_Format is
          end;
       end if;
 
-      return I18N.CLDR_Data.Unit_Display_Name
+      return I18N.Unit_Format.Display_Name
         (Locale, Base, Width, Plural_Category_Name (Category));
    end Locale_Unit_Name;
 
