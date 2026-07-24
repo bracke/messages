@@ -1,4 +1,5 @@
 with I18N.CLDR_Data;
+with I18N.List_Format;
 with I18N.Relative_Format;
 with I18N.Unit_Format;
 with I18N.Plurals;
@@ -1650,7 +1651,7 @@ package body Messages.Extra_Format is
    begin
       return
         (if Found then Value
-         else I18N.CLDR_Data.Per_Unit_Separator (Locale));
+         else I18N.Unit_Format.Per_Unit_Separator (Locale));
    end Per_Unit_Separator;
 
    function Unit_Short_Per_Separator (Locale : String) return String is
@@ -1703,7 +1704,7 @@ package body Messages.Extra_Format is
    begin
       return
         (if Found then Value
-         else I18N.CLDR_Data.List_Final_Separator (Locale));
+         else I18N.List_Format.Separator (Locale, "standard", "final"));
    end List_Final_Separator;
 
    function List_Pair_Separator (Locale : String) return String is
@@ -1727,7 +1728,7 @@ package body Messages.Extra_Format is
          end if;
       end;
 
-      return I18N.CLDR_Data.List_Pair_Separator (Locale);
+      return I18N.List_Format.Separator (Locale, "standard", "pair");
    end List_Pair_Separator;
 
    function List_Start_Separator (Locale : String) return String is
@@ -1751,7 +1752,7 @@ package body Messages.Extra_Format is
          end if;
       end;
 
-      return I18N.CLDR_Data.List_Start_Separator (Locale);
+      return I18N.List_Format.Separator (Locale, "standard", "start");
    end List_Start_Separator;
 
    function List_Middle_Separator (Locale : String) return String is
@@ -1775,7 +1776,7 @@ package body Messages.Extra_Format is
          end if;
       end;
 
-      return I18N.CLDR_Data.List_Middle_Separator (Locale);
+      return I18N.List_Format.Separator (Locale, "standard", "middle");
    end List_Middle_Separator;
 
    function Runtime_List_Separator
@@ -1884,37 +1885,37 @@ package body Messages.Extra_Format is
          if Total = 2 then
             return Typed_Runtime_List_Separator
               (Locale, "or", "pair", "final",
-               I18N.CLDR_Data.List_Or_Pair_Separator (Locale));
+               I18N.List_Format.Separator (Locale, "or", "pair"));
          elsif Count = Total then
             return Typed_Runtime_List_Separator
               (Locale, "or", "final",
-               I18N.CLDR_Data.List_Or_Final_Separator (Locale));
+               I18N.List_Format.Separator (Locale, "or", "final"));
          elsif Count = 2 then
             return Typed_Runtime_List_Separator
               (Locale, "or", "start",
-               I18N.CLDR_Data.List_Or_Start_Separator (Locale));
+               I18N.List_Format.Separator (Locale, "or", "start"));
          else
             return Typed_Runtime_List_Separator
               (Locale, "or", "middle",
-               I18N.CLDR_Data.List_Or_Middle_Separator (Locale));
+               I18N.List_Format.Separator (Locale, "or", "middle"));
          end if;
       elsif Kind = "unit" then
          if Total = 2 then
             return Typed_Runtime_List_Separator
               (Locale, "unit", "pair", "item",
-               I18N.CLDR_Data.List_Unit_Pair_Separator (Locale));
+               I18N.List_Format.Separator (Locale, "unit", "pair"));
          elsif Count = 2 then
             return Typed_Runtime_List_Separator
               (Locale, "unit", "start", "item",
-               I18N.CLDR_Data.List_Unit_Start_Separator (Locale));
+               I18N.List_Format.Separator (Locale, "unit", "start"));
          elsif Count = Total then
             return Typed_Runtime_List_Separator
               (Locale, "unit", "final", "middle", "item",
-               I18N.CLDR_Data.List_Unit_Final_Separator (Locale));
+               I18N.List_Format.Separator (Locale, "unit", "final"));
          else
             return Typed_Runtime_List_Separator
               (Locale, "unit", "middle", "item",
-               I18N.CLDR_Data.List_Unit_Middle_Separator (Locale));
+               I18N.List_Format.Separator (Locale, "unit", "middle"));
          end if;
       elsif Total = 2 then
          return List_Pair_Separator (Locale);
