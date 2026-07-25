@@ -2,8 +2,9 @@
 
 `messages` is an Ada 2022 library for strict, deterministic **ICU-style message
 formatting**. It is built on the [`i18n`](../i18n) Unicode/CLDR platform, which
-it depends on for locale identity, plural classification, and all number, date,
-and currency formatting.
+it depends on for locale identity, plural classification, and all
+locale-sensitive value formatting — numbers, dates, currency, units and
+measures, durations, byte sizes, relative time, and lists.
 
 The application-facing contract is catalog-based:
 
