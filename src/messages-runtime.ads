@@ -492,9 +492,11 @@ package Messages.Runtime is
    --  Target. On success Last is the final written index (Target (Target'First
    --  .. Last) holds the output) and Status is Success. When the rendered text
    --  is longer than Target, Status is Buffer_Overflow, Target holds the prefix
-   --  that fits, and Last is the number of characters written. On any other
-   --  failure status, Last is 0 and Target contents are unspecified. This facade
-   --  does not expose any private renderer, compiler, or cache internals.
+   --  that fits, and Last is the final written index of that prefix (so
+   --  Target (Target'First .. Last) holds it, the same convention as success).
+   --  On any other failure status, Last is 0 and Target contents are
+   --  unspecified. This facade does not expose any private renderer, compiler,
+   --  or cache internals.
    --
    --  @param Item Initialized runtime instance.
    --  @param Locale Requested locale.

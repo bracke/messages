@@ -4,6 +4,13 @@ with Messages.Arguments;
 
 private package Messages.Render is
 
+   --  Regression-only AST renderer: the in-tree compatibility/differential
+   --  tests walk the AST directly through this path. It is NOT on the public
+   --  render path (Messages.Runtime supersedes it) and is NOT locale-faithful --
+   --  it hardcodes Locale => "en" and a fixed ordinal category mapping (1/2/3)
+   --  rather than I18N.Plurals. Do not wire it into production; use
+   --  Messages.Runtime.
+   --
    --  Safely render a validated AST into a structured Result.
    --
    --  Missing variables fail with Missing_Variable. Plural selectors must be
