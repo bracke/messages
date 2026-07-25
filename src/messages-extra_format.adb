@@ -1,4 +1,6 @@
+with I18N.Byte_Size_Format;
 with I18N.CLDR_Data;
+with I18N.Duration_Format;
 with I18N.List_Format;
 with I18N.Number_Format;
 with I18N.Relative_Format;
@@ -70,41 +72,6 @@ package body Messages.Extra_Format is
         and then Dot /= Start
         and then Dot /= Text'Last;
    end Is_Decimal_Text;
-
-   function Is_Natural_Text (Text : String) return Boolean is
-   begin
-      if Text'Length = 0 then
-         return False;
-      end if;
-
-      for C of Text loop
-         if not Is_Digit (C) then
-            return False;
-         end if;
-      end loop;
-
-      return True;
-   end Is_Natural_Text;
-
-   function Natural_Value (Text : String) return Natural is
-      Result : Natural := 0;
-   begin
-      for C of Text loop
-         Result := Result * 10 + Character'Pos (C) - Character'Pos ('0');
-      end loop;
-      return Result;
-   end Natural_Value;
-
-   function Long_Long_Natural_Value (Text : String) return Long_Long_Integer is
-      Result : Long_Long_Integer := 0;
-   begin
-      for C of Text loop
-         Result :=
-           Result * 10
-           + Long_Long_Integer (Character'Pos (C) - Character'Pos ('0'));
-      end loop;
-      return Result;
-   end Long_Long_Natural_Value;
 
    function Integer_Image (Value : Long_Long_Integer) return String is
       Raw : constant String := Long_Long_Integer'Image (Value);
@@ -248,15 +215,6 @@ package body Messages.Extra_Format is
          (if Found then Value else I18N.Number_Format.Digit_Text (Locale, Digit)));
    end Put_Digit;
 
-   function Number_Minus_Sign (Locale : String) return String is
-      Found : Boolean;
-      Value : constant String :=
-        I18N.Runtime_Data.Locale_Text (Locale, "number_minus_sign", Found);
-   begin
-      return
-        (if Found then Value else I18N.CLDR_Data.Number_Minus_Sign (Locale));
-   end Number_Minus_Sign;
-
    procedure Put_Natural
      (Target   : in out String;
       Last     : in out Natural;
@@ -277,20 +235,6 @@ package body Messages.Extra_Format is
          Put_Digit (Target, Last, Overflow, Locale, C);
       end loop;
    end Put_Natural;
-
-   procedure Put_Long_Long_Natural
-     (Target   : in out String;
-      Last     : in out Natural;
-      Overflow : in out Boolean;
-      Locale   : String;
-      Value    : Long_Long_Integer)
-   is
-      Raw : constant String := Integer_Image (Value);
-   begin
-      for C of Raw loop
-         Put_Digit (Target, Last, Overflow, Locale, C);
-      end loop;
-   end Put_Long_Long_Natural;
 
    procedure Put_Decimal_Text
      (Target   : in out String;
@@ -2036,34 +1980,11 @@ package body Messages.Extra_Format is
       Ok       : out Boolean;
       Overflow : in out Boolean)
    is
-      Total   : Natural;
-      Hours   : Natural;
-      Minutes : Natural;
-      Seconds : Natural;
    begin
-      Ok := False;
-      if not Is_Natural_Text (Value) then
-         return;
-      end if;
-
-      Total := Natural_Value (Value);
-      Hours := Total / 3_600;
-      Minutes := (Total mod 3_600) / 60;
-      Seconds := Total mod 60;
-
-      Put_Natural (Target, Last, Overflow, Locale, Hours);
-      Put
-        (Target, Last, Overflow,
-         I18N.CLDR_Data.Duration_Field_Separator (Locale));
-      Put_Natural (Target, Last, Overflow, Locale, Minutes, 2);
-      Put
-        (Target, Last, Overflow,
-         I18N.CLDR_Data.Duration_Field_Separator (Locale));
-      Put_Natural (Target, Last, Overflow, Locale, Seconds, 2);
-      Ok := not Overflow;
-   exception
-      when Constraint_Error =>
-         Ok := False;
+      --  The digital-clock duration form is a locale formatting primitive owned
+      --  by i18n (like number and unit formatting); this crate only maps the
+      --  ICU {n, duration} argument onto it.
+      I18N.Duration_Format.Format_Into (Value, Locale, Target, Last, Ok, Overflow);
    end Format_Duration;
 
    procedure Format_Bytes
@@ -2074,47 +1995,10 @@ package body Messages.Extra_Format is
       Ok       : out Boolean;
       Overflow : in out Boolean)
    is
-      Amount : Long_Long_Integer;
-      Scaled : Long_Long_Integer;
-      Scale  : Long_Long_Integer := 1;
    begin
-      Ok := False;
-      if not Is_Natural_Text (Value) then
-         return;
-      end if;
-
-      Amount := Long_Long_Natural_Value (Value);
-      if Amount >= 1_125_899_906_842_624 then
-         Scale := 1_125_899_906_842_624;
-         Scaled :=
-           (Amount + 562_949_953_421_312) / 1_125_899_906_842_624;
-      elsif Amount >= 1_099_511_627_776 then
-         Scale := 1_099_511_627_776;
-         Scaled := (Amount + 549_755_813_888) / 1_099_511_627_776;
-      elsif Amount >= 1_073_741_824 then
-         Scale := 1_073_741_824;
-         Scaled := (Amount + 536_870_912) / 1_073_741_824;
-      elsif Amount >= 1_048_576 then
-         Scale := 1_048_576;
-         Scaled := (Amount + 524_288) / 1_048_576;
-      elsif Amount >= 1_024 then
-         Scale := 1_024;
-         Scaled := (Amount + 512) / 1_024;
-      else
-         Scaled := Amount;
-      end if;
-
-      Put_Long_Long_Natural (Target, Last, Overflow, Locale, Scaled);
-      Put
-        (Target, Last, Overflow,
-         Unit_Value_Separator (Locale));
-      Put
-        (Target, Last, Overflow,
-         I18N.CLDR_Data.Byte_Size_Unit_Label (Scale));
-      Ok := not Overflow;
-   exception
-      when Constraint_Error =>
-         Ok := False;
+      --  IEC binary byte sizes are likewise an i18n formatting primitive; map
+      --  the ICU {n, bytes} argument onto it.
+      I18N.Byte_Size_Format.Format_Into (Value, Locale, Target, Last, Ok, Overflow);
    end Format_Bytes;
 
    procedure Format_Unit
