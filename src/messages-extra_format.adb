@@ -1,5 +1,6 @@
 with I18N.CLDR_Data;
 with I18N.List_Format;
+with I18N.Number_Format;
 with I18N.Relative_Format;
 with I18N.Unit_Format;
 with I18N.Plurals;
@@ -244,7 +245,7 @@ package body Messages.Extra_Format is
         (Target,
          Last,
          Overflow,
-         (if Found then Value else I18N.CLDR_Data.Digit_Text (Locale, Digit)));
+         (if Found then Value else I18N.Number_Format.Digit_Text (Locale, Digit)));
    end Put_Digit;
 
    function Number_Minus_Sign (Locale : String) return String is
@@ -340,7 +341,7 @@ package body Messages.Extra_Format is
               (Target,
                Last,
                Overflow,
-               (if Found then Sep else I18N.CLDR_Data.Decimal_Separator (Locale)));
+               (if Found then Sep else I18N.Number_Format.Decimal_Separator (Locale)));
          end;
          for Index in Dot + 1 .. Value'Last loop
             Put_Digit (Target, Last, Overflow, Locale, Value (Index));
