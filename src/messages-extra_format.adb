@@ -1701,8 +1701,6 @@ package body Messages.Extra_Format is
       Ok       : out Boolean;
       Overflow : in out Boolean)
    is
-      Name     : String (1 .. 64);
-      Name_Last : Natural;
    begin
       Ok := False;
       if not Is_Decimal_Text (Value)
@@ -1735,12 +1733,6 @@ package body Messages.Extra_Format is
            (if Compound = "" or else Has_Runtime_Per_Separator (Locale) then ""
             else Locale_Unit_Name (Locale, Compound, Width, Category));
       begin
-         Name_Last := Text'Length;
-         if Name_Last > Name'Length then
-            return;
-         end if;
-         Name (1 .. Name_Last) := Text;
-
          if Compound_Name /= "" then
             --  Some languages seat the value inside the rate's name rather than
             --  in front of it -- Japanese "時速 {0} キロメートル". Such a row is
@@ -1763,7 +1755,7 @@ package body Messages.Extra_Format is
             Put
               (Target, Last, Overflow,
                Unit_Value_Separator (Locale));
-            Put (Target, Last, Overflow, Name (1 .. Name_Last));
+            Put (Target, Last, Overflow, Text);
          end if;
 
          if Per_Unit /= "" and then Compound_Name = "" then
