@@ -978,10 +978,57 @@ package body Messages.Runtime is
          Valid := False;
    end Classify_Plural_Argument;
 
-   procedure Render_Public_Nodes
+   function Extra_Kind_Of
+     (K : Messages.AST.Node_Kind)
+      return Messages.Extra_Format.Extra_Kind
+   is
+   begin
+      case K is
+         when Messages.AST.Duration_Format =>
+            return Messages.Extra_Format.Duration;
+         when Messages.AST.Byte_Size_Format =>
+            return Messages.Extra_Format.Byte_Size;
+         when Messages.AST.Unit_Format =>
+            return Messages.Extra_Format.Unit;
+         when Messages.AST.Relative_Time_Format =>
+            return Messages.Extra_Format.Relative_Time;
+         when others =>
+            return Messages.Extra_Format.List;
+      end case;
+   end Extra_Kind_Of;
+
+   --  The single ICU node walk shared by both public paths. It is parameterized
+   --  over an output sink so the two output modes -- an Unbounded_String result
+   --  and a bounded caller buffer -- run the identical branch-selection,
+   --  formatting, plural/ordinal and diagnostic semantics rather than two
+   --  hand-synchronized copies. Put appends text; Put_Text appends text with
+   --  '#'-number substitution; Signal_Full marks the sink overflowed (a
+   --  formatter's own fixed buffer was too small); Is_Full stops the walk once
+   --  the sink can take no more.
+   generic
+      type Sink_Type (<>) is limited private;
+      with procedure Put (S : in out Sink_Type; Text : String);
+      with procedure Put_Text
+        (S             : in out Sink_Type;
+         Text          : String;
+         Number_Text   : String;
+         Number_Active : Boolean);
+      with procedure Signal_Full (S : in out Sink_Type);
+      with function Is_Full (S : Sink_Type) return Boolean;
+   procedure Render_Sink
      (Root          : Messages.AST.Node_Access;
       Arguments     : Messages.Arguments.Arguments;
-      Output        : in out Unbounded_String;
+      Sink          : in out Sink_Type;
+      Status        : in out Messages.Result.Render_Status;
+      Diagnostics   : in out Messages.Diagnostics.Diagnostic_List;
+      Locale        : String;
+      Number_Text   : String := "";
+      Number_Active : Boolean := False);
+
+   procedure Render_Sink
+     (Root          : Messages.AST.Node_Access;
+      Arguments     : Messages.Arguments.Arguments;
+      Sink          : in out Sink_Type;
       Status        : in out Messages.Result.Render_Status;
       Diagnostics   : in out Messages.Diagnostics.Diagnostic_List;
       Locale        : String;
@@ -991,17 +1038,13 @@ package body Messages.Runtime is
       Current : Messages.AST.Node_Access := Root;
    begin
       while Current /= null loop
-         exit when Status /= Messages.Result.Success;
+         exit when Status /= Messages.Result.Success or else Is_Full (Sink);
 
          case Current.Kind is
             when Messages.AST.Text          =>
                Messages.Observability.Emit (Messages.Observability.Op_Text, "");
-               Append
-                 (Output,
-                  Substitute_Number
-                    (Text        => To_String (Current.Text),
-                     Number_Text => Number_Text,
-                     Active      => Number_Active));
+               Put_Text
+                 (Sink, To_String (Current.Text), Number_Text, Number_Active);
 
             when Messages.AST.Variable      =>
                declare
@@ -1010,7 +1053,7 @@ package body Messages.Runtime is
                   Messages.Observability.Emit
                     (Messages.Observability.Op_Variable, Key);
                   if Messages.Arguments.Has (Arguments, Key) then
-                     Append (Output, Messages.Arguments.Get (Arguments, Key));
+                     Put (Sink, Messages.Arguments.Get (Arguments, Key));
                   else
                      Status := Messages.Result.Missing_Argument;
                      Add_Runtime_Diagnostic (Diagnostics, Status, Key);
@@ -1028,7 +1071,7 @@ package body Messages.Runtime is
                         Formatted : String (1 .. I18N.Number_Format.Max_Formatted_Length);
                         Last      : Natural;
                         Ok        : Boolean;
-                        Overflow  : Boolean;
+                        Format_Overflow : Boolean;
                      begin
                         I18N.Number_Format.Format_Into
                           (Value_Text => Messages.Arguments.Get (Arguments, Key),
@@ -1037,16 +1080,17 @@ package body Messages.Runtime is
                            Target     => Formatted,
                            Last       => Last,
                            Ok         => Ok,
-                           Overflow   => Overflow);
+                           Overflow   => Format_Overflow);
 
-                        if Overflow then
-                           Status := Messages.Result.Buffer_Overflow;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
+                        if Format_Overflow then
+                           Signal_Full (Sink);
+                           Add_Runtime_Diagnostic
+                             (Diagnostics, Messages.Result.Buffer_Overflow, Key);
                         elsif not Ok then
                            Status := Messages.Result.Invalid_Argument;
                            Add_Runtime_Diagnostic (Diagnostics, Status, Key);
                         elsif Last > 0 then
-                           Append (Output, Formatted (1 .. Last));
+                           Put (Sink, Formatted (1 .. Last));
                         end if;
                      end;
                   else
@@ -1067,7 +1111,7 @@ package body Messages.Runtime is
                         Formatted : String (1 .. I18N.Date_Time_Format.Max_Formatted_Length);
                         Last      : Natural;
                         Ok        : Boolean;
-                        Overflow  : Boolean;
+                        Format_Overflow : Boolean;
                      begin
                         if Current.Kind = Messages.AST.Date_Format then
                            I18N.Date_Time_Format.Format_Date_Into
@@ -1077,7 +1121,7 @@ package body Messages.Runtime is
                               Target     => Formatted,
                               Last       => Last,
                               Ok         => Ok,
-                              Overflow   => Overflow);
+                              Overflow   => Format_Overflow);
                         elsif Current.Kind = Messages.AST.Time_Format then
                            I18N.Date_Time_Format.Format_Time_Into
                              (Value_Text => Messages.Arguments.Get (Arguments, Key),
@@ -1086,7 +1130,7 @@ package body Messages.Runtime is
                               Target     => Formatted,
                               Last       => Last,
                               Ok         => Ok,
-                              Overflow   => Overflow);
+                              Overflow   => Format_Overflow);
                         else
                            I18N.Date_Time_Format.Format_Date_Time_Into
                              (Value_Text => Messages.Arguments.Get (Arguments, Key),
@@ -1095,17 +1139,18 @@ package body Messages.Runtime is
                               Target     => Formatted,
                               Last       => Last,
                               Ok         => Ok,
-                              Overflow   => Overflow);
+                              Overflow   => Format_Overflow);
                         end if;
 
-                        if Overflow then
-                           Status := Messages.Result.Buffer_Overflow;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
+                        if Format_Overflow then
+                           Signal_Full (Sink);
+                           Add_Runtime_Diagnostic
+                             (Diagnostics, Messages.Result.Buffer_Overflow, Key);
                         elsif not Ok then
                            Status := Messages.Result.Invalid_Argument;
                            Add_Runtime_Diagnostic (Diagnostics, Status, Key);
                         elsif Last > 0 then
-                           Append (Output, Formatted (1 .. Last));
+                           Put (Sink, Formatted (1 .. Last));
                         end if;
                      end;
                   else
@@ -1126,7 +1171,7 @@ package body Messages.Runtime is
                         Formatted : String (1 .. I18N.Currency.Max_Formatted_Length);
                         Last      : Natural;
                         Ok        : Boolean;
-                        Overflow  : Boolean;
+                        Format_Overflow : Boolean;
                      begin
                         I18N.Currency.Format_Into
                           (Amount_Text   => Messages.Arguments.Get (Arguments, Key),
@@ -1135,16 +1180,17 @@ package body Messages.Runtime is
                            Target        => Formatted,
                            Last          => Last,
                            Ok            => Ok,
-                           Overflow      => Overflow);
+                           Overflow      => Format_Overflow);
 
-                        if Overflow then
-                           Status := Messages.Result.Buffer_Overflow;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
+                        if Format_Overflow then
+                           Signal_Full (Sink);
+                           Add_Runtime_Diagnostic
+                             (Diagnostics, Messages.Result.Buffer_Overflow, Key);
                         elsif not Ok then
                            Status := Messages.Result.Invalid_Argument;
                            Add_Runtime_Diagnostic (Diagnostics, Status, Key);
                         elsif Last > 0 then
-                           Append (Output, Formatted (1 .. Last));
+                           Put (Sink, Formatted (1 .. Last));
                         end if;
                      end;
                   else
@@ -1158,22 +1204,6 @@ package body Messages.Runtime is
                | Messages.AST.List_Format =>
                declare
                   Key : constant String := To_String (Current.Name);
-
-                  function Kind return Messages.Extra_Format.Extra_Kind is
-                  begin
-                     case Current.Kind is
-                        when Messages.AST.Duration_Format =>
-                           return Messages.Extra_Format.Duration;
-                        when Messages.AST.Byte_Size_Format =>
-                           return Messages.Extra_Format.Byte_Size;
-                        when Messages.AST.Unit_Format =>
-                           return Messages.Extra_Format.Unit;
-                        when Messages.AST.Relative_Time_Format =>
-                           return Messages.Extra_Format.Relative_Time;
-                        when others =>
-                           return Messages.Extra_Format.List;
-                     end case;
-                  end Kind;
                begin
                   Messages.Observability.Emit
                     (Messages.Observability.Op_Variable, Key);
@@ -1182,26 +1212,27 @@ package body Messages.Runtime is
                         Formatted : String (1 .. Messages.Extra_Format.Max_Formatted_Length);
                         Last      : Natural;
                         Ok        : Boolean;
-                        Overflow  : Boolean;
+                        Format_Overflow : Boolean;
                      begin
                         Messages.Extra_Format.Format_Into
-                          (Kind     => Kind,
+                          (Kind     => Extra_Kind_Of (Current.Kind),
                            Value    => Messages.Arguments.Get (Arguments, Key),
                            Locale   => Locale,
                            Option   => To_String (Current.Currency_Code),
                            Target   => Formatted,
                            Last     => Last,
                            Ok       => Ok,
-                           Overflow => Overflow);
+                           Overflow => Format_Overflow);
 
-                        if Overflow then
-                           Status := Messages.Result.Buffer_Overflow;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
+                        if Format_Overflow then
+                           Signal_Full (Sink);
+                           Add_Runtime_Diagnostic
+                             (Diagnostics, Messages.Result.Buffer_Overflow, Key);
                         elsif not Ok then
                            Status := Messages.Result.Invalid_Argument;
                            Add_Runtime_Diagnostic (Diagnostics, Status, Key);
                         elsif Last > 0 then
-                           Append (Output, Formatted (1 .. Last));
+                           Put (Sink, Formatted (1 .. Last));
                         end if;
                      end;
                   else
@@ -1277,10 +1308,10 @@ package body Messages.Runtime is
                                  Add_Runtime_Diagnostic
                                    (Diagnostics, Status, Key);
                               else
-                                 Render_Public_Nodes
+                                 Render_Sink
                                    (Root          => Branch,
                                     Arguments     => Arguments,
-                                    Output        => Output,
+                                    Sink          => Sink,
                                     Status        => Status,
                                     Diagnostics   => Diagnostics,
                                     Locale        => Locale,
@@ -1322,10 +1353,10 @@ package body Messages.Runtime is
                         elsif Branch /= null then
                            --  A present-but-empty branch (Branch = null)
                            --  renders as empty text with Success.
-                           Render_Public_Nodes
+                           Render_Sink
                              (Root          => Branch,
                               Arguments     => Arguments,
-                              Output        => Output,
+                              Sink          => Sink,
                               Status        => Status,
                               Diagnostics   => Diagnostics,
                               Locale        => Locale,
@@ -1392,10 +1423,10 @@ package body Messages.Runtime is
                                  Add_Runtime_Diagnostic
                                    (Diagnostics, Status, Key);
                               else
-                                 Render_Public_Nodes
+                                 Render_Sink
                                    (Root          => Branch,
                                     Arguments     => Arguments,
-                                    Output        => Output,
+                                    Sink          => Sink,
                                     Status        => Status,
                                     Diagnostics   => Diagnostics,
                                     Locale        => Locale,
@@ -1415,7 +1446,43 @@ package body Messages.Runtime is
 
          Current := Current.Next;
       end loop;
-   end Render_Public_Nodes;
+   end Render_Sink;
+
+   --  Unbounded_String sink: builds the materialized result. Put never fills it;
+   --  only a formatter's own overflow (Signal_Full) marks it.
+   type Public_Sink is limited record
+      Text     : Unbounded_String;
+      Overflow : Boolean := False;
+   end record;
+
+   procedure Public_Put (S : in out Public_Sink; Text : String) is
+   begin
+      Append (S.Text, Text);
+   end Public_Put;
+
+   procedure Public_Put_Text
+     (S             : in out Public_Sink;
+      Text          : String;
+      Number_Text   : String;
+      Number_Active : Boolean)
+   is
+   begin
+      Append (S.Text, Substitute_Number (Text, Number_Text, Number_Active));
+   end Public_Put_Text;
+
+   procedure Public_Signal_Full (S : in out Public_Sink) is
+   begin
+      S.Overflow := True;
+   end Public_Signal_Full;
+
+   function Public_Is_Full (S : Public_Sink) return Boolean is (S.Overflow);
+
+   procedure Render_Public is new Render_Sink
+     (Sink_Type   => Public_Sink,
+      Put         => Public_Put,
+      Put_Text    => Public_Put_Text,
+      Signal_Full => Public_Signal_Full,
+      Is_Full     => Public_Is_Full);
 
    --  Execute a precompiled catalog entry. No parsing or compilation occurs on
    --  this path: complexity is O(output length).
@@ -1425,23 +1492,32 @@ package body Messages.Runtime is
       Locale    : String)
       return Messages.Result.Render_Result
    is
-      Output      : Unbounded_String;
+      Sink        : Public_Sink;
       Status      : Messages.Result.Render_Status := Messages.Result.Success;
       Diagnostics : Messages.Diagnostics.Diagnostic_List;
    begin
       Messages.Observability.Emit (Messages.Observability.Message_Start, "");
-      Render_Public_Nodes
+      Render_Public
         (Root        => Root,
          Arguments   => Arguments,
-         Output      => Output,
+         Sink        => Sink,
          Status      => Status,
          Diagnostics => Diagnostics,
          Locale      => Locale);
       Messages.Observability.Emit (Messages.Observability.Message_End, "");
 
-      if Status /= Messages.Result.Success then
+      if Sink.Overflow then
+         Add_Runtime_Diagnostic
+           (Diagnostics => Diagnostics,
+            Status      => Messages.Result.Buffer_Overflow,
+            Key         => "output");
+         return
+           Public_Failure
+             (Status      => Messages.Result.Buffer_Overflow,
+              Diagnostics => Diagnostics);
+      elsif Status /= Messages.Result.Success then
          return Public_Failure (Status => Status, Diagnostics => Diagnostics);
-      elsif Length (Output) > Messages.Result.Max_Output_Length then
+      elsif Length (Sink.Text) > Messages.Result.Max_Output_Length then
          Add_Runtime_Diagnostic
            (Diagnostics => Diagnostics,
             Status      => Messages.Result.Buffer_Overflow,
@@ -1453,7 +1529,8 @@ package body Messages.Runtime is
       else
          return
            (Status      => Messages.Result.Success,
-            Text        => Messages.Result.To_Output_View (To_String (Output)),
+            Text        =>
+              Messages.Result.To_Output_View (To_String (Sink.Text)),
             Diagnostics => Diagnostics);
       end if;
    exception
@@ -1461,8 +1538,8 @@ package body Messages.Runtime is
          return Messages.Result.Failure (Messages.Result.Internal_Error);
    end Render_Compiled;
 
-   --  Append Text into caller-owned Target, tracking the written count and a
-   --  saturating overflow flag. No allocation occurs.
+   --  Append Text into Buffer, tracking the written count and a saturating
+   --  overflow flag. No allocation occurs.
    procedure Append_Bounded
      (Target   : in out String;
       Count    : in out Natural;
@@ -1480,7 +1557,7 @@ package body Messages.Runtime is
       end loop;
    end Append_Bounded;
 
-   --  Append text into Target, substituting '#' with Number_Text when active.
+   --  Append text into Buffer, substituting '#' with Number_Text when active.
    procedure Append_Text_Bounded
      (Target        : in out String;
       Count         : in out Natural;
@@ -1502,420 +1579,44 @@ package body Messages.Runtime is
       end loop;
    end Append_Text_Bounded;
 
-   --  Render an AST directly into caller-owned fixed storage. This is the true
-   --  no-heap render path: it never materializes an Unbounded_String. It mirrors
-   --  Render_Public_Nodes branch-selection semantics, including locale-aware
-   --  plural/ordinal categories.
-   procedure Render_Bounded_Nodes
-     (Root          : Messages.AST.Node_Access;
-      Arguments     : Messages.Arguments.Arguments;
-      Target        : in out String;
-      Count         : in out Natural;
-      Overflow      : in out Boolean;
-      Status        : in out Messages.Result.Render_Status;
-      Diagnostics   : in out Messages.Diagnostics.Diagnostic_List;
-      Locale        : String;
-      Number_Text   : String := "";
-      Number_Active : Boolean := False)
-   is
-      Current : Messages.AST.Node_Access := Root;
+   --  Bounded sink: renders into an owned fixed buffer sized to the caller's
+   --  Target, then Render_Into copies it out. No heap is used. Put fills the
+   --  buffer and marks overflow when it is exhausted.
+   type Bounded_Sink (Capacity : Natural) is limited record
+      Buffer   : String (1 .. Capacity);
+      Count    : Natural := 0;
+      Overflow : Boolean := False;
+   end record;
+
+   procedure Bounded_Put (S : in out Bounded_Sink; Text : String) is
    begin
-      while Current /= null loop
-         exit when Status /= Messages.Result.Success or else Overflow;
+      Append_Bounded (S.Buffer, S.Count, S.Overflow, Text);
+   end Bounded_Put;
 
-         case Current.Kind is
-            when Messages.AST.Text          =>
-               Messages.Observability.Emit (Messages.Observability.Op_Text, "");
-               Append_Text_Bounded
-                 (Target, Count, Overflow,
-                  To_String (Current.Text), Number_Text, Number_Active);
+   procedure Bounded_Put_Text
+     (S             : in out Bounded_Sink;
+      Text          : String;
+      Number_Text   : String;
+      Number_Active : Boolean)
+   is
+   begin
+      Append_Text_Bounded
+        (S.Buffer, S.Count, S.Overflow, Text, Number_Text, Number_Active);
+   end Bounded_Put_Text;
 
-            when Messages.AST.Variable      =>
-               declare
-                  Key : constant String := To_String (Current.Name);
-               begin
-                  Messages.Observability.Emit
-                    (Messages.Observability.Op_Variable, Key);
-                  if Messages.Arguments.Has (Arguments, Key) then
-                     Append_Bounded
-                       (Target, Count, Overflow,
-                        Messages.Arguments.Get (Arguments, Key));
-                  else
-                     Status := Messages.Result.Missing_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  end if;
-               end;
+   procedure Bounded_Signal_Full (S : in out Bounded_Sink) is
+   begin
+      S.Overflow := True;
+   end Bounded_Signal_Full;
 
-            when Messages.AST.Number        =>
-               declare
-                  Key : constant String := To_String (Current.Name);
-               begin
-                  Messages.Observability.Emit
-                    (Messages.Observability.Op_Variable, Key);
-                  if Messages.Arguments.Has (Arguments, Key) then
-                     declare
-                        Formatted : String (1 .. I18N.Number_Format.Max_Formatted_Length);
-                        Last      : Natural;
-                        Ok        : Boolean;
-                        Format_Overflow : Boolean;
-                     begin
-                        I18N.Number_Format.Format_Into
-                          (Value_Text => Messages.Arguments.Get (Arguments, Key),
-                           Locale     => Locale,
-                           Style      => To_String (Current.Currency_Code),
-                           Target     => Formatted,
-                           Last       => Last,
-                           Ok         => Ok,
-                           Overflow   => Format_Overflow);
+   function Bounded_Is_Full (S : Bounded_Sink) return Boolean is (S.Overflow);
 
-                        if Format_Overflow then
-                           Overflow := True;
-                        elsif not Ok then
-                           Status := Messages.Result.Invalid_Argument;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                        elsif Last > 0 then
-                           Append_Bounded
-                             (Target, Count, Overflow, Formatted (1 .. Last));
-                        end if;
-                     end;
-                  else
-                     Status := Messages.Result.Missing_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  end if;
-               end;
-
-            when Messages.AST.Date_Format | Messages.AST.Time_Format
-               | Messages.AST.Date_Time_Format =>
-               declare
-                  Key : constant String := To_String (Current.Name);
-               begin
-                  Messages.Observability.Emit
-                    (Messages.Observability.Op_Variable, Key);
-                  if Messages.Arguments.Has (Arguments, Key) then
-                     declare
-                        Formatted : String (1 .. I18N.Date_Time_Format.Max_Formatted_Length);
-                        Last      : Natural;
-                        Ok        : Boolean;
-                        Format_Overflow : Boolean;
-                     begin
-                        if Current.Kind = Messages.AST.Date_Format then
-                           I18N.Date_Time_Format.Format_Date_Into
-                             (Value_Text => Messages.Arguments.Get (Arguments, Key),
-                              Locale     => Locale,
-                              Style      => To_String (Current.Currency_Code),
-                              Target     => Formatted,
-                              Last       => Last,
-                              Ok         => Ok,
-                              Overflow   => Format_Overflow);
-                        elsif Current.Kind = Messages.AST.Time_Format then
-                           I18N.Date_Time_Format.Format_Time_Into
-                             (Value_Text => Messages.Arguments.Get (Arguments, Key),
-                              Locale     => Locale,
-                              Style      => To_String (Current.Currency_Code),
-                              Target     => Formatted,
-                              Last       => Last,
-                              Ok         => Ok,
-                              Overflow   => Format_Overflow);
-                        else
-                           I18N.Date_Time_Format.Format_Date_Time_Into
-                             (Value_Text => Messages.Arguments.Get (Arguments, Key),
-                              Locale     => Locale,
-                              Style      => To_String (Current.Currency_Code),
-                              Target     => Formatted,
-                              Last       => Last,
-                              Ok         => Ok,
-                              Overflow   => Format_Overflow);
-                        end if;
-
-                        if Format_Overflow then
-                           Overflow := True;
-                        elsif not Ok then
-                           Status := Messages.Result.Invalid_Argument;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                        elsif Last > 0 then
-                           Append_Bounded
-                             (Target, Count, Overflow, Formatted (1 .. Last));
-                        end if;
-                     end;
-                  else
-                     Status := Messages.Result.Missing_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  end if;
-               end;
-
-            when Messages.AST.Currency      =>
-               declare
-                  Key  : constant String := To_String (Current.Name);
-                  Code : constant String := To_String (Current.Currency_Code);
-               begin
-                  Messages.Observability.Emit
-                    (Messages.Observability.Op_Variable, Key);
-                  if Messages.Arguments.Has (Arguments, Key) then
-                     declare
-                        Formatted : String (1 .. I18N.Currency.Max_Formatted_Length);
-                        Last      : Natural;
-                        Ok        : Boolean;
-                        Format_Overflow : Boolean;
-                     begin
-                        I18N.Currency.Format_Into
-                          (Amount_Text   => Messages.Arguments.Get (Arguments, Key),
-                           Currency_Code => Code,
-                           Locale        => Locale,
-                           Target        => Formatted,
-                           Last          => Last,
-                           Ok            => Ok,
-                           Overflow      => Format_Overflow);
-
-                        if Format_Overflow then
-                           Overflow := True;
-                        elsif not Ok then
-                           Status := Messages.Result.Invalid_Argument;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                        elsif Last > 0 then
-                           Append_Bounded
-                             (Target, Count, Overflow, Formatted (1 .. Last));
-                        end if;
-                     end;
-                  else
-                     Status := Messages.Result.Missing_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  end if;
-               end;
-
-            when Messages.AST.Duration_Format | Messages.AST.Byte_Size_Format
-               | Messages.AST.Unit_Format | Messages.AST.Relative_Time_Format
-               | Messages.AST.List_Format =>
-               declare
-                  Key : constant String := To_String (Current.Name);
-
-                  function Kind return Messages.Extra_Format.Extra_Kind is
-                  begin
-                     case Current.Kind is
-                        when Messages.AST.Duration_Format =>
-                           return Messages.Extra_Format.Duration;
-                        when Messages.AST.Byte_Size_Format =>
-                           return Messages.Extra_Format.Byte_Size;
-                        when Messages.AST.Unit_Format =>
-                           return Messages.Extra_Format.Unit;
-                        when Messages.AST.Relative_Time_Format =>
-                           return Messages.Extra_Format.Relative_Time;
-                        when others =>
-                           return Messages.Extra_Format.List;
-                     end case;
-                  end Kind;
-               begin
-                  Messages.Observability.Emit
-                    (Messages.Observability.Op_Variable, Key);
-                  if Messages.Arguments.Has (Arguments, Key) then
-                     declare
-                        Formatted : String (1 .. Messages.Extra_Format.Max_Formatted_Length);
-                        Last      : Natural;
-                        Ok        : Boolean;
-                        Format_Overflow : Boolean;
-                     begin
-                        Messages.Extra_Format.Format_Into
-                          (Kind     => Kind,
-                           Value    => Messages.Arguments.Get (Arguments, Key),
-                           Locale   => Locale,
-                           Option   => To_String (Current.Currency_Code),
-                           Target   => Formatted,
-                           Last     => Last,
-                           Ok       => Ok,
-                           Overflow => Format_Overflow);
-
-                        if Format_Overflow then
-                           Overflow := True;
-                        elsif not Ok then
-                           Status := Messages.Result.Invalid_Argument;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                        elsif Last > 0 then
-                           Append_Bounded
-                             (Target, Count, Overflow, Formatted (1 .. Last));
-                        end if;
-                     end;
-                  else
-                     Status := Messages.Result.Missing_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  end if;
-               end;
-
-            when Messages.AST.Plural        =>
-               declare
-                  Key : constant String := To_String (Current.Name);
-               begin
-                  Messages.Observability.Emit (Messages.Observability.Op_Plural, Key);
-                  if not Messages.Arguments.Has (Arguments, Key) then
-                     Status := Messages.Result.Missing_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  else
-                     declare
-                        Category : I18N.Plurals.Plural_Category;
-                        Rendered : Unbounded_String;
-                        Valid    : Boolean;
-                     begin
-                        Classify_Plural_Argument
-                          (Raw      => Messages.Arguments.Get (Arguments, Key),
-                           Locale   => Locale,
-                           Offset   => Current.Plural_Offset,
-                           Category => Category,
-                           Rendered => Rendered,
-                           Valid    => Valid);
-                        if not Valid then
-                           Status := Messages.Result.Invalid_Argument;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                        else
-                           declare
-                              Raw_Value : constant String :=
-                                Messages.Arguments.Get (Arguments, Key);
-                              Exact_Key : constant String :=
-                                (if Is_Decimal_Integer (Raw_Value)
-                                 then Integer_Image_No_Leading_Space
-                                        (Long_Long_Integer'Value (Raw_Value))
-                                 else "");
-                              Branch : Messages.AST.Node_Access :=
-                                (if Exact_Key'Length > 0
-                                 then Messages.AST.Branch_Body
-                                        (Current.Plural_Exact, Exact_Key)
-                                 else null);
-                           begin
-                              if Branch = null then
-                                 Branch :=
-                                   (case Category is
-                                      when I18N.Plurals.Zero =>
-                                         Current.Plural_Zero,
-                                      when I18N.Plurals.One =>
-                                         Current.One,
-                                      when I18N.Plurals.Two =>
-                                         Current.Plural_Two,
-                                      when I18N.Plurals.Few =>
-                                         Current.Plural_Few,
-                                      when I18N.Plurals.Many =>
-                                         Current.Plural_Many,
-                                      when I18N.Plurals.Other =>
-                                         Current.Other);
-                              end if;
-
-                              if Branch = null then
-                                 Branch := Current.Other;
-                              end if;
-
-                              if Branch = null then
-                                 Status := Messages.Result.Formatting_Error;
-                                 Add_Runtime_Diagnostic
-                                   (Diagnostics, Status, Key);
-                              else
-                                 Render_Bounded_Nodes
-                                   (Branch, Arguments, Target, Count, Overflow,
-                                    Status, Diagnostics, Locale,
-                                    To_String (Rendered), True);
-                              end if;
-                           end;
-                        end if;
-                     end;
-                  end if;
-               end;
-
-            when Messages.AST.Select_Node   =>
-               declare
-                  Key : constant String := To_String (Current.Name);
-               begin
-                  Messages.Observability.Emit (Messages.Observability.Op_Select, Key);
-                  if not Messages.Arguments.Has (Arguments, Key) then
-                     Status := Messages.Result.Missing_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  else
-                     declare
-                        Value   : constant String :=
-                          Messages.Arguments.Get (Arguments, Key);
-                        Matched : constant Boolean :=
-                          Messages.AST.Has_Branch (Current.Branches, Value);
-                        Branch  : constant Messages.AST.Node_Access :=
-                          (if Matched
-                           then Messages.AST.Branch_Body (Current.Branches, Value)
-                           else
-                             Messages.AST.Branch_Body (Current.Branches, "other"));
-                     begin
-                        if not Matched
-                          and then not Messages.AST.Has_Branch
-                                         (Current.Branches, "other")
-                        then
-                           Status := Messages.Result.Formatting_Error;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                        elsif Branch /= null then
-                           Render_Bounded_Nodes
-                             (Branch, Arguments, Target, Count, Overflow,
-                              Status, Diagnostics, Locale, Number_Text,
-                              Number_Active);
-                        end if;
-                     end;
-                  end if;
-               end;
-
-            when Messages.AST.SelectOrdinal =>
-               declare
-                  Key : constant String := To_String (Current.Name);
-               begin
-                  Messages.Observability.Emit (Messages.Observability.Op_Ordinal, Key);
-                  if not Messages.Arguments.Has (Arguments, Key) then
-                     Status := Messages.Result.Missing_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  elsif not Is_Decimal_Integer
-                              (Messages.Arguments.Get (Arguments, Key))
-                  then
-                     Status := Messages.Result.Invalid_Argument;
-                     Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                  else
-                     declare
-                        Value    : constant Long_Long_Integer :=
-                          Long_Long_Integer'Value
-                            (Messages.Arguments.Get (Arguments, Key));
-                        Rendered : constant String :=
-                          Integer_Image_No_Leading_Space (Value);
-                        Branch   : Messages.AST.Node_Access :=
-                          Messages.AST.Branch_Body (Current.Ord_Exact, Rendered);
-                     begin
-                        if Branch = null then
-                           case I18N.Plurals.Ordinal (Locale, Value) is
-                              when I18N.Plurals.Zero =>
-                                 Branch := Current.Ord_Zero;
-                              when I18N.Plurals.One =>
-                                 Branch := Current.Ord_One;
-                              when I18N.Plurals.Two =>
-                                 Branch := Current.Ord_Two;
-                              when I18N.Plurals.Few =>
-                                 Branch := Current.Ord_Few;
-                              when I18N.Plurals.Many =>
-                                 Branch := Current.Ord_Many;
-                              when others =>
-                                 Branch := Current.Ord_Other;
-                           end case;
-                        end if;
-
-                        --  An absent category branch falls back to "other".
-                        if Branch = null then
-                           Branch := Current.Ord_Other;
-                        end if;
-
-                        if Branch = null then
-                           Status := Messages.Result.Formatting_Error;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                        else
-                           Render_Bounded_Nodes
-                             (Branch, Arguments, Target, Count, Overflow,
-                              Status, Diagnostics, Locale, Rendered, True);
-                        end if;
-                     exception
-                        when Constraint_Error =>
-                           Status := Messages.Result.Invalid_Argument;
-                           Add_Runtime_Diagnostic (Diagnostics, Status, Key);
-                     end;
-                  end if;
-               end;
-         end case;
-
-         Current := Current.Next;
-      end loop;
-   end Render_Bounded_Nodes;
+   procedure Render_Bounded is new Render_Sink
+     (Sink_Type   => Bounded_Sink,
+      Put         => Bounded_Put,
+      Put_Text    => Bounded_Put_Text,
+      Signal_Full => Bounded_Signal_Full,
+      Is_Full     => Bounded_Is_Full);
 
    ---------------------------------------------------------------------------
    --  Locale fallback resolution (shared by Render, Resolve, Render_Into).
@@ -2707,31 +2408,37 @@ package body Messages.Runtime is
       end if;
 
       declare
-         Count       : Natural := 0;
-         Overflow    : Boolean := False;
+         Sink        : Bounded_Sink (Target'Length);
          RStatus     : Messages.Result.Render_Status := Messages.Result.Success;
          Diagnostics : Messages.Diagnostics.Diagnostic_List;
       begin
          Messages.Observability.Emit (Messages.Observability.Message_Start, "");
-         Render_Bounded_Nodes
+         Render_Bounded
            (Root        => Item.Catalog.Element (Idx).Root,
             Arguments   => Arguments,
-            Target      => Target,
-            Count       => Count,
-            Overflow    => Overflow,
+            Sink        => Sink,
             Status      => RStatus,
             Diagnostics => Diagnostics,
             Locale      => To_String (Resolved_Locale));
          Messages.Observability.Emit (Messages.Observability.Message_End, "");
 
+         --  The sink rendered into its own fixed buffer; copy the written prefix
+         --  into the caller's Target.
+         if Sink.Count > 0 then
+            Target (Target'First .. Target'First + Sink.Count - 1) :=
+              Sink.Buffer (1 .. Sink.Count);
+         end if;
+
          if RStatus /= Messages.Result.Success then
             Last := 0;
             Status := RStatus;
-         elsif Overflow then
-            Last := (if Count = 0 then 0 else Target'First + Count - 1);
+         elsif Sink.Overflow then
+            Last :=
+              (if Sink.Count = 0 then 0 else Target'First + Sink.Count - 1);
             Status := Messages.Result.Buffer_Overflow;
          else
-            Last := (if Count = 0 then 0 else Target'First + Count - 1);
+            Last :=
+              (if Sink.Count = 0 then 0 else Target'First + Sink.Count - 1);
             Status := Messages.Result.Success;
          end if;
       end;
