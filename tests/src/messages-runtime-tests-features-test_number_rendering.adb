@@ -1053,16 +1053,16 @@ begin
              "12345670.00",
            "scale skeleton composes with grouping controls");
    Assert (Rendered (Runtime, "en", "pressure_bar", Args) =
-             "12345.67 bars",
+             "12,345.67 bars",
            "pressure-bar unit alias renders source-backed unit names");
    Assert (Rendered (Runtime, "en", "pressure_atmosphere", Args) =
-             "12345.67 atmospheres",
+             "12,345.67 atmospheres",
            "atmosphere unit renders source-backed unit names");
    Assert (Rendered (Runtime, "en", "pressure_inhg", Args) =
-             "12345.67 inHg",
+             "12,345.67 inHg",
            "pressure-inch-ofhg measure-unit skeleton renders short symbol");
    Assert (Rendered (Runtime, "en", "pressure_mmhg", Args) =
-             "12345.67 millimeters of mercury",
+             "12,345.67 millimeters of mercury",
            "pressure-millimeter-ofhg measure-unit skeleton renders full name");
    Messages.Arguments.Set (Args, "value", "1234.67");
    Assert (Rendered (Runtime, "en", "group_min2", Args) = "1234.67",

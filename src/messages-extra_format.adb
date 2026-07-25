@@ -299,53 +299,21 @@ package body Messages.Extra_Format is
       Locale   : String;
       Value    : String)
    is
-      Start        : Positive := Value'First;
-      Integer_From : Positive;
-      Integer_To   : Natural;
-      Dot          : Natural := 0;
+      Formatted   : String (1 .. I18N.Number_Format.Max_Formatted_Length);
+      Number_Last : Natural;
+      Ok          : Boolean;
+      Number_Ov   : Boolean;
    begin
-      if Value (Start) = '-' then
-         Put (Target, Last, Overflow, Number_Minus_Sign (Locale));
-         Start := Start + 1;
-      elsif Value (Start) = '+' then
-         Start := Start + 1;
-      end if;
-
-      Integer_From := Start;
-      for Index in Start .. Value'Last loop
-         if Value (Index) = '.' then
-            Dot := Index;
-            exit;
-         end if;
-      end loop;
-
-      Integer_To := (if Dot = 0 then Value'Last else Dot - 1);
-      while Integer_From < Integer_To
-        and then Value (Integer_From) = '0'
-      loop
-         Integer_From := Integer_From + 1;
-      end loop;
-
-      for Index in Integer_From .. Integer_To loop
-         Put_Digit (Target, Last, Overflow, Locale, Value (Index));
-      end loop;
-
-      if Dot /= 0 then
-         declare
-            Found : Boolean;
-            Sep   : constant String :=
-              I18N.Runtime_Data.Locale_Text
-                (Locale, "decimal_separator", Found);
-         begin
-            Put
-              (Target,
-               Last,
-               Overflow,
-               (if Found then Sep else I18N.Number_Format.Decimal_Separator (Locale)));
-         end;
-         for Index in Dot + 1 .. Value'Last loop
-            Put_Digit (Target, Last, Overflow, Locale, Value (Index));
-         end loop;
+      --  Delegate the embedded number to the i18n formatter: it groups,
+      --  substitutes digits and consults the on-the-fly data -- the same
+      --  rendering a top-level {number} argument gets -- rather than a parallel
+      --  layout here that never grouped.
+      I18N.Number_Format.Format_Into
+        (Value, Locale, "", Formatted, Number_Last, Ok, Number_Ov);
+      if Ok then
+         Put (Target, Last, Overflow, Formatted (1 .. Number_Last));
+      else
+         Put (Target, Last, Overflow, Value);
       end if;
    end Put_Decimal_Text;
 

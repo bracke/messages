@@ -2964,36 +2964,38 @@ begin
            "measure-unit skeleton localizes Korean megahertz");
    Messages.Arguments.Set (Args, "pressure", "1013");
    Assert (Rendered (Runtime, "en", "measure_hectopascal_short", Args) =
-             "1013 hPa",
+             "1,013 hPa",
            "measure-unit skeleton accepts short pressure-hectopascal output");
    Assert (Rendered (Runtime, "en", "measure_pascal", Args) =
-             "1013 pascals",
+             "1,013 pascals",
            "measure-unit skeleton accepts pressure-pascal");
    Assert (Rendered (Runtime, "en", "measure_kilopascal_short", Args) =
-             "1013 kPa",
+             "1,013 kPa",
            "measure-unit skeleton accepts short pressure-kilopascal output");
    Assert (Rendered (Runtime, "en", "measure_millibar", Args) =
-             "1013 millibars",
+             "1,013 millibars",
            "measure-unit skeleton accepts pressure-millibar");
    Assert (Rendered (Runtime, "de", "measure_millibar", Args) =
-             "1013 Millibar",
+             "1.013 Millibar",
            "measure-unit skeleton localizes German millibars");
    Assert (Rendered (Runtime, "sl", "measure_millibar", Args) =
-             "1013 milibarov",
+             "1.013 milibarov",
            "measure-unit skeleton localizes Slovenian millibars");
    Assert (Rendered (Runtime, "ru", "measure_millibar", Args) =
-             "1013 " & UTF8 ([16#43C#, 16#438#, 16#43B#, 16#43B#, 16#438#, 16#431#, 16#430#, 16#440#]),
+             "1" & UTF8 ([16#A0#]) & "013 "
+             & UTF8 ([16#43C#, 16#438#, 16#43B#, 16#43B#, 16#438#, 16#431#, 16#430#, 16#440#]),
            "measure-unit skeleton localizes Russian millibars");
    Assert (Rendered (Runtime, "ar", "measure_millibar", Args) =
-             UTF8 ([16#661#, 16#660#, 16#661#, 16#663#]) & " " & UTF8 ([16#645#, 16#644#, 16#64A#]) & " " &
+             UTF8 ([16#661#, 16#66C#, 16#660#, 16#661#, 16#663#]) & " "
+             & UTF8 ([16#645#, 16#644#, 16#64A#]) & " " &
              UTF8 ([16#628#, 16#627#, 16#631#]),
            "measure-unit skeleton localizes Arabic millibars");
    Assert (Rendered (Runtime, "ja", "measure_millibar", Args) =
-             "1013" & UTF8 ([16#30DF#, 16#30EA#, 16#30D0#,
+             "1,013" & UTF8 ([16#30DF#, 16#30EA#, 16#30D0#,
                               16#30FC#, 16#30EB#]),
            "measure-unit skeleton localizes Japanese millibars");
    Assert (Rendered (Runtime, "ko", "measure_millibar", Args) =
-             "1013" & UTF8 ([16#BC00#, 16#B9AC#, 16#BC14#]),
+             "1,013" & UTF8 ([16#BC00#, 16#B9AC#, 16#BC14#]),
            "measure-unit skeleton localizes Korean millibars");
    Messages.Arguments.Set (Args, "electric", "2");
    Assert (Rendered (Runtime, "en", "unit_ampere_alias", Args) =
