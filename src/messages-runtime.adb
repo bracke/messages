@@ -848,39 +848,6 @@ package body Messages.Runtime is
       end if;
    end Parse_Default_Locale_Line;
 
-   --  Detect the first default_locale directive, or return the built-in default.
-   function Detect_Default_Locale
-     (Lines : Line_Vectors.Vector)
-      return String
-    is
-      Unused_Invalid_Tag : Unbounded_String;
-      Unused_Invalid_Line : Natural;
-      Unused_Duplicate_Line : Natural;
-      Has_Default : Boolean;
-      Value       : Unbounded_String;
-      Duplicate   : Boolean;
-      Invalid     : Boolean;
-   begin
-      Analyze_Default_Locale
-        (Lines       => Lines,
-         Has_Default => Has_Default,
-         Value       => Value,
-         Duplicate   => Duplicate,
-         Invalid     => Invalid,
-         Invalid_Tag => Unused_Invalid_Tag,
-         Invalid_Line => Unused_Invalid_Line,
-         Duplicate_Line => Unused_Duplicate_Line);
-
-      if Has_Default then
-         if not Invalid and then not Duplicate then
-            return To_String (Value);
-         end if;
-         return I18N.Locales.Default_Locale_Name;
-      end if;
-
-      return I18N.Locales.Default_Locale_Name;
-   end Detect_Default_Locale;
-
    ---------------------------------------------------------------------------
    --  Public status / diagnostics helpers.
    ---------------------------------------------------------------------------

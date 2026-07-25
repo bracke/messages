@@ -71,10 +71,6 @@ private package Messages.Compiled is
       Other_Target  : Op_Index := 0;
       Exact_Targets : Exact_Target_Array_Access := null;
       Select_Targets : Select_Target_Array_Access := null;
-      Male_Target   : Op_Index := 0;
-      Female_Target : Op_Index := 0;
-      Male_Hash     : Ada.Containers.Hash_Type := 0;
-      Female_Hash   : Ada.Containers.Hash_Type := 0;
       End_Target    : Op_Index := 0;
       Substitute_Number_Sign : Boolean := False;
       Restores_Number_Context : Boolean := False;
