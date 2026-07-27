@@ -58,9 +58,13 @@ jobs:
       - name: Install system libraries (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew update
+          # brew update periodically fails on Homebrew's own infra (portable-ruby
+          # / formulae.brew.sh downloads); it is not fatal here -- openssl@3 is a
+          # stable formula the existing index already resolves.
+          brew update || echo "::warning::brew update failed; using the existing formula index"
           # openssl@3: httpclient's TLS bridge (i18n's download_tzdb links it).
-          brew install openssl@3
+          # Already present on the runner is fine; just ensure it is installed.
+          brew list openssl@3 >/dev/null 2>&1 || brew install openssl@3
           # Homebrew on the x86_64 runner installs under /usr/local; openssl@3 is
           # keg-only, so add its lib dir to the linker's search path.
           echo "LIBRARY_PATH=$(brew --prefix openssl@3)/lib" >> "$GITHUB_ENV"
