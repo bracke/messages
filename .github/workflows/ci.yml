@@ -128,6 +128,23 @@ jobs:
         # regeneration must have produced it next door.
         run: test -f ../i18n/share/i18n/formats.i18ndata
 
+      - name: Bundle i18n data beside each test executable
+        shell: bash
+        working-directory: messages
+        # The runtime finds its data at Exe/../share/i18n. Unlike the app crates
+        # (search/launcher/backup) which bundle via an Alire post-build action,
+        # the test/conformance/example/benchmark crates run their own binaries,
+        # and the sibling-relative fallback (../../i18n/share/i18n) does not
+        # resolve on Windows -- so copy the freshly generated tree beside each
+        # binary's bin/ directory. Every render then localizes correctly on all
+        # three platforms instead of falling back to defaults.
+        run: |
+          for crate in tests conformance examples benchmarks; do
+            rm -rf "$crate/share/i18n"
+            mkdir -p "$crate/share"
+            cp -r ../i18n/share/i18n "$crate/share/i18n"
+          done
+
       - name: Build and run the test suite
         shell: bash
         working-directory: messages/tests
