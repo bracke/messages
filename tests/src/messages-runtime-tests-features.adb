@@ -146,8 +146,8 @@ package body Messages.Runtime.Tests.Features is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Base    : constant String := "/tmp/i18n_feat_base.catalog";
-      Shard   : constant String := "/tmp/i18n_feat_shard.catalog";
+      Base    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_feat_base.catalog";
+      Shard   : constant String := Project_Tools.Files.Temp_Dir & "/i18n_feat_shard.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
       Result  : Messages.Runtime.Load_Result;
@@ -178,7 +178,7 @@ package body Messages.Runtime.Tests.Features is
       Messages.Runtime.Load_Text
         (Runtime, "base", "en.title = ""Hi""" & ASCII.LF, Result);
       Messages.Runtime.Load_File
-        (Runtime, "/tmp/i18n_feat_does_not_exist.catalog", Result);
+        (Runtime, Project_Tools.Files.Temp_Dir & "/i18n_feat_does_not_exist.catalog", Result);
 
       Assert (Result.Status = Messages.Runtime.Source_Not_Found,
               "missing shard file must report Source_Not_Found");
@@ -423,7 +423,7 @@ package body Messages.Runtime.Tests.Features is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path : constant String := "/tmp/i18n_feat_validate.catalog";
+      Path : constant String := Project_Tools.Files.Temp_Dir & "/i18n_feat_validate.catalog";
       VR   : Messages.Runtime.Catalog_Validation_Result;
    begin
       Project_Tools.Files.Write_Text_File
@@ -431,7 +431,7 @@ package body Messages.Runtime.Tests.Features is
       VR := Messages.Runtime.Validate_Catalog_File (Path);
       Assert (VR.Valid, "valid catalog file validates");
 
-      VR := Messages.Runtime.Validate_Catalog_File ("/tmp/i18n_feat_no_such.catalog");
+      VR := Messages.Runtime.Validate_Catalog_File (Project_Tools.Files.Temp_Dir & "/i18n_feat_no_such.catalog");
       Assert (not VR.Valid, "missing catalog file fails validation");
    end Test_Validate_File;
 
@@ -439,7 +439,7 @@ package body Messages.Runtime.Tests.Features is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path : constant String := "/tmp/i18n_feat_binary.i18nb";
+      Path : constant String := Project_Tools.Files.Temp_Dir & "/i18n_feat_binary.i18nb";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
       Result  : Messages.Runtime.Load_Result;
@@ -603,7 +603,7 @@ package body Messages.Runtime.Tests.Features is
       begin
          Messages.Runtime.Load_Text (Bad, "bad", "no separator" & ASCII.LF, Bad_Res);
          --  Bad load is non-destructive; force an invalid runtime via Initialize.
-         Messages.Runtime.Initialize (Bad, "/tmp/i18n_feat_no_such_init.catalog");
+         Messages.Runtime.Initialize (Bad, Project_Tools.Files.Temp_Dir & "/i18n_feat_no_such_init.catalog");
          Assert (not Messages.Runtime.Is_Valid (Bad), "runtime should be invalid");
          Assert (Messages.Runtime.Resolve (Bad, "en", "title").Status
                    = Messages.Runtime.Runtime_Invalid,

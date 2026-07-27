@@ -186,7 +186,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_public_api.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_public_api.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -223,7 +223,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_locale_fallback.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_locale_fallback.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -261,7 +261,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_missing_key.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_missing_key.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -292,7 +292,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_invalid_catalog.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_invalid_catalog.catalog";
       Runtime : Messages.Runtime.Instance;
    begin
       Write_File
@@ -314,7 +314,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_default_locale.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_default_locale.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -350,7 +350,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_status_mapping.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_status_mapping.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -400,7 +400,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_duplicate_entry.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_duplicate_entry.catalog";
       Runtime : Messages.Runtime.Instance;
    begin
       Write_File
@@ -424,9 +424,9 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Base_Path      : constant String := "/tmp/i18n_release_load_base.catalog";
-      Shard_Path     : constant String := "/tmp/i18n_release_load_shard.catalog";
-      Duplicate_Path : constant String := "/tmp/i18n_release_load_duplicate.catalog";
+      Base_Path      : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_load_base.catalog";
+      Shard_Path     : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_load_shard.catalog";
+      Duplicate_Path : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_load_duplicate.catalog";
       Runtime        : Messages.Runtime.Instance;
       Args           : Messages.Arguments.Arguments;
    begin
@@ -485,7 +485,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_late_default_locale.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_late_default_locale.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -518,7 +518,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_empty_catalog.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_empty_catalog.catalog";
       Runtime : Messages.Runtime.Instance;
    begin
       Write_File (Path, "# no messages" & ASCII.LF);
@@ -534,7 +534,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_duplicate_default.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_duplicate_default.catalog";
       Runtime : Messages.Runtime.Instance;
    begin
       Write_File
@@ -558,7 +558,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_empty_default.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_empty_default.catalog";
       Runtime : Messages.Runtime.Instance;
    begin
       Write_File
@@ -576,8 +576,8 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Empty_Locale_Path : constant String := "/tmp/i18n_release_empty_locale.catalog";
-      Empty_Key_Path    : constant String := "/tmp/i18n_release_empty_key.catalog";
+      Empty_Locale_Path : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_empty_locale.catalog";
+      Empty_Key_Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_empty_key.catalog";
       Runtime           : Messages.Runtime.Instance;
    begin
       Write_File
@@ -604,7 +604,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_default_duplicate.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_default_duplicate.catalog";
       Runtime : Messages.Runtime.Instance;
    begin
       Write_File
@@ -628,7 +628,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_malformed_line.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_malformed_line.catalog";
       Runtime : Messages.Runtime.Instance;
    begin
       Write_File
@@ -650,7 +650,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_equals_value.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_equals_value.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -687,7 +687,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_empty_message.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_empty_message.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -719,7 +719,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_diagnostics_no_change.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_diagnostics_no_change.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
@@ -769,7 +769,7 @@ package body Messages.Runtime.Tests.Release is
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Path    : constant String := "/tmp/i18n_release_callback_exception.catalog";
+      Path    : constant String := Project_Tools.Files.Temp_Dir & "/i18n_release_callback_exception.catalog";
       Runtime : Messages.Runtime.Instance;
       Args    : Messages.Arguments.Arguments;
    begin
