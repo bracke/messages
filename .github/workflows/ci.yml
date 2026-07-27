@@ -128,21 +128,29 @@ jobs:
         # regeneration must have produced it next door.
         run: test -f ../i18n/share/i18n/formats.i18ndata
 
-      - name: Bundle i18n data beside each test executable
+      - name: Point the runtime at i18n's data
         shell: bash
         working-directory: messages
-        # The runtime finds its data at Exe/../share/i18n. Unlike the app crates
-        # (search/launcher/backup) which bundle via an Alire post-build action,
-        # the test/conformance/example/benchmark crates run their own binaries,
-        # and the sibling-relative fallback (../../i18n/share/i18n) does not
-        # resolve on Windows -- so copy the freshly generated tree beside each
-        # binary's bin/ directory. Every render then localizes correctly on all
-        # three platforms instead of falling back to defaults.
+        # The suites format real locales through i18n's on-the-fly data. Its
+        # relative-path search resolves on POSIX but not on Windows (the winning
+        # candidates carry "/../" segments that a mixed-separator lookup mangles).
+        # The data store consults I18N_DATA_DIR first, so set it to the native
+        # absolute path of the freshly generated tree -- cygpath -w gives GNAT a
+        # backslash Windows path it can open. Also bundle a copy beside each
+        # binary as a belt-and-suspenders fallback (Exe/../share/i18n).
         run: |
+          SRC="$(cd ../i18n/share/i18n && pwd)"
+          if [ "${RUNNER_OS:-}" = "Windows" ]; then
+            echo "I18N_DATA_DIR=$(cygpath -w "$SRC")" >> "$GITHUB_ENV"
+          else
+            echo "I18N_DATA_DIR=$SRC" >> "$GITHUB_ENV"
+          fi
+          echo "i18n data at: $SRC"
+          ls "$SRC" | tr '\n' ' '; echo
+          test -f "$SRC/formats.i18ndata" || { echo "::error::formats.i18ndata missing"; exit 1; }
           for crate in tests conformance examples benchmarks; do
-            rm -rf "$crate/share/i18n"
-            mkdir -p "$crate/share"
-            cp -r ../i18n/share/i18n "$crate/share/i18n"
+            rm -rf "$crate/share/i18n"; mkdir -p "$crate/share"
+            cp -r "$SRC" "$crate/share/i18n"
           done
 
       - name: Build and run the test suite
