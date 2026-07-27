@@ -146,8 +146,10 @@ jobs:
             echo "I18N_DATA_DIR=$SRC" >> "$GITHUB_ENV"
           fi
           echo "i18n data at: $SRC"
-          ls "$SRC" | tr '\n' ' '; echo
-          test -f "$SRC/formats.i18ndata" || { echo "::error::formats.i18ndata missing"; exit 1; }
+          echo "sizes:"; for f in formats display-names normalization uprops segmentation; do
+            printf '  %-16s %s bytes\n' "$f.i18ndata" "$(stat -c%s "$SRC/$f.i18ndata" 2>/dev/null || echo MISSING)"
+          done
+          [ "$(stat -c%s "$SRC/formats.i18ndata" 2>/dev/null || echo 0)" -gt 0 ] || { echo "::error::formats.i18ndata is empty"; exit 1; }
           for crate in tests conformance examples benchmarks; do
             rm -rf "$crate/share/i18n"; mkdir -p "$crate/share"
             cp -r "$SRC" "$crate/share/i18n"
