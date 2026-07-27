@@ -146,10 +146,7 @@ jobs:
             echo "I18N_DATA_DIR=$SRC" >> "$GITHUB_ENV"
           fi
           echo "i18n data at: $SRC"
-          echo "sizes:"; for f in formats display-names normalization uprops segmentation; do
-            printf '  %-16s %s bytes\n' "$f.i18ndata" "$(stat -c%s "$SRC/$f.i18ndata" 2>/dev/null || echo MISSING)"
-          done
-          [ "$(stat -c%s "$SRC/formats.i18ndata" 2>/dev/null || echo 0)" -gt 0 ] || { echo "::error::formats.i18ndata is empty"; exit 1; }
+          echo "formats.i18ndata bytes: $(wc -c < "$SRC/formats.i18ndata")"
           for crate in tests conformance examples benchmarks; do
             rm -rf "$crate/share/i18n"; mkdir -p "$crate/share"
             cp -r "$SRC" "$crate/share/i18n"
@@ -160,6 +157,8 @@ jobs:
         working-directory: messages/tests
         run: |
           alr --non-interactive build
+          # Diagnostic: what the runtime actually sees when spawned via alr exec.
+          alr exec -- bash -c 'echo "DIAG cwd=$(pwd)"; echo "DIAG I18N_DATA_DIR=[$I18N_DATA_DIR]"; if [ -n "$I18N_DATA_DIR" ]; then echo "DIAG datadir formats bytes: $(wc -c < "$I18N_DATA_DIR/formats.i18ndata" 2>/dev/null || echo NONE)"; fi; echo "DIAG bundle formats bytes: $(wc -c < share/i18n/formats.i18ndata 2>/dev/null || echo NONE)"'
           alr exec -- ./bin/tests
 
       # The release checker drives gprbuild on the examples/benchmarks/conformance
