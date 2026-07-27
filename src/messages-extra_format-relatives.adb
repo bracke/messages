@@ -124,11 +124,22 @@ package body Relatives is
 
       if Category /= I18N.Plurals.Other then
          declare
+            --  CLDR narrows an absent plural category to "other". Consult the
+            --  runtime override for the "other" row too, not just the generated
+            --  data -- otherwise a loaded relative_unit.<base>.other override is
+            --  ignored whenever the count resolves to a non-other category
+            --  (e.g. Arabic "two"), and formatting falls back to the raw unit.
+            Other_Found : Boolean;
+            Other_Override : constant String :=
+              I18N.Runtime_Data.Locale_Text
+                (Locale, "relative_unit." & Base & ".other", Other_Found);
             Other : constant String :=
               I18N.Relative_Format.Unit_Category_Name
                 (Locale, Base, "other");
          begin
-            if Other /= "" then
+            if Other_Found then
+               return Other_Override;
+            elsif Other /= "" then
                return Other;
             end if;
          end;
