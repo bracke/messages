@@ -194,7 +194,23 @@ procedure Check_Messages is
             Quiet   => True);
 
          declare
-            Text : constant String := To_String (Output);
+            --  The example binaries print through Ada.Text_IO, which emits CRLF
+            --  on Windows; the expected strings use ASCII.LF. Drop CR so the
+            --  byte-exact comparison holds on every platform.
+            function Without_CR (S : String) return String is
+               Result : String (1 .. S'Length);
+               Last   : Natural := 0;
+            begin
+               for Ch of S loop
+                  if Ch /= ASCII.CR then
+                     Last := Last + 1;
+                     Result (Last) := Ch;
+                  end if;
+               end loop;
+               return Result (1 .. Last);
+            end Without_CR;
+
+            Text : constant String := Without_CR (To_String (Output));
          begin
             if Prefix_Only then
                if Text'Length < Expected'Length
