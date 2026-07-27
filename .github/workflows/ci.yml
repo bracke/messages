@@ -20,6 +20,12 @@ jobs:
     name: build and test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    env:
+      # The conformance harness and benchmarks run from the messages root and
+      # locate i18n's on-the-fly data by relative search, which does not find the
+      # sibling checkout on Windows. Point every step at it explicitly; the data
+      # store consults I18N_DATA_DIR first, so this is robust on all platforms.
+      I18N_DATA_DIR: ${{ github.workspace }}/i18n/share/i18n
     strategy:
       fail-fast: false
       matrix:
