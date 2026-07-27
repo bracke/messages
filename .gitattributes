@@ -1,0 +1,9 @@
+# The conformance fixtures and the worked-example expected output are read and
+# compared byte-exact. Force LF on every checkout so a Windows autocrlf clone
+# does not append CR to suite names, fixture paths, or expected lines -- a
+# trailing CR turns "segmentation" into "segmentation\r" (missing suite) and a
+# fixture path into an unopenable name (USE_ERROR: Invalid argument).
+conformance/fixtures/** text eol=lf
+examples/EXPECTED_OUTPUT.md text eol=lf
+examples/catalogs/** text eol=lf
+share/** text eol=lf
