@@ -131,21 +131,10 @@ jobs:
           alr --non-interactive build
           alr exec -- ./bin/tests
 
-      - name: Build and run the release checker
-        shell: bash
-        working-directory: messages/check_messages
-        run: |
-          alr --non-interactive build
-          ./bin/check_messages
-
-      - name: Build and run the conformance harness
-        shell: bash
-        working-directory: messages/conformance
-        run: |
-          alr --non-interactive build
-          # check_conformance resolves fixtures relative to the crate root.
-          cd .. && ./conformance/bin/check_conformance
-
+      # The release checker drives gprbuild on the examples/benchmarks/conformance
+      # crates directly, so their Alire config projects must already exist. Build
+      # each once here to generate config/*_config.gpr (and to check they compile)
+      # before the checker runs.
       - name: Build the worked examples
         shell: bash
         working-directory: messages/examples
@@ -155,3 +144,18 @@ jobs:
         shell: bash
         working-directory: messages/benchmarks
         run: alr --non-interactive build
+
+      - name: Build the conformance harness
+        shell: bash
+        working-directory: messages/conformance
+        run: alr --non-interactive build
+
+      - name: Build and run the release checker
+        shell: bash
+        working-directory: messages/check_messages
+        # check_messages builds the examples/benchmarks/conformance crates, checks
+        # the worked-example output, and runs the benchmarks and the ICU/CLDR
+        # conformance harness.
+        run: |
+          alr --non-interactive build
+          ./bin/check_messages
