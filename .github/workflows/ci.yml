@@ -1,0 +1,157 @@
+name: ci
+
+# Builds messages and runs its suites on Linux, macOS and Windows.
+#
+# messages is a pure library over i18n; it pins i18n by path and inherits i18n's
+# regeneration chain. Building i18n runs its pre-build regeneration -- download_tzdb
+# (httpclient, zlib, tarlib, awklib-on-regexp) and the CLDR import (project_tools),
+# asking hostkit for the host's scratch directory -- so CI checks out each sibling
+# next to the checkout and installs OpenSSL (httpclient's TLS bridge links it).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: build and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # x86_64 macOS: gnat_native=15.2.1 ships no aarch64-darwin binary, so
+        # macos-latest (arm64) cannot resolve the pin; macos-15-intel is the last
+        # x86_64 image Actions offers.
+        os: [ubuntu-latest, macos-15-intel, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: messages }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/i18n", path: i18n }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/project_tools", path: project_tools }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/httpclient", path: httpclient }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/zlib", path: zlib }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/cryptolib", path: cryptolib }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/tarlib", path: tarlib }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/awklib", path: awklib }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/regexp", path: regexp }
+      - uses: actions/checkout@v4
+        with: { repository: "${{ github.repository_owner }}/hostkit", path: hostkit }
+
+      - name: Install system libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libssl-dev
+
+      - name: Install system libraries (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          # openssl@3: httpclient's TLS bridge (i18n's download_tzdb links it).
+          brew install openssl@3
+          # Homebrew on the x86_64 runner installs under /usr/local; openssl@3 is
+          # keg-only, so add its lib dir to the linker's search path.
+          echo "LIBRARY_PATH=$(brew --prefix openssl@3)/lib" >> "$GITHUB_ENV"
+
+      - name: Install system libraries (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          # Alire's gnat_native is a mingw-w64 toolchain, so its ld needs mingw
+          # import libraries; take them from the preinstalled MSYS2.
+          pacman() { /c/msys64/usr/bin/pacman "$@"; }
+          pacman-key() { /c/msys64/usr/bin/pacman-key "$@"; }
+          pacman-key --init || true
+          pacman-key --populate msys2 || true
+
+          # openssl: httpclient's TLS bridge (i18n's download_tzdb links it).
+          packages="mingw-w64-x86_64-openssl"
+
+          sync() {
+            pacman -Sy --noconfirm --needed --disable-download-timeout "$@" $packages
+          }
+
+          synced=""
+          for attempt in 1 2 3; do
+            if sync; then synced=yes; break; fi
+            echo "::warning::pacman sync attempt ${attempt} failed"
+            sleep 15
+          done
+
+          if [ -z "$synced" ]; then
+            echo "::warning::signed pacman sync failed; retrying without signature checks"
+            sed 's/^SigLevel.*/SigLevel = Never/' /c/msys64/etc/pacman.conf \
+              > /c/msys64/tmp/pacman-nosig.conf
+            for attempt in 1 2 3; do
+              if sync --config C:/msys64/tmp/pacman-nosig.conf; then synced=yes; break; fi
+              echo "::warning::unsigned pacman sync attempt ${attempt} failed"
+              sleep 15
+            done
+          fi
+
+          [ -n "$synced" ] || { echo "::error::could not install the MSYS2 packages"; exit 1; }
+
+          echo "CPATH=C:/msys64/mingw64/include" >> "$GITHUB_ENV"
+          echo "LIBRARY_PATH=C:/msys64/mingw64/lib" >> "$GITHUB_ENV"
+          echo "C:\msys64\mingw64\bin" >> "$GITHUB_PATH"
+
+      - name: Set up Alire
+        uses: alire-project/setup-alire@v5
+        with:
+          toolchain: gnat_native=15.2.1 gprbuild
+
+      - name: Build messages
+        shell: bash
+        working-directory: messages
+        run: alr --non-interactive build
+
+      - name: Verify the i18n locale data resolves
+        shell: bash
+        working-directory: messages
+        # messages formats real locales through i18n's on-the-fly data; the
+        # regeneration must have produced it next door.
+        run: test -f ../i18n/share/i18n/formats.i18ndata
+
+      - name: Build and run the test suite
+        shell: bash
+        working-directory: messages/tests
+        run: |
+          alr --non-interactive build
+          alr exec -- ./bin/tests
+
+      - name: Build and run the release checker
+        shell: bash
+        working-directory: messages/check_messages
+        run: |
+          alr --non-interactive build
+          ./bin/check_messages
+
+      - name: Build and run the conformance harness
+        shell: bash
+        working-directory: messages/conformance
+        run: |
+          alr --non-interactive build
+          # check_conformance resolves fixtures relative to the crate root.
+          cd .. && ./conformance/bin/check_conformance
+
+      - name: Build the worked examples
+        shell: bash
+        working-directory: messages/examples
+        run: alr --non-interactive build
+
+      - name: Build the render benchmarks
+        shell: bash
+        working-directory: messages/benchmarks
+        run: alr --non-interactive build
