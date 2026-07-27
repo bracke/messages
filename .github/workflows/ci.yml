@@ -141,7 +141,10 @@ jobs:
         run: |
           SRC="$(cd ../i18n/share/i18n && pwd)"
           if [ "${RUNNER_OS:-}" = "Windows" ]; then
-            echo "I18N_DATA_DIR=$(cygpath -w "$SRC")" >> "$GITHUB_ENV"
+            # cygpath -m gives the forward-slash Windows form (D:/a/...), which
+            # GNAT's Ada.Directories/Stream_IO resolve; the backslash form
+            # (cygpath -w) does not open even though bash reads it fine.
+            echo "I18N_DATA_DIR=$(cygpath -m "$SRC")" >> "$GITHUB_ENV"
           else
             echo "I18N_DATA_DIR=$SRC" >> "$GITHUB_ENV"
           fi
