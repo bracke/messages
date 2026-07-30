@@ -176,6 +176,204 @@ package body Messages.Consistency is
       return False;
    end Escapes_Something;
 
+   --  Text with the parts no translator writes blanked out: arguments, option
+   --  names, and the capitalized placeholders a usage line puts after them
+   --  ("--locale LOCALE"). What is left is prose, which is the only thing worth
+   --  comparing between a message and its translation. Lowercased, so the
+   --  comparison does not turn on a sentence's first letter.
+   function Prose_Of (Text : String) return String is
+      Result : String := Text;
+      Index  : Positive := Result'First;
+
+      procedure Blank (From : Positive; To : Natural) is
+      begin
+         for Scan in From .. To loop
+            Result (Scan) := ' ';
+         end loop;
+      end Blank;
+   begin
+      while Index <= Result'Last loop
+         if Result (Index) = '{' then
+            declare
+               Close : Natural := 0;
+            begin
+               for Scan in Index .. Result'Last loop
+                  if Result (Scan) = '}' then
+                     Close := Scan;
+                     exit;
+                  end if;
+               end loop;
+               exit when Close = 0;
+               Blank (Index, Close);
+               Index := Close + 1;
+            end;
+
+         elsif Result (Index) = '-'
+           and then (Index = Result'First
+                     or else not Is_Word_Character (Result (Index - 1)))
+         then
+            declare
+               Stop : Natural := Index;
+            begin
+               --  Through the value too, where the option carries one:
+               --  "--color=auto|always|never" is one thing a user types, and
+               --  its alternatives are not words anybody translates.
+               while Stop < Result'Last
+                 and then (Is_Word_Character (Result (Stop + 1))
+                           or else Result (Stop + 1) in '-' | '=' | '|')
+               loop
+                  Stop := Stop + 1;
+               end loop;
+               Blank (Index, Stop);
+               Index := Stop + 1;
+            end;
+
+         elsif Result (Index) in 'A' .. 'Z' then
+            declare
+               Stop : Natural := Index;
+            begin
+               while Stop < Result'Last
+                 and then Result (Stop + 1) in 'A' .. 'Z' | '0' .. '9'
+               loop
+                  Stop := Stop + 1;
+               end loop;
+
+               --  Two or more capitals in a row is a placeholder, not a word.
+               if Stop > Index then
+                  Blank (Index, Stop);
+               else
+                  Result (Index) :=
+                    Character'Val
+                      (Character'Pos (Result (Index))
+                       + (Character'Pos ('a') - Character'Pos ('A')));
+               end if;
+               Index := Stop + 1;
+            end;
+
+         else
+            Index := Index + 1;
+         end if;
+      end loop;
+      return Result;
+   end Prose_Of;
+
+   --  Is this written in something other than the Latin script? Counted in
+   --  bytes: every byte of a UTF-8 character outside ASCII has its high bit
+   --  set, so the ratio is not the ratio of characters, but it does not need to
+   --  be -- it needs to separate "mostly Greek" from "mostly English".
+   function Mostly_Foreign (Text : String) return Boolean is
+      Latin, Other : Natural := 0;
+   begin
+      for Item of Text loop
+         if Character'Pos (Item) > 127 then
+            Other := Other + 1;
+         elsif Item in 'a' .. 'z' | 'A' .. 'Z' then
+            Latin := Latin + 1;
+         end if;
+      end loop;
+      return Other > Latin;
+   end Mostly_Foreign;
+
+   Max_Words : constant := 256;
+   type Span is record
+      From : Positive := 1;
+      To   : Natural  := 0;
+   end record;
+   type Span_List is array (1 .. Max_Words) of Span;
+
+   --  The Latin-script words of at least three letters, which is where a
+   --  borrowed word stops being noise. Anything the caller named as a token
+   --  that must survive translation is not a word here: it is meant to be
+   --  identical in every locale, so finding it identical says nothing.
+   procedure Words_Of
+     (Text     : String;
+      Verbatim : Token_Array;
+      Into     : out Span_List;
+      Count    : out Natural)
+   is
+      Index : Positive := Text'First;
+   begin
+      Into  := [others => <>];
+      Count := 0;
+
+      while Index <= Text'Last loop
+         if Text (Index) in 'a' .. 'z' then
+            declare
+               Stop : Natural := Index;
+               Skip : Boolean := False;
+            begin
+               while Stop < Text'Last and then Text (Stop + 1) in 'a' .. 'z'
+               loop
+                  Stop := Stop + 1;
+               end loop;
+
+               if Stop - Index + 1 >= 3 then
+                  for Token of Verbatim loop
+                     declare
+                        T : constant String := To_String (Token);
+                     begin
+                        if T'Length = Stop - Index + 1
+                          and then Prose_Of (T) = Text (Index .. Stop)
+                        then
+                           Skip := True;
+                        end if;
+                     end;
+                  end loop;
+
+                  if not Skip and then Count < Max_Words then
+                     Count := Count + 1;
+                     Into (Count) := (From => Index, To => Stop);
+                  end if;
+               end if;
+               Index := Stop + 1;
+            end;
+         else
+            Index := Index + 1;
+         end if;
+      end loop;
+   end Words_Of;
+
+   Run_Length : constant := 3;
+
+   --  Three of the original's words, in order, inside the translation.
+   function Shared_Run
+     (Original : String; Translation : String; Verbatim : Token_Array)
+      return String
+   is
+      A, B : Span_List;
+      A_Count, B_Count : Natural;
+   begin
+      Words_Of (Original, Verbatim, A, A_Count);
+      Words_Of (Translation, Verbatim, B, B_Count);
+
+      if A_Count < Run_Length or else B_Count < Run_Length then
+         return "";
+      end if;
+
+      for I in 1 .. B_Count - Run_Length + 1 loop
+         for J in 1 .. A_Count - Run_Length + 1 loop
+            declare
+               Same : Boolean := True;
+            begin
+               for Step in 0 .. Run_Length - 1 loop
+                  if Translation (B (I + Step).From .. B (I + Step).To)
+                    /= Original (A (J + Step).From .. A (J + Step).To)
+                  then
+                     Same := False;
+                     exit;
+                  end if;
+               end loop;
+
+               if Same then
+                  return Translation
+                           (B (I).From .. B (I + Run_Length - 1).To);
+               end if;
+            end;
+         end loop;
+      end loop;
+      return "";
+   end Shared_Run;
+
    function Word_Count (Text : String) return Natural is
       Count : Natural := 0;
       In_Word : Boolean := False;
@@ -247,6 +445,67 @@ package body Messages.Consistency is
             end;
          end loop;
       end Each_Line;
+
+      --  Which locales are written in another script, decided from the whole
+      --  locale rather than from one string. It has to be the whole locale: a
+      --  half-translated string is mostly English by weight, so asking the
+      --  string alone would excuse exactly the strings this is looking for.
+      --  Counted in entries, not characters, for the same reason -- one long
+      --  usage line of option names would otherwise outweigh every translated
+      --  message a locale has.
+      Max_Locales : constant := 512;
+      type Script_Tally is record
+         Name    : Unbounded_String;
+         Entries : Natural := 0;
+         Foreign : Natural := 0;
+      end record;
+      Tally : array (1 .. Max_Locales) of Script_Tally;
+      Tallied : Natural := 0;
+
+      procedure Read_Script (Line : String) is
+         Locale, Key, Value : Unbounded_String;
+         Ok : Boolean;
+      begin
+         Split (Line, Locale, Key, Value, Ok);
+         if not Ok or else Locale = Default
+           or else Holds (Line, "default_locale")
+         then
+            return;
+         end if;
+
+         for Index in 1 .. Tallied loop
+            if Tally (Index).Name = Locale then
+               Tally (Index).Entries := Tally (Index).Entries + 1;
+               if Mostly_Foreign (To_String (Value)) then
+                  Tally (Index).Foreign := Tally (Index).Foreign + 1;
+               end if;
+               return;
+            end if;
+         end loop;
+
+         if Tallied < Max_Locales then
+            Tallied := Tallied + 1;
+            Tally (Tallied) :=
+              (Name    => Locale,
+               Entries => 1,
+               Foreign => (if Mostly_Foreign (To_String (Value)) then 1
+                           else 0));
+         end if;
+      end Read_Script;
+
+      --  A third of the entries is enough. A locale does not have to be
+      --  entirely outside ASCII to be outside ASCII -- it has labels, product
+      --  names and a usage line like everyone else.
+      function Foreign_Script (Locale : String) return Boolean is
+      begin
+         for Index in 1 .. Tallied loop
+            if Tally (Index).Name = Locale then
+               return Tally (Index).Entries > 0
+                 and then Tally (Index).Foreign * 3 >= Tally (Index).Entries;
+            end if;
+         end loop;
+         return False;
+      end Foreign_Script;
 
       procedure Read_Default (Line : String) is
          Locale, Key, Value : Unbounded_String;
@@ -367,6 +626,19 @@ package body Messages.Consistency is
                   end;
                end loop;
 
+               if Foreign_Script (L) then
+                  declare
+                     Run : constant String :=
+                       Shared_Run (Prose_Of (Source), Prose_Of (V), Verbatim);
+                  begin
+                     if Run /= "" then
+                        Note (Into, Partly_Original, L, K,
+                              "left in " & To_String (Default) & ": """
+                              & Run & """");
+                     end if;
+                  end;
+               end if;
+
                if Escapes_Something (V) then
                   Note (Into, Escape_Hazard, L, K,
                         "an apostrophe here starts a quoted literal and"
@@ -383,6 +655,7 @@ package body Messages.Consistency is
       Into := (Items => [others => <>], Count => 0, Overflow => False,
                Identical => 0);
       Each_Line (Read_Default'Access);
+      Each_Line (Read_Script'Access);
       Each_Line (Check_One'Access);
    end Check_Text;
 

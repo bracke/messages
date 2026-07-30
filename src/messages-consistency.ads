@@ -40,6 +40,20 @@ package Messages.Consistency is
       --  A token the caller named -- an option, a command, a product name --
       --  is in the original and not in the translation.
 
+      Partly_Original,
+      --  A run of the original's own words left standing inside a translation
+      --  written in another script: "取得 a website recursively into 対象".
+      --  Text like this passes every other check here -- the key exists, the
+      --  arguments are all present, the tokens survive -- and reads to a user
+      --  as a language they did not ask for.
+      --
+      --  Only locales this package can see are not written in the Latin script
+      --  are examined, and only a run of three words is reported, because one
+      --  borrowed word is how languages normally name a thing they borrowed.
+      --  So this finds less than it misses: a Latin-script locale left in
+      --  English is invisible to it, and so is a single swapped word. What it
+      --  reports, it is right about.
+
       Escape_Hazard);
       --  An apostrophe that ICU reads as the start of a quoted literal, which
       --  swallows the argument that follows it.

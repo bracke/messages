@@ -99,6 +99,48 @@ fallback chain without rendering. Locale fallback (`de-AT -> de -> default`) and
 canonicalization are provided by `I18N.Locales`; plural/selectordinal branch
 selection by `I18N.Plurals`.
 
+## Translation consistency
+
+`Validate_Catalog_File` answers whether a catalog is well-formed.
+`Messages.Consistency` answers something a well-formed catalog can still get
+wrong: a locale that has drifted from the messages it was translated from. None
+of it judges a translation -- that needs a speaker of the language. It catches
+what does not:
+
+| Finding | What it means |
+| --- | --- |
+| `Missing_Original` | A translated key the default locale does not have, so nothing can ask for it. |
+| `Argument_Dropped` | The original takes an argument the translation does not: "file not found", without the filename. |
+| `Argument_Added` | The translation takes an argument no caller supplies. |
+| `Token_Dropped` | A caller-named token -- an option, a command, a product name -- is in the original and not in the translation, so a user who types what they were shown gets an error. |
+| `Partly_Original` | A run of the original's own words left standing inside a translation written in another script. |
+| `Escape_Hazard` | An apostrophe ICU reads as opening a quoted literal, which swallows the argument after it. |
+
+Text identical to the original is counted rather than listed, and does not fail:
+short strings coincide between languages often enough that failing on it would
+teach people to ignore the check.
+
+`Partly_Original` catches word substitution -- the English sentence with a
+couple of nouns swapped -- which passes every other rule here because the key
+exists and the arguments are all present. It reports only a run of three of the
+original's words, and only in locales it can see are not written in the Latin
+script, because one borrowed word is how a language normally names a thing it
+borrowed. So it finds less than it misses: a Latin-script locale left in English
+is invisible to it. What it reports, it is right about.
+
+`tools/catalog_check` is the same rules on a command line, so a project needs no
+Ada of its own to have them. It exits 1 on anything that would reach a user:
+
+```sh
+catalog_check share/app/messages.catalog \
+  --verbatim=--help,--version,install,appname \
+  --locale-only=meta.
+```
+
+`--verbatim` names the tokens that must survive translation. `--locale-only`
+names key prefixes a locale may carry without the default locale having them,
+for catalogs that mark a translation's own state.
+
 ## Bounded rendering
 
 `Render_Into` renders a compiled message directly into caller-owned fixed

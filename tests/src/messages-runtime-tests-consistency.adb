@@ -137,6 +137,68 @@ package body Messages.Runtime.Tests.Consistency is
               "text that is word for word the original is counted");
    end Test_An_Untranslated_Line_Is_Found;
 
+   --  Text outside ASCII, built from its bytes so that this file stays ASCII
+   --  and needs no wide-character switch to compile. The rule counts bytes
+   --  with the high bit set, so which script this is does not matter; these
+   --  are Greek alphas.
+   function Other_Script (Letters : Positive) return String is
+      Result : String (1 .. Letters * 2) := [others => Character'Val (16#CE#)];
+   begin
+      for Index in 1 .. Letters loop
+         Result (Index * 2) := Character'Val (16#B1#);
+      end loop;
+      return Result;
+   end Other_Script;
+
+   --  A locale needs more than one line here: whether it is written in another
+   --  script is decided from the locale as a whole, precisely so that a line
+   --  which is mostly English cannot vouch for itself.
+   function Foreign (Description : String) return String is
+     ("default_locale = en" & LF
+      & "en.usage.description = ""Fetch a website recursively into target.""" & LF
+      & "en.error.unknown = ""unknown command""" & LF
+      & "en.status.done = ""done""" & LF
+      & "el.error.unknown = """ & Other_Script (7) & """" & LF
+      & "el.status.done = """ & Other_Script (5) & """" & LF
+      & "el.usage.description = """ & Description & """" & LF);
+
+   procedure Test_A_Half_Translated_Line_Is_Found
+     (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      Into : Messages.Consistency.Report;
+   begin
+      --  Word substitution, which is what an untested catalog drifts into: the
+      --  English sentence with the nouns swapped. Every other rule here passes
+      --  it, because the key exists and it takes no arguments.
+      Messages.Consistency.Check_Text
+        ("test",
+         Foreign (Other_Script (2) & " a website recursively into "
+                  & Other_Script (2) & "."),
+         Into => Into);
+      Assert (Has (Into, Messages.Consistency.Partly_Original),
+              "a run of the original's own words inside a translation");
+      Assert (Into.Identical = 0,
+              "and not merely counted as identical, which it is not");
+   end Test_A_Half_Translated_Line_Is_Found;
+
+   procedure Test_A_Borrowed_Word_Is_Quiet
+     (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      Into : Messages.Consistency.Report;
+   begin
+      --  A borrowed word is not a finding. Languages name a borrowed thing
+      --  with the borrowed word, and reporting that would teach people to
+      --  ignore this.
+      Messages.Consistency.Check_Text
+        ("test",
+         Foreign ("website " & Other_Script (12)),
+         Into => Into);
+      Assert (not Has (Into, Messages.Consistency.Partly_Original),
+              "one English word in a translation is not a finding");
+   end Test_A_Borrowed_Word_Is_Quiet;
+
    overriding function Name
      (T : Test_Case)
       return AUnit.Message_String
@@ -170,6 +232,12 @@ package body Messages.Runtime.Tests.Consistency is
       AUnit.Test_Cases.Registration.Register_Routine
         (T, Test_An_Untranslated_Line_Is_Found'Access,
          "an untranslated line is found");
+      AUnit.Test_Cases.Registration.Register_Routine
+        (T, Test_A_Half_Translated_Line_Is_Found'Access,
+         "a half-translated line is found");
+      AUnit.Test_Cases.Registration.Register_Routine
+        (T, Test_A_Borrowed_Word_Is_Quiet'Access,
+         "a borrowed word is quiet");
    end Register_Tests;
 
 end Messages.Runtime.Tests.Consistency;
