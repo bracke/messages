@@ -5,6 +5,7 @@ with Messages.Runtime.Tests.Diagnostics;
 with Messages.Runtime.Tests.Corpus;
 with Messages.Runtime.Tests.Release;
 with Messages.Runtime.Tests.Features;
+with Messages.Runtime.Tests.Consistency;
 
 package body Messages.Runtime.Tests.Suite is
 
@@ -21,6 +22,7 @@ package body Messages.Runtime.Tests.Suite is
       Result.Add_Test (new Messages.Runtime.Tests.Corpus.Test_Case);
       Result.Add_Test (new Messages.Runtime.Tests.Release.Test_Case);
       Result.Add_Test (new Messages.Runtime.Tests.Features.Test_Case);
+      Result.Add_Test (new Messages.Runtime.Tests.Consistency.Test_Case);
       return Result;
    end Suite;
 

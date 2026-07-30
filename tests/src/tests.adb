@@ -12,6 +12,7 @@ with Messages.Runtime.Tests.Corpus;
 with Messages.Runtime.Tests.Compilation;
 with Messages.Runtime.Tests.Diagnostics;
 with Messages.Runtime.Tests.Execution;
+with Messages.Runtime.Tests.Consistency;
 with Messages.Runtime.Tests.Features;
 with Messages.Runtime.Tests.Release;
 with Messages.Runtime.Tests.Strict;
@@ -48,6 +49,12 @@ procedure Tests is
          Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Corpus.Test_Case));
          Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Release.Test_Case));
          Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Features.Test_Case));
+         Result.Add_Test
+           (Test_Case_Access'(new Messages.Runtime.Tests.Consistency.Test_Case));
+
+      elsif Name = "consistency" then
+         Result.Add_Test
+           (Test_Case_Access'(new Messages.Runtime.Tests.Consistency.Test_Case));
 
       elsif Name = "parser" then
          Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Strict.Test_Case));
