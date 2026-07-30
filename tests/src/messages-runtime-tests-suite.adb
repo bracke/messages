@@ -23,6 +23,8 @@ package body Messages.Runtime.Tests.Suite is
       Result.Add_Test (new Messages.Runtime.Tests.Release.Test_Case);
       Result.Add_Test (new Messages.Runtime.Tests.Features.Test_Case);
       Result.Add_Test (new Messages.Runtime.Tests.Consistency.Test_Case);
+      --  Adding a case here is enough: tests.adb runs this list for an
+      --  unfiltered run, and its named filters are for single cases.
       return Result;
    end Suite;
 

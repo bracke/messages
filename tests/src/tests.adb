@@ -12,6 +12,7 @@ with Messages.Runtime.Tests.Corpus;
 with Messages.Runtime.Tests.Compilation;
 with Messages.Runtime.Tests.Diagnostics;
 with Messages.Runtime.Tests.Execution;
+with All_Suites;
 with Messages.Runtime.Tests.Consistency;
 with Messages.Runtime.Tests.Features;
 with Messages.Runtime.Tests.Release;
@@ -42,15 +43,12 @@ procedure Tests is
         new AUnit.Test_Suites.Test_Suite;
    begin
       if Name = "all" or else Name = "" then
-         Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Strict.Test_Case));
-         Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Compilation.Test_Case));
-         Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Execution.Test_Case));
-         Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Diagnostics.Test_Case));
-         Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Corpus.Test_Case));
-         Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Release.Test_Case));
-         Result.Add_Test (Test_Case_Access'(new Messages.Runtime.Tests.Features.Test_Case));
-         Result.Add_Test
-           (Test_Case_Access'(new Messages.Runtime.Tests.Consistency.Test_Case));
+         --  One list, in All_Suites. It used to be written out again here, and
+         --  the two drifted the way two lists do: a test case registered in the
+         --  other one compiled, reported nothing, and never ran, while the
+         --  totals looked healthy. The filters below name single cases, which
+         --  is a different question and stays here.
+         Result.Add_Test (All_Suites.Suite);
 
       elsif Name = "consistency" then
          Result.Add_Test
