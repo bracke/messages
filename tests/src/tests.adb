@@ -1,3 +1,4 @@
+with AUnit;
 with AUnit.Test_Cases;
 with Ada.Command_Line;
 with Ada.Characters.Handling;
@@ -18,7 +19,12 @@ with Messages.Runtime.Tests.Features;
 with Messages.Runtime.Tests.Release;
 with Messages.Runtime.Tests.Strict;
 
+--  AUnit's plain Test_Runner reports success however many assertions
+--  failed, so a build server ticks a job green over a failing suite.
+--  The outcome is carried in the exit status here instead.
 procedure Tests is
+   use type AUnit.Status;
+
 
    function To_Lower (Value : String) return String is
       Lowered : String (Value'Range) := Value;
@@ -90,9 +96,10 @@ procedure Tests is
       return Result;
    end Suite;
 
-   procedure Runner is new AUnit.Run.Test_Runner (Suite);
+   function Runner is new AUnit.Run.Test_Runner_With_Status (Suite);
 
    Reporter : AUnit.Reporter.Text.Text_Reporter;
+   Status   : AUnit.Status;
 
    procedure Parse_Arguments;
 
@@ -142,11 +149,15 @@ procedure Tests is
 begin
    Parse_Arguments;
    if Should_Run then
-      Runner (Reporter);
+      Status := Runner (Reporter);
    end if;
 exception
    when E : others =>
       Ada.Text_IO.Put_Line
         (Ada.Text_IO.Standard_Error, Ada.Exceptions.Exception_Message (E));
       Ada.Command_Line.Set_Exit_Status (1);
+
+   if Status /= AUnit.Success then
+      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+   end if;
 end Tests;
