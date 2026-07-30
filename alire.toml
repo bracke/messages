@@ -6,6 +6,7 @@ maintainers = ["Bent Bracke <bent@bracke.dk>"]
 maintainers-logins = ["bracke"]
 licenses = "MIT"
 website = "https://github.com/bracke/messages"
+long-description = "messages is strict, deterministic ICU-style message formatting: catalogs of named messages, argument substitution, and the plural, selectordinal and select forms, rendered against the i18n platform for locale identity, plural classification and every locale-sensitive value. The contract is catalog-based rather than format-string-based, so the text a user sees is data a translator can edit and a checker can validate. Rendering can be bounded into caller-owned storage with no intermediate allocation, and Messages.Consistency answers what a well-formed catalog can still get wrong: a translation that has drifted from the message it was translated from."
 tags = ["messages", "i18n", "icu"]
 project-files = ["messages.gpr"]
 
