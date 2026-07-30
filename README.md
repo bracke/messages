@@ -139,7 +139,13 @@ catalog_check share/app/messages.catalog \
 
 `--verbatim` names the tokens that must survive translation. `--locale-only`
 names key prefixes a locale may carry without the default locale having them,
-for catalogs that mark a translation's own state.
+for catalogs that record something about a translation itself -- who wrote it,
+when it was last touched.
+
+A marker saying how far a translation is to be trusted is a different thing, and
+worth less than it looks: it is a claim, and nothing here verifies it. A catalog
+where every locale is machine-translated should say that once, in prose, rather
+than divide itself into tiers no test can tell apart.
 
 ## Bounded rendering
 

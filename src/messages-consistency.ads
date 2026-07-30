@@ -97,10 +97,13 @@ package Messages.Consistency is
    --                  locale uses them: option names, command names, product
    --                  names. Empty checks none.
    --  @param Locale_Only Key prefixes a locale may carry without the default
-   --                       locale having them. A catalog that marks a
-   --                       translation's own state -- "meta.provisional" and
-   --                       its like -- has keys that exist per locale by
-   --                       design, and they are not drift.
+   --                       locale having them. A catalog that records
+   --                       something about a translation itself -- who wrote
+   --                       it, when it was last touched -- has keys that exist
+   --                       per locale by design, and they are not drift.
+   --                       Note that a marker saying how far a translation is
+   --                       to be trusted is a claim, and a claim nothing
+   --                       verifies is worth less than no claim at all.
    --  @param Into The findings, emptied first.
    procedure Check_Text
      (Source_Name : String;
