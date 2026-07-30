@@ -1,0 +1,23 @@
+name = "catalog_check"
+description = "Check a message catalogue's translations against its default locale"
+version = "0.1.0-dev"
+
+authors = ["Bent Bracke"]
+maintainers = ["Bent Bracke <bent@bracke.dk>"]
+maintainers-logins = ["bracke"]
+licenses = "MIT"
+tags = ["tool", "i18n", "check"]
+
+executables = ["catalog_check"]
+
+[[depends-on]]
+gnat_native = "=15.2.1"
+
+[[depends-on]]
+messages = "*"
+
+[[pins]]
+messages = { path = "../.." }
+
+[build-profiles]
+"*" = "development"

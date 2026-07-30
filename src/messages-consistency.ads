@@ -40,13 +40,9 @@ package Messages.Consistency is
       --  A token the caller named -- an option, a command, a product name --
       --  is in the original and not in the translation.
 
-      Escape_Hazard,
+      Escape_Hazard);
       --  An apostrophe that ICU reads as the start of a quoted literal, which
       --  swallows the argument that follows it.
-
-      Identical_To_Original);
-      --  Word for word the default locale's text. Untranslated, or a
-      --  coincidence worth a glance.
 
    type Finding is record
       Kind   : Finding_Kind := Missing_Original;
@@ -66,6 +62,13 @@ package Messages.Consistency is
       Items    : Finding_Array;
       Count    : Natural range 0 .. Max_Findings := 0;
       Overflow : Boolean := False;
+
+      --  Strings word for word the default locale's, counted rather than
+      --  listed. Untranslated, or a coincidence: two words agree between
+      --  languages often, and a catalogue of any size has hundreds. Listing
+      --  them fills a report and pushes out the findings that matter, which is
+      --  what this counter exists to have stopped doing.
+      Identical : Natural := 0;
    end record;
 
    type Token_Array is array (Positive range <>) of Unbounded_String;

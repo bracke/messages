@@ -1,0 +1,18 @@
+with "config/catalog_check_config.gpr";
+project Catalog_Check is
+   for Source_Dirs use ("src/", "config/");
+   for Object_Dir use "obj/" & Catalog_Check_Config.Build_Profile;
+   for Exec_Dir use "bin";
+   for Create_Missing_Dirs use "True";
+   for Main use ("catalog_check.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        Catalog_Check_Config.Ada_Compiler_Switches & ("-gnat2022", "-gnatyM100");
+   end Compiler;
+
+   --  Bytes out as bytes in: a catalogue is UTF-8 and its findings quote it.
+   package Binder is
+      for Switches ("Ada") use ("-Es", "-Wb");
+   end Binder;
+end Catalog_Check;

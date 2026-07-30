@@ -133,8 +133,8 @@ package body Messages.Runtime.Tests.Consistency is
         ("test",
          Catalog ("de.error.missing_value = ""missing value for {value}"""),
          Into => Into);
-      Assert (Has (Into, Messages.Consistency.Identical_To_Original),
-              "text that is word for word the original");
+      Assert (Into.Identical = 1,
+              "text that is word for word the original is counted");
    end Test_An_Untranslated_Line_Is_Found;
 
    overriding function Name

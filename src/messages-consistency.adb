@@ -374,14 +374,14 @@ package body Messages.Consistency is
                end if;
 
                if V = Source and then Word_Count (Source) > 2 then
-                  Note (Into, Identical_To_Original, L, K,
-                        "word for word the " & To_String (Default) & " text");
+                  Into.Identical := Into.Identical + 1;
                end if;
             end;
          end;
       end Check_One;
    begin
-      Into := (Items => [others => <>], Count => 0, Overflow => False);
+      Into := (Items => [others => <>], Count => 0, Overflow => False,
+               Identical => 0);
       Each_Line (Read_Default'Access);
       Each_Line (Check_One'Access);
    end Check_Text;
@@ -395,7 +395,8 @@ package body Messages.Consistency is
       File : Ada.Text_IO.File_Type;
       Body_Text : Unbounded_String;
    begin
-      Into := (Items => [others => <>], Count => 0, Overflow => False);
+      Into := (Items => [others => <>], Count => 0, Overflow => False,
+               Identical => 0);
 
       begin
          Ada.Text_IO.Open (File, Ada.Text_IO.In_File, Path);
