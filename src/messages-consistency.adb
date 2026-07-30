@@ -195,6 +195,7 @@ package body Messages.Consistency is
      (Source_Name : String;
       Text        : String;
       Verbatim    : Token_Array := No_Tokens;
+      Locale_Only : Token_Array := No_Tokens;
       Into        : out Report)
    is
       pragma Unreferenced (Source_Name);
@@ -288,6 +289,15 @@ package body Messages.Consistency is
             V : constant String := To_String (Value);
          begin
             if not Has_Original (K) then
+               --  Unless the caller said this key belongs to a locale rather
+               --  than to the default one.
+               for Prefix of Locale_Only loop
+                  if Ada.Strings.Fixed.Index (K, To_String (Prefix)) = K'First
+                  then
+                     return;
+                  end if;
+               end loop;
+
                Note (Into, Missing_Original, L, K,
                      "no message with this key in " & To_String (Default));
                return;
@@ -377,9 +387,10 @@ package body Messages.Consistency is
    end Check_Text;
 
    procedure Check_File
-     (Path     : String;
-      Verbatim : Token_Array := No_Tokens;
-      Into     : out Report)
+     (Path        : String;
+      Verbatim    : Token_Array := No_Tokens;
+      Locale_Only : Token_Array := No_Tokens;
+      Into        : out Report)
    is
       File : Ada.Text_IO.File_Type;
       Body_Text : Unbounded_String;
@@ -400,7 +411,7 @@ package body Messages.Consistency is
       end loop;
       Ada.Text_IO.Close (File);
 
-      Check_Text (Path, To_String (Body_Text), Verbatim, Into);
+      Check_Text (Path, To_String (Body_Text), Verbatim, Locale_Only, Into);
    exception
       when others =>
          if Ada.Text_IO.Is_Open (File) then

@@ -79,19 +79,26 @@ package Messages.Consistency is
    --  @param Verbatim Tokens that must survive translation where the default
    --                  locale uses them: option names, command names, product
    --                  names. Empty checks none.
+   --  @param Locale_Only Key prefixes a locale may carry without the default
+   --                       locale having them. A catalog that marks a
+   --                       translation's own state -- "meta.provisional" and
+   --                       its like -- has keys that exist per locale by
+   --                       design, and they are not drift.
    --  @param Into The findings, emptied first.
    procedure Check_Text
      (Source_Name : String;
       Text        : String;
       Verbatim    : Token_Array := No_Tokens;
+      Locale_Only : Token_Array := No_Tokens;
       Into        : out Report);
 
    --  The same, over a file. A file that cannot be read is one finding saying
    --  so, rather than an exception.
    procedure Check_File
-     (Path     : String;
-      Verbatim : Token_Array := No_Tokens;
-      Into     : out Report);
+     (Path        : String;
+      Verbatim    : Token_Array := No_Tokens;
+      Locale_Only : Token_Array := No_Tokens;
+      Into        : out Report);
 
    --  One line a person can read, of the form
    --  "de.error.missing_value: the argument {value} is dropped".
