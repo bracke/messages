@@ -16,14 +16,8 @@ gnat = ">=12"
 [[depends-on]]
 i18n = ">=1.1.0"
 
-# Pinned to a published commit rather than a sibling directory, so a clone of
-# this repository alone resolves and builds, and so a crate depending on
-# messages can fetch it without needing i18n beside it: Alire validates a
-# fetched crate's own manifest, and a path pin cannot resolve from the pin
-# cache. i18n is not in the Alire community index. To work against a local
-# checkout instead: alr pin i18n --use=../i18n
 [[pins]]
-i18n = { url = "https://github.com/bracke/i18n.git", commit = "13245f47ebc84dc60c48a604c75562010533d2e8" }
+i18n = { path = "../i18n" }
 
 [[actions]]
 type = "test"
