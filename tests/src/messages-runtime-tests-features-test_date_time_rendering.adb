@@ -1791,7 +1791,7 @@ begin
            "short z and v zone skeletons render deterministic abbreviations");
    Assert (Rendered (Runtime, "en", "zone_long_names", Args) =
              "Eastern Daylight Time|Eastern Time|America/New_York",
-           "long z zone skeleton renders deterministic generic names");
+           "zzzz renders the specific (daylight) name, vvvv the generic one");
    Assert (Rendered (Runtime, "fr", "zone_long_names", Args) =
              "heure d" & U (16#2019#) & U (16#E9#) & "t" & U (16#E9#) & " de l" & U (16#2019#)
              & "Est nord-am" & U (16#E9#) & "ricain|heure de l" & U (16#2019#) & "Est nord-am"
@@ -1803,20 +1803,20 @@ begin
    Assert (Rendered (Runtime, "de", "berlin_zone_names", Args) =
              "Mitteleurop" & U (16#E4#) & "ische Sommerzeit|Mitteleurop" & U (16#E4#)
              & "ische Zeit|Europe/Berlin",
-           "European zone skeleton names localize German generic names");
+           "European zzzz and vvvv localize German specific and generic names");
    Assert (Rendered (Runtime, "de", "berlin_short_zone_names", Args) =
              "MESZ|MEZ|Europe/Berlin",
            "European short zone skeleton names use generated CLDR fallback");
    Assert (Rendered (Runtime, "de-AT", "berlin_zone_names", Args) =
              "Mitteleurop" & U (16#E4#) & "ische Sommerzeit|Mitteleurop" & U (16#E4#)
              & "ische Zeit|Europe/Berlin",
-           "European zone skeleton names fall back through source-backed German family rows");
+           "European zone names fall back from de-AT to German metazone names");
    Assert (Rendered (Runtime, "en-AU", "lord_howe_short_names", Args) =
              "LHST|LHT|Lord Howe Time|Australia/Lord_Howe",
-           "Lord Howe zone skeleton names use generated CLDR short family rows");
+           "Lord Howe short names come from the en-AU metazone names");
    Assert (Rendered (Runtime, "de", "lord_howe_zone_names", Args) =
              "Lord-Howe-Normalzeit|Lord-Howe-Zeit|Australia/Lord_Howe",
-           "Lord Howe zone skeleton names localize German generic names");
+           "Lord Howe zzzz and vvvv localize German specific and generic names");
    Assert (Rendered (Runtime, "de", "brisbane_zone_names", Args) =
              "Ostaustralische Normalzeit|Ostaustralische Normalzeit|Australia/Brisbane",
            "Brisbane zone skeleton names use generated CLDR eastern Australia rows");
@@ -1839,7 +1839,7 @@ begin
              & U (16#43D#) & U (16#430#) & U (16#44F#) & " " & U (16#410#) & U (16#43C#)
              & U (16#435#) & U (16#440#) & U (16#438#) & U (16#43A#) & U (16#430#)
              & "|America/New_York",
-           "zone skeleton names localize Russian generic names");
+           "zzzz and vvvv localize Russian specific and generic names");
    Assert (Rendered (Runtime, "ar", "zone_names", Args) =
              U (16#627#) & U (16#644#) & U (16#62A#) & U (16#648#) & U (16#642#) & U (16#64A#)
              & U (16#62A#) & " " & U (16#627#) & U (16#644#) & U (16#635#) & U (16#64A#)
@@ -1853,22 +1853,22 @@ begin
              & U (16#644#) & U (16#623#) & U (16#645#) & U (16#631#) & U (16#64A#) & U (16#643#)
              & U (16#627#) & " " & U (16#627#) & U (16#644#) & U (16#634#) & U (16#645#)
              & U (16#627#) & U (16#644#) & U (16#64A#) & U (16#629#) & "|America/New_York",
-           "zone skeleton names localize Arabic generic names");
+           "zzzz and vvvv localize Arabic specific and generic names");
    Assert (Rendered (Runtime, "ja", "zone_names", Args) =
              U (16#7C73#) & U (16#56FD#) & U (16#6771#) & U (16#90E8#) & U (16#590F#) & U (16#6642#)
              & U (16#9593#) & "|" & U (16#7C73#) & U (16#56FD#) & U (16#6771#) & U (16#90E8#)
              & U (16#6642#) & U (16#9593#) & "|America/New_York",
-           "zone skeleton names localize Japanese generic names");
+           "zzzz and vvvv localize Japanese specific and generic names");
    Assert (Rendered (Runtime, "zh", "zone_names", Args) =
              U (16#5317#) & U (16#7F8E#) & U (16#4E1C#) & U (16#90E8#) & U (16#590F#) & U (16#4EE4#)
              & U (16#65F6#) & U (16#95F4#) & "|" & U (16#5317#) & U (16#7F8E#) & U (16#4E1C#)
              & U (16#90E8#) & U (16#65F6#) & U (16#95F4#) & "|America/New_York",
-           "zone skeleton names localize Chinese generic names");
+           "zzzz and vvvv localize Chinese specific and generic names");
    Assert (Rendered (Runtime, "ko", "zone_names", Args) =
              U (16#BBF8#) & " " & U (16#B3D9#) & U (16#BD80#) & " " & U (16#D558#) & U (16#ACC4#)
              & " " & U (16#D45C#) & U (16#C900#) & U (16#C2DC#) & "|" & U (16#BBF8#) & " "
              & U (16#B3D9#) & U (16#BD80#) & " " & U (16#C2DC#) & U (16#AC04#) & "|America/New_York",
-           "zone skeleton names localize Korean generic names");
+           "zzzz and vvvv localize Korean specific and generic names");
    Assert (Rendered (Runtime, "en", "tokyo_short_generic", Args) =
              "Japan Time|Japan Standard Time|Asia/Tokyo",
            "short v skeleton falls back to short GMT for fixed zones");
@@ -1877,7 +1877,7 @@ begin
            "VVV and VVVV zone skeletons use generated CLDR exemplar locations");
    Assert (Rendered (Runtime, "de", "tokyo_zone_names", Args) =
              "Japanische Normalzeit|Japanische Normalzeit|Asia/Tokyo",
-           "fixed zone skeleton names localize German names");
+           "a zone without daylight time gives its German standard name for zzzz and vvvv");
    Assert (Rendered (Runtime, "de-AT", "tokyo_zone_names", Args) =
              "Japanische Normalzeit|Japanische Normalzeit|Asia/Tokyo",
            "fixed zone skeleton names fall back through source-backed German zone rows");
@@ -1915,7 +1915,7 @@ begin
              & U (16#430#) & U (16#440#) & U (16#442#) & U (16#43D#) & U (16#43E#) & U (16#435#)
              & " " & U (16#432#) & U (16#440#) & U (16#435#) & U (16#43C#) & U (16#44F#)
              & "|Asia/Tokyo",
-           "fixed zone skeleton names localize Russian names");
+           "a zone without daylight time gives its Russian standard name for zzzz and vvvv");
    Assert (Rendered (Runtime, "ar", "tokyo_zone_names", Args) =
              U (16#62A#) & U (16#648#) & U (16#642#) & U (16#64A#) & U (16#62A#) & " " & U (16#627#)
              & U (16#644#) & U (16#64A#) & U (16#627#) & U (16#628#) & U (16#627#) & U (16#646#)
@@ -1924,22 +1924,22 @@ begin
              & U (16#62A#) & " " & U (16#627#) & U (16#644#) & U (16#64A#) & U (16#627#)
              & U (16#628#) & U (16#627#) & U (16#646#) & " " & U (16#627#) & U (16#644#)
              & U (16#631#) & U (16#633#) & U (16#645#) & U (16#64A#) & "|Asia/Tokyo",
-           "fixed zone skeleton names localize Arabic names");
+           "a zone without daylight time gives its Arabic standard name for zzzz and vvvv");
    Assert (Rendered (Runtime, "ja", "tokyo_zone_names", Args) =
              U (16#65E5#) & U (16#672C#) & U (16#6A19#) & U (16#6E96#) & U (16#6642#) & "|"
              & U (16#65E5#) & U (16#672C#) & U (16#6A19#) & U (16#6E96#) & U (16#6642#)
              & "|Asia/Tokyo",
-           "fixed zone skeleton names localize Japanese names");
+           "a zone without daylight time gives its Japanese standard name for zzzz and vvvv");
    Assert (Rendered (Runtime, "zh", "tokyo_zone_names", Args) =
              U (16#65E5#) & U (16#672C#) & U (16#6807#) & U (16#51C6#) & U (16#65F6#) & U (16#95F4#)
              & "|" & U (16#65E5#) & U (16#672C#) & U (16#6807#) & U (16#51C6#) & U (16#65F6#)
              & U (16#95F4#) & "|Asia/Tokyo",
-           "fixed zone skeleton names localize Chinese names");
+           "a zone without daylight time gives its Chinese standard name for zzzz and vvvv");
    Assert (Rendered (Runtime, "ko", "tokyo_zone_names", Args) =
              U (16#C77C#) & U (16#BCF8#) & " " & U (16#D45C#) & U (16#C900#) & U (16#C2DC#) & "|"
              & U (16#C77C#) & U (16#BCF8#) & " " & U (16#D45C#) & U (16#C900#) & U (16#C2DC#)
              & "|Asia/Tokyo",
-           "fixed zone skeleton names localize Korean names");
+           "a zone without daylight time gives its Korean standard name for zzzz and vvvv");
    Assert (Rendered (Runtime, "en", "utc_zone_widths", Args) =
              "Z|+00:00|UTC",
            "time zone skeleton widths distinguish zero x from X/Z");
