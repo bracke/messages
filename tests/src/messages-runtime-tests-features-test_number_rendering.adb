@@ -89,6 +89,9 @@ begin
       & "en.percent = ""{value, number, ::percent}""" & ASCII.LF
       & "ar.percent = ""{value, number, ::percent}""" & ASCII.LF
       & "fa.percent = ""{value, number, ::percent}""" & ASCII.LF
+      & "de.percent = ""{value, number, ::percent}""" & ASCII.LF
+      & "sv.negative = ""{value, number}""" & ASCII.LF
+      & "fa.negative = ""{value, number}""" & ASCII.LF
       & "en.percent_integer = ""{value, number, ::percent precision-integer}"""
       & ASCII.LF
       & "en.permille = ""{value, number, ::permille}""" & ASCII.LF
@@ -609,11 +612,20 @@ begin
    Assert (Rendered (Runtime, "en", "percent", Args) = "12%",
            "percent number skeleton scales and adds percent sign");
    Assert (Rendered (Runtime, "ar", "percent", Args) =
-             U (16#661#) & U (16#662#) & U (16#66A#),
-           "Arabic percent skeleton uses localized percent sign");
+             U (16#661#) & U (16#662#) & U (16#66A#) & U (16#61C#),
+           "Arabic percent skeleton uses CLDR's percent sign, Arabic letter mark included");
+   Assert (Rendered (Runtime, "de", "percent", Args) = "12" & U (16#A0#) & "%",
+           "German percent keeps the no-break space its CLDR percent pattern puts before the sign");
    Assert (Rendered (Runtime, "fa", "percent", Args) =
              U (16#6F1#) & U (16#6F2#) & U (16#66A#),
            "Persian percent skeleton uses localized percent sign");
+   Messages.Arguments.Set (Args, "value", "-5");
+   Assert (Rendered (Runtime, "sv", "negative", Args) = U (16#2212#) & "5",
+           "Swedish negative numbers use CLDR's minus sign U+2212");
+   Assert (Rendered (Runtime, "fa", "negative", Args) =
+             U (16#200E#) & U (16#2212#) & U (16#6F5#),
+           "Persian negative numbers use CLDR's marked minus sign");
+   Messages.Arguments.Set (Args, "value", "0.123");
    Messages.Arguments.Set (Args, "value", "0.129");
    Assert (Rendered (Runtime, "en", "percent_integer", Args) = "13%",
            "compound percent/integer number skeleton renders");
