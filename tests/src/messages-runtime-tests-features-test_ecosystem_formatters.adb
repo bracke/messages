@@ -1257,6 +1257,7 @@ begin
       & ASCII.LF
       & "en.relative = ""{offset, relative, day}""" & ASCII.LF
       & "und.neutral_relative = ""{offset, relative, day}""" & ASCII.LF
+      & "und.weekday_relative = ""{offset, relative, mon}""" & ASCII.LF
       & "bn.relative = ""{offset, relative, day}""" & ASCII.LF
       & "en-u-nu-beng.relative = ""{offset, relative, day}"""
       & ASCII.LF
@@ -3270,6 +3271,8 @@ begin
    Assert (Rendered (Runtime, "is", "neutral_relative", Args) =
              U (16#ED#) & " g" & U (16#E6#) & "r",
            "an und entry renders in the locale asked for, not the one it falls back to");
+   Assert (Rendered (Runtime, "de", "weekday_relative", Args) = "letzten Montag",
+           "relative-time formatter gives CLDR's name for last Monday");
    Messages.Arguments.Set (Args, "offset", "3");
    Assert (Rendered (Runtime, "de", "relative", Args) = "in 3 Tagen",
            "relative-time formatter uses the German future pattern past CLDR's named offsets");

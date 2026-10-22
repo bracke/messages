@@ -19,6 +19,9 @@ commits; each of those says in its own message what changed and why.
   +2, `last week`, rather than `1 day ago` and `in 2 days` (ICU's and
   ECMAScript's `numeric: auto`). A locale's runtime relative patterns still
   win over the names.
+- `{offset, relative, mon}` .. `{offset, relative, sun}` give CLDR's weekday
+  names for -1, 0 and +1 ("last Monday", "letzten Montag", "先週の月曜日");
+  other offsets are invalid, as CLDR has no pattern counting weekdays.
 - **Catalog entries under `und` are locale-neutral**: found last, after the
   default locale, they render in the requested locale rather than in the
   one they were found under. One `und` entry written in CLDR-backed

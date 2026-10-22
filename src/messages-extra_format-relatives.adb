@@ -1,6 +1,12 @@
 separate (Messages.Extra_Format)
 package body Relatives is
 
+   --  A weekday as CLDR names its relative field. A weekday has only CLDR's
+   --  names -- "last Monday", "this Monday", "next Monday" -- not patterns.
+   function Is_Weekday (Base : String) return Boolean is
+     (Base = "mon" or else Base = "tue" or else Base = "wed" or else Base = "thu"
+      or else Base = "fri" or else Base = "sat" or else Base = "sun");
+
    function Relative_Option_Is_Valid (Option : String) return Boolean is
       Base : constant String := Option_Base (Option);
       Width : constant String := Option_Width (Option);
@@ -23,7 +29,8 @@ package body Relatives is
            or else Base = "week"
            or else Base = "month"
            or else Base = "quarter"
-           or else Base = "year");
+           or else Base = "year"
+           or else Is_Weekday (Base));
    end Relative_Option_Is_Valid;
    function Relative_Width_Key (Option : String) return String is
       Width : constant String := Option_Width (Option);
@@ -87,7 +94,7 @@ package body Relatives is
    begin
       if Found then
          return Override;
-      elsif Offset = 0 or else abs Offset > 2 then
+      elsif (Offset = 0 and then not Is_Weekday (Base)) or else abs Offset > 2 then
          --  0 is the current period's name (Relative_Current); CLDR names
          --  no offset past two.
          return "";
@@ -468,6 +475,9 @@ package body Relatives is
          if Exact_Found then
             Put (Target, Last, Overflow, Exact_Value);
             Ok := not Overflow;
+            return;
+         elsif Is_Weekday (Option_Base (Option)) then
+            --  No pattern counts weeks of Mondays.
             return;
          end if;
       end;
