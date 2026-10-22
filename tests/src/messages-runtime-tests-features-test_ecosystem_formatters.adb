@@ -3421,10 +3421,10 @@ begin
              & " 2 " & UTF8 ([16#433#, 16#43E#, 16#434#, 16#430#]),
            "relative-time formatter localizes Russian year offsets");
    Assert (Rendered (Runtime, "ar", "relative_week", Args) =
-             UTF8 ([16#62E#, 16#644#, 16#627#, 16#644#]) & " "
-             & U (16#0662#) & " "
-             & UTF8 ([16#623#, 16#633#, 16#628#, 16#648#, 16#639#]),
-           "relative-time formatter localizes Arabic week offsets");
+             U (16#62E#) & U (16#644#) & U (16#627#) & U (16#644#) & " "
+             & U (16#623#) & U (16#633#) & U (16#628#) & U (16#648#) & U (16#639#)
+             & U (16#64A#) & U (16#646#),
+           "relative-time formatter gives Arabic's CLDR dual for two weeks ahead");
    Assert (Rendered (Runtime, "de", "relative_quarter_short", Args) =
            "in 2 Quart.",
            "relative-time formatter localizes German short quarter offsets");
