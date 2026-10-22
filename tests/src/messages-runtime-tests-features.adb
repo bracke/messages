@@ -647,7 +647,7 @@ package body Messages.Runtime.Tests.Features is
 
       function Persian_Time return String is
       begin
-         return U (16#6F0#) & U (16#6F9#) & ":" & U (16#6F0#) & U (16#6F5#);
+         return U (16#6F9#) & ":" & U (16#6F0#) & U (16#6F5#);
       end Persian_Time;
 
       procedure Set_Common (Count : String) is
@@ -752,7 +752,7 @@ package body Messages.Runtime.Tests.Features is
         ("hi-IN-x-test", "2",
          "hi 12,34,567.89 " & U (16#20B9#) & "12,34,567.80 29 "
          & U (16#92B#) & U (16#93C#) & U (16#930#) & U (16#935#)
-         & U (16#930#) & U (16#940#) & " 2024 09:05 other");
+         & U (16#930#) & U (16#940#) & " 2024 9:05 am other");
       Assert_Render
         ("ar-EG", "3",
          "ar " & U (16#661#) & U (16#66C#) & U (16#662#) & U (16#663#)
@@ -763,8 +763,8 @@ package body Messages.Runtime.Tests.Features is
          & U (16#667#) & U (16#66B#) & U (16#668#) & U (16#660#) & " $ "
          & U (16#662#) & U (16#669#) & U (16#200F#) & "/" & U (16#662#)
          & U (16#200F#) & "/" & U (16#662#) & U (16#660#) & U (16#662#)
-         & U (16#664#) & " " & U (16#660#) & U (16#669#) & ":"
-         & U (16#660#) & U (16#665#) & " few");
+         & U (16#664#) & " " & U (16#669#) & ":"
+         & U (16#660#) & U (16#665#) & " " & U (16#635#) & " few");
       Assert_Render
         ("fa-IR", "1",
          "fa " & Persian_Number & " " & Persian_Currency & " "
@@ -799,7 +799,7 @@ package body Messages.Runtime.Tests.Features is
          "zz 1,234,567.89 other");
       Assert_Render
         ("es-MX", "1",
-         "en 1,234,567.89 $1,234,567.80 February 29, 2024 09:05 one");
+         "en 1,234,567.89 $1,234,567.80 February 29, 2024 9:05" & U (16#202F#) & "AM one");
    end Test_Locale_Fallback_Formatting_Matrix;
 
    ---------------------------------------------------------------------------
@@ -2378,7 +2378,7 @@ package body Messages.Runtime.Tests.Features is
       Messages.Arguments.Set (Args, "channel", "sms");
       Messages.Arguments.Set (Args, "count", "1");
       Assert (Rendered (Runtime, "en", "summary", Args) =
-                "one sms at 09:05",
+                "one sms at 9:05" & U (16#202F#) & "AM",
               "English select branch nests short time formatting");
 
       Messages.Arguments.Set (Args, "channel", "email");

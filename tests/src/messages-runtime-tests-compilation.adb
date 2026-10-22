@@ -362,7 +362,8 @@ package body Messages.Runtime.Tests.Compilation is
            (Condition =>
               Result.Ok
               and then Messages.Errors.Value_Text (Result) =
-                "On 2026-06-29 at 14:30",
+                "On 2026-06-29 at 2:30"
+                & Character'Val (16#E2#) & Character'Val (16#80#) & Character'Val (16#AF#) & "PM",
             Message   => "compiled date/time should format values");
       end;
       Messages.Runtime.Finalize (Runtime);

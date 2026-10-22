@@ -683,12 +683,13 @@ begin
    Messages.Arguments.Set (Args, "day", "2024-02-29");
    Messages.Arguments.Set (Args, "clock", "09:05:07");
    Assert (Rendered (Runtime, "en", "when", Args) =
-             "On 2024-02-29 at 09:05:07",
-           "English date/time uses ISO date and 24-hour time");
+             "On 2024-02-29 at 9:05:07" & U (16#202F#) & "AM",
+           "English date/time uses ISO date and CLDR's 12-hour time");
    Assert (Rendered (Runtime, "de", "when", Args) =
              "Am 29.02.2024 um 09:05:07",
            "German date uses day-month-year output");
-   Assert (Rendered (Runtime, "en", "short", Args) = "2/29/24 09:05",
+   Assert (Rendered (Runtime, "en", "short", Args) =
+             "2/29/24 9:05" & U (16#202F#) & "AM",
            "short date/time styles render deterministically");
    Assert (Rendered (Runtime, "en", "short_skeleton_alias", Args) =
              Rendered (Runtime, "en", "short", Args),
@@ -709,7 +710,7 @@ begin
              Rendered (Runtime, "en", "medium", Args),
            "date/medium/time/medium skeleton aliases match date/time styles");
    Assert (Rendered (Runtime, "en", "long", Args) =
-             "February 29, 2024 09:05:07",
+             "February 29, 2024 9:05:07" & U (16#202F#) & "AM UTC",
            "long date/time styles render deterministically");
    Assert (Rendered (Runtime, "en", "long_skeleton_alias", Args) =
              Rendered (Runtime, "en", "long", Args),
@@ -732,7 +733,16 @@ begin
    Assert (Rendered (Runtime, "de", "full", Args) =
              "Donnerstag, 29. Februar 2024",
            "full date style includes localized weekday and month names");
-   Assert (Rendered (Runtime, "ar", "full", Args) = Arabic_Full,
+   Assert (Rendered (Runtime, "ar", "full", Args) =
+             U (16#627#) & U (16#644#) & U (16#62E#) & U (16#645#) & U (16#64A#) & U (16#633#)
+             & U (16#60C#) & " " & U (16#662#) & U (16#669#) & " " & U (16#641#) & U (16#628#)
+             & U (16#631#) & U (16#627#) & U (16#64A#) & U (16#631#) & " " & U (16#662#)
+             & U (16#660#) & U (16#662#) & U (16#664#) & " " & U (16#669#) & ":" & U (16#660#)
+             & U (16#665#) & ":" & U (16#660#) & U (16#667#) & " " & U (16#635#) & " " & U (16#627#)
+             & U (16#644#) & U (16#62A#) & U (16#648#) & U (16#642#) & U (16#64A#) & U (16#62A#)
+             & " " & U (16#627#) & U (16#644#) & U (16#639#) & U (16#627#) & U (16#644#)
+             & U (16#645#) & U (16#64A#) & " " & U (16#627#) & U (16#644#) & U (16#645#)
+             & U (16#646#) & U (16#633#) & U (16#642#),
            "Arabic full date/time localizes names and digits");
    Assert (Rendered (Runtime, "ja", "full", Args) =
              "2024" & U (16#5E74#) & "2" & U (16#6708#)
@@ -764,7 +774,8 @@ begin
              Rendered (Runtime, "ko", "short_time", Args),
            "Korean short skeleton style alias keeps 12-hour output");
    Assert (Rendered (Runtime, "ko", "long_time", Args) =
-             U (16#C624#) & U (16#C804#) & " 9:05:07",
+             U (16#C624#) & U (16#C804#) & " 9" & U (16#C2DC#) & " 5" & U (16#BD84#) & " 7"
+             & U (16#CD08#) & " UTC",
            "Korean long time style uses localized 12-hour output");
    Assert (Rendered (Runtime, "ko", "long_time_alias", Args) =
              Rendered (Runtime, "ko", "long_time", Args),
@@ -909,67 +920,86 @@ begin
       "Hebrew calendar conversion applies to datetime skeletons");
 
    Messages.Arguments.Set (Args, "instant", "2024-02-29T23:30:00+02:00");
-   Assert (Rendered (Runtime, "en", "utc_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "utc_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM UTC",
            "time format converts offset instant to UTC");
-   Assert (Rendered (Runtime, "en", "utc_lower_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "utc_lower_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM UTC",
            "time format accepts lowercase utc as a UTC target-zone alias");
-   Assert (Rendered (Runtime, "en", "gmt_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "gmt_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM GMT",
            "time format accepts GMT as a UTC target-zone alias");
-   Assert (Rendered (Runtime, "en", "gmt_lower_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "gmt_lower_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM GMT",
            "time format accepts lowercase gmt as a UTC target-zone alias");
-   Assert (Rendered (Runtime, "en", "z_lower_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "z_lower_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM UTC",
            "time format accepts lowercase z as a UTC target-zone alias");
    Assert (Rendered (Runtime, "en", "offset_hour_time", Args) =
-             "23:30:00",
+             "11:30:00" & U (16#202F#) & "PM GMT+2",
            "time format accepts compact +HH target-zone offsets");
    Assert (Rendered (Runtime, "en", "offset_compact_time", Args) =
-             "00:00:00",
+             "12:00:00" & U (16#202F#) & "AM GMT+2:30",
            "time format accepts compact +HHMM target-zone offsets");
    Assert (Rendered (Runtime, "en", "offset_negative_hour_time", Args) =
-             "16:30:00",
+             "4:30:00" & U (16#202F#) & "PM GMT-5",
            "time format accepts compact -HH target-zone offsets");
-   Assert (Rendered (Runtime, "en", "etc_utc_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "etc_utc_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM UTC",
            "time format accepts Etc/UTC as a UTC target-zone alias");
-   Assert (Rendered (Runtime, "en", "etc_gmt_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "etc_gmt_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM GMT",
            "time format accepts Etc/GMT as a UTC target-zone alias");
-   Assert (Rendered (Runtime, "en", "ut_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "ut_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM UTC",
            "time format accepts UT as a UTC target-zone alias");
-   Assert (Rendered (Runtime, "en", "ut_lower_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "ut_lower_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM UTC",
            "time format accepts lowercase ut as a UTC target-zone alias");
-   Assert (Rendered (Runtime, "en", "zulu_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "zulu_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM UTC",
            "time format accepts Zulu as a UTC target-zone alias");
 
    Messages.Arguments.Set (Args, "instant", "2024-02-29T23:30:00+02");
-   Assert (Rendered (Runtime, "en", "utc_time", Args) = "21:30:00",
+   Assert (Rendered (Runtime, "en", "utc_time", Args) =
+             "9:30:00" & U (16#202F#) & "PM UTC",
            "time format accepts compact +HH instant offsets");
    Messages.Arguments.Set (Args, "instant", "2024-02-29T23:30:00+0230");
-   Assert (Rendered (Runtime, "en", "utc_time", Args) = "21:00:00",
+   Assert (Rendered (Runtime, "en", "utc_time", Args) =
+             "9:00:00" & U (16#202F#) & "PM UTC",
            "time format accepts compact +HHMM instant offsets");
    Messages.Arguments.Set (Args, "instant", "2024-02-29T23:30:00-05");
-   Assert (Rendered (Runtime, "en", "utc_time", Args) = "04:30:00",
+   Assert (Rendered (Runtime, "en", "utc_time", Args) =
+             "4:30:00" & U (16#202F#) & "AM UTC",
            "time format accepts compact -HH instant offsets");
 
    Messages.Arguments.Set (Args, "instant", "2024-02-29T23:30:00Z");
    Assert (Rendered (Runtime, "en", "berlin_date", Args) = "3/1/24",
            "date format converts instant into configured zone date");
    Messages.Arguments.Set (Args, "instant", "2024-07-01T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "berlin_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "berlin_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Berlin named zone applies deterministic summer time");
    Messages.Arguments.Set (Args, "instant", "2024-03-31T00:59:00Z");
-   Assert (Rendered (Runtime, "en", "berlin_summer", Args) = "01:59",
+   Assert (Rendered (Runtime, "en", "berlin_summer", Args) =
+             "1:59" & U (16#202F#) & "AM",
            "Berlin DST boundary keeps standard offset before spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-03-31T01:00:00Z");
-   Assert (Rendered (Runtime, "en", "berlin_summer", Args) = "03:00",
+   Assert (Rendered (Runtime, "en", "berlin_summer", Args) =
+             "3:00" & U (16#202F#) & "AM",
            "Berlin DST boundary applies summer offset at spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-10-27T00:59:00Z");
-   Assert (Rendered (Runtime, "en", "berlin_summer", Args) = "02:59",
+   Assert (Rendered (Runtime, "en", "berlin_summer", Args) =
+             "2:59" & U (16#202F#) & "AM",
            "Berlin DST boundary keeps summer offset before autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-10-27T01:00:00Z");
-   Assert (Rendered (Runtime, "en", "berlin_summer", Args) = "02:00",
+   Assert (Rendered (Runtime, "en", "berlin_summer", Args) =
+             "2:00" & U (16#202F#) & "AM",
            "Berlin DST boundary restores standard offset at autumn transition");
 
    Messages.Arguments.Set (Args, "instant", "2024-03-01T02:30:00Z");
-   Assert (Rendered (Runtime, "en", "new_york", Args) = "2/29/24 21:30",
+   Assert (Rendered (Runtime, "en", "new_york", Args) =
+             "2/29/24 9:30" & U (16#202F#) & "PM",
            "datetime format converts instant into configured zone");
    Assert (Rendered (Runtime, "en", "us_eastern", Args) =
              Rendered (Runtime, "en", "new_york", Args),
@@ -1042,11 +1072,14 @@ begin
         Rendered (Runtime, "en", "new_york_full", Args),
       "dateTime-full skeleton alias preserves zone conversion");
    Messages.Arguments.Set (Args, "instant", "2024-07-01T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "new_york_summer", Args) = "08:00",
+   Assert (Rendered (Runtime, "en", "new_york_summer", Args) =
+             "8:00" & U (16#202F#) & "AM",
            "New York named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "canada_eastern", Args) = "08:00",
+   Assert (Rendered (Runtime, "en", "canada_eastern", Args) =
+             "8:00" & U (16#202F#) & "AM",
            "Canada/Eastern aliases America/Toronto");
-   Assert (Rendered (Runtime, "en", "us_pacific", Args) = "05:00",
+   Assert (Rendered (Runtime, "en", "us_pacific", Args) =
+             "5:00" & U (16#202F#) & "AM",
            "US/Pacific aliases America/Los_Angeles");
    Assert (Rendered (Runtime, "en", "new_york_offset", Args) =
              "2024 07 01 08:00 -0400",
@@ -1065,366 +1098,533 @@ begin
              "2024 01 02 01:45 +1345",
            "generated tzdb table converts Pacific/Chatham daylight offset");
    Messages.Arguments.Set (Args, "instant", "2024-03-10T06:59:00Z");
-   Assert (Rendered (Runtime, "en", "new_york_summer", Args) = "01:59",
+   Assert (Rendered (Runtime, "en", "new_york_summer", Args) =
+             "1:59" & U (16#202F#) & "AM",
            "New York DST boundary keeps standard offset before spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-03-10T07:00:00Z");
-   Assert (Rendered (Runtime, "en", "new_york_summer", Args) = "03:00",
+   Assert (Rendered (Runtime, "en", "new_york_summer", Args) =
+             "3:00" & U (16#202F#) & "AM",
            "New York DST boundary applies daylight offset at spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-11-03T05:59:00Z");
-   Assert (Rendered (Runtime, "en", "new_york_summer", Args) = "01:59",
+   Assert (Rendered (Runtime, "en", "new_york_summer", Args) =
+             "1:59" & U (16#202F#) & "AM",
            "New York DST boundary keeps daylight offset before autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-11-03T06:00:00Z");
-   Assert (Rendered (Runtime, "en", "new_york_summer", Args) = "01:00",
+   Assert (Rendered (Runtime, "en", "new_york_summer", Args) =
+             "1:00" & U (16#202F#) & "AM",
            "New York DST boundary restores standard offset at autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-07-01T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "toronto", Args) = "08:00",
+   Assert (Rendered (Runtime, "en", "toronto", Args) =
+             "8:00" & U (16#202F#) & "AM",
            "Toronto named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "montreal", Args) = "08:00",
+   Assert (Rendered (Runtime, "en", "montreal", Args) =
+             "8:00" & U (16#202F#) & "AM",
            "Montreal named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "detroit", Args) = "08:00",
+   Assert (Rendered (Runtime, "en", "detroit", Args) =
+             "8:00" & U (16#202F#) & "AM",
            "Detroit named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "indianapolis", Args) = "08:00",
+   Assert (Rendered (Runtime, "en", "indianapolis", Args) =
+             "8:00" & U (16#202F#) & "AM",
            "Indianapolis named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "louisville", Args) = "08:00",
+   Assert (Rendered (Runtime, "en", "louisville", Args) =
+             "8:00" & U (16#202F#) & "AM",
            "Louisville named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "nassau", Args) = "08:00",
+   Assert (Rendered (Runtime, "en", "nassau", Args) =
+             "8:00" & U (16#202F#) & "AM",
            "Nassau named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "london_summer", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "london_summer", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "London named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "dublin", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "dublin", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Dublin named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "lisbon", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "lisbon", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Lisbon named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "canary", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "canary", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Canary named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "moscow", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "moscow", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Moscow named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "athens", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "athens", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Athens named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "helsinki", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "helsinki", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Helsinki named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "bucharest", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "bucharest", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Bucharest named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "sofia", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "sofia", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Sofia named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "vilnius", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "vilnius", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Vilnius named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "riga", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "riga", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Riga named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "tallinn", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "tallinn", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Tallinn named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "kyiv", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "kyiv", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Kyiv named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "rome_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "rome_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Rome named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "amsterdam_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "amsterdam_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Amsterdam named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "zurich_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "zurich_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Zurich named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "vienna_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "vienna_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Vienna named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "brussels_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "brussels_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Brussels named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "copenhagen_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "copenhagen_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Copenhagen named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "stockholm_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "stockholm_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Stockholm named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "oslo_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "oslo_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Oslo named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "warsaw_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "warsaw_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Warsaw named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "prague_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "prague_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Prague named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "budapest_summer", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "budapest_summer", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Budapest named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "bratislava", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "bratislava", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Bratislava named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "luxembourg", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "luxembourg", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Luxembourg named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "monaco", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "monaco", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Monaco named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "andorra", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "andorra", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Andorra named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "malta", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "malta", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Malta named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "san_marino", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "san_marino", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "San Marino named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "vatican", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "vatican", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Vatican named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "belgrade", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "belgrade", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Belgrade named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "zagreb", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "zagreb", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Zagreb named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "ljubljana", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "ljubljana", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Ljubljana named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "sarajevo", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "sarajevo", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Sarajevo named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "skopje", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "skopje", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Skopje named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "podgorica", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "podgorica", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Podgorica named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "tirane", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "tirane", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Tirane named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "chisinau", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "chisinau", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Chisinau named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "nicosia", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "nicosia", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Nicosia named zone applies deterministic summer time");
-   Assert (Rendered (Runtime, "en", "los_angeles_summer", Args) = "05:00",
+   Assert (Rendered (Runtime, "en", "los_angeles_summer", Args) =
+             "5:00" & U (16#202F#) & "AM",
            "Los Angeles named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "vancouver", Args) = "05:00",
+   Assert (Rendered (Runtime, "en", "vancouver", Args) =
+             "5:00" & U (16#202F#) & "AM",
            "Vancouver named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "tijuana", Args) = "05:00",
+   Assert (Rendered (Runtime, "en", "tijuana", Args) =
+             "5:00" & U (16#202F#) & "AM",
            "Tijuana named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "denver_summer", Args) = "06:00",
+   Assert (Rendered (Runtime, "en", "denver_summer", Args) =
+             "6:00" & U (16#202F#) & "AM",
            "Denver named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "boise", Args) = "06:00",
+   Assert (Rendered (Runtime, "en", "boise", Args) =
+             "6:00" & U (16#202F#) & "AM",
            "Boise named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "edmonton", Args) = "06:00",
+   Assert (Rendered (Runtime, "en", "edmonton", Args) =
+             "6:00" & U (16#202F#) & "AM",
            "Edmonton named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "winnipeg", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "winnipeg", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Winnipeg named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "phoenix", Args) = "05:00",
+   Assert (Rendered (Runtime, "en", "phoenix", Args) =
+             "5:00" & U (16#202F#) & "AM",
            "Phoenix named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "mexico_city", Args) = "06:00",
+   Assert (Rendered (Runtime, "en", "mexico_city", Args) =
+             "6:00" & U (16#202F#) & "AM",
            "Mexico City named zone uses deterministic post-2022 fixed offset");
-   Assert (Rendered (Runtime, "en", "bogota", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "bogota", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Bogota named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "lima", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "lima", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Lima named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "johannesburg", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "johannesburg", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Johannesburg named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "accra", Args) = "12:00",
+   Assert (Rendered (Runtime, "en", "accra", Args) =
+             "12:00" & U (16#202F#) & "PM",
            "Accra named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "abidjan", Args) = "12:00",
+   Assert (Rendered (Runtime, "en", "abidjan", Args) =
+             "12:00" & U (16#202F#) & "PM",
            "Abidjan named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "algiers", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "algiers", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Algiers named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "tunis", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "tunis", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Tunis named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "nairobi", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "nairobi", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Nairobi named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "lagos", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "lagos", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Lagos named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "dubai", Args) = "16:00",
+   Assert (Rendered (Runtime, "en", "dubai", Args) =
+             "4:00" & U (16#202F#) & "PM",
            "Dubai named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "yerevan", Args) = "16:00",
+   Assert (Rendered (Runtime, "en", "yerevan", Args) =
+             "4:00" & U (16#202F#) & "PM",
            "Yerevan named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "tbilisi", Args) = "16:00",
+   Assert (Rendered (Runtime, "en", "tbilisi", Args) =
+             "4:00" & U (16#202F#) & "PM",
            "Tbilisi named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "baku", Args) = "16:00",
+   Assert (Rendered (Runtime, "en", "baku", Args) =
+             "4:00" & U (16#202F#) & "PM",
            "Baku named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "riyadh", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "riyadh", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Riyadh named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "jerusalem", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "jerusalem", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Jerusalem named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "tehran", Args) = "15:30",
+   Assert (Rendered (Runtime, "en", "tehran", Args) =
+             "3:30" & U (16#202F#) & "PM",
            "Tehran named zone uses deterministic post-2022 fixed offset");
-   Assert (Rendered (Runtime, "en", "shanghai", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "shanghai", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Shanghai named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "singapore", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "singapore", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Singapore named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "hong_kong", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "hong_kong", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Hong Kong named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "taipei", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "taipei", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Taipei named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "kuala_lumpur", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "kuala_lumpur", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Kuala Lumpur named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "istanbul", Args) = "15:00",
+   Assert (Rendered (Runtime, "en", "istanbul", Args) =
+             "3:00" & U (16#202F#) & "PM",
            "Istanbul named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "seoul", Args) = "21:00",
+   Assert (Rendered (Runtime, "en", "seoul", Args) =
+             "9:00" & U (16#202F#) & "PM",
            "Seoul named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "ulaanbaatar", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "ulaanbaatar", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Ulaanbaatar named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "bangkok", Args) = "19:00",
+   Assert (Rendered (Runtime, "en", "bangkok", Args) =
+             "7:00" & U (16#202F#) & "PM",
            "Bangkok named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "jakarta", Args) = "19:00",
+   Assert (Rendered (Runtime, "en", "jakarta", Args) =
+             "7:00" & U (16#202F#) & "PM",
            "Jakarta named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "ho_chi_minh", Args) = "19:00",
+   Assert (Rendered (Runtime, "en", "ho_chi_minh", Args) =
+             "7:00" & U (16#202F#) & "PM",
            "Ho Chi Minh named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "karachi", Args) = "17:00",
+   Assert (Rendered (Runtime, "en", "karachi", Args) =
+             "5:00" & U (16#202F#) & "PM",
            "Karachi named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "colombo", Args) = "17:30",
+   Assert (Rendered (Runtime, "en", "colombo", Args) =
+             "5:30" & U (16#202F#) & "PM",
            "Colombo named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "dhaka", Args) = "18:00",
+   Assert (Rendered (Runtime, "en", "dhaka", Args) =
+             "6:00" & U (16#202F#) & "PM",
            "Dhaka named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "yangon", Args) = "18:30",
+   Assert (Rendered (Runtime, "en", "yangon", Args) =
+             "6:30" & U (16#202F#) & "PM",
            "Yangon named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "tashkent", Args) = "17:00",
+   Assert (Rendered (Runtime, "en", "tashkent", Args) =
+             "5:00" & U (16#202F#) & "PM",
            "Tashkent named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "kathmandu", Args) = "17:45",
+   Assert (Rendered (Runtime, "en", "kathmandu", Args) =
+             "5:45" & U (16#202F#) & "PM",
            "Kathmandu named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "manila", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "manila", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Manila named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "honolulu", Args) = "02:00",
+   Assert (Rendered (Runtime, "en", "honolulu", Args) =
+             "2:00" & U (16#202F#) & "AM",
            "Honolulu named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "auckland", Args) = "00:00",
+   Assert (Rendered (Runtime, "en", "auckland", Args) =
+             "12:00" & U (16#202F#) & "AM",
            "Auckland named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "sydney", Args) = "22:00",
+   Assert (Rendered (Runtime, "en", "sydney", Args) =
+             "10:00" & U (16#202F#) & "PM",
            "Sydney named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "melbourne", Args) = "22:00",
+   Assert (Rendered (Runtime, "en", "melbourne", Args) =
+             "10:00" & U (16#202F#) & "PM",
            "Melbourne named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "hobart", Args) = "22:00",
+   Assert (Rendered (Runtime, "en", "hobart", Args) =
+             "10:00" & U (16#202F#) & "PM",
            "Hobart named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "adelaide", Args) = "21:30",
+   Assert (Rendered (Runtime, "en", "adelaide", Args) =
+             "9:30" & U (16#202F#) & "PM",
            "Adelaide named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "brisbane", Args) = "22:00",
+   Assert (Rendered (Runtime, "en", "brisbane", Args) =
+             "10:00" & U (16#202F#) & "PM",
            "Brisbane named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "perth", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "perth", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Perth named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "darwin", Args) = "21:30",
+   Assert (Rendered (Runtime, "en", "darwin", Args) =
+             "9:30" & U (16#202F#) & "PM",
            "Darwin named zone uses deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "sao_paulo", Args) = "09:00",
+   Assert (Rendered (Runtime, "en", "sao_paulo", Args) =
+             "9:00" & U (16#202F#) & "AM",
            "Sao Paulo named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "buenos_aires", Args) = "09:00",
+   Assert (Rendered (Runtime, "en", "buenos_aires", Args) =
+             "9:00" & U (16#202F#) & "AM",
            "Buenos Aires named zone uses deterministic fixed offset");
 
    Messages.Arguments.Set (Args, "instant", "2021-07-01T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "mexico_city", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "mexico_city", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Mexico City named zone applies historical deterministic DST");
-   Assert (Rendered (Runtime, "en", "tehran", Args) = "16:30",
+   Assert (Rendered (Runtime, "en", "tehran", Args) =
+             "4:30" & U (16#202F#) & "PM",
            "Tehran named zone applies historical deterministic DST");
 
    Messages.Arguments.Set (Args, "instant", "2018-01-15T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "sao_paulo", Args) = "10:00",
+   Assert (Rendered (Runtime, "en", "sao_paulo", Args) =
+             "10:00" & U (16#202F#) & "AM",
            "Sao Paulo named zone applies historical deterministic DST");
 
    Messages.Arguments.Set (Args, "instant", "2024-01-15T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "sao_paulo", Args) = "09:00",
+   Assert (Rendered (Runtime, "en", "sao_paulo", Args) =
+             "9:00" & U (16#202F#) & "AM",
            "Sao Paulo named zone uses post-2019 deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "auckland", Args) = "01:00",
+   Assert (Rendered (Runtime, "en", "auckland", Args) =
+             "1:00" & U (16#202F#) & "AM",
            "Auckland named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "sydney", Args) = "23:00",
+   Assert (Rendered (Runtime, "en", "sydney", Args) =
+             "11:00" & U (16#202F#) & "PM",
            "Sydney named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "melbourne", Args) = "23:00",
+   Assert (Rendered (Runtime, "en", "melbourne", Args) =
+             "11:00" & U (16#202F#) & "PM",
            "Melbourne named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "hobart", Args) = "23:00",
+   Assert (Rendered (Runtime, "en", "hobart", Args) =
+             "11:00" & U (16#202F#) & "PM",
            "Hobart named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "adelaide", Args) = "22:30",
+   Assert (Rendered (Runtime, "en", "adelaide", Args) =
+             "10:30" & U (16#202F#) & "PM",
            "Adelaide named zone applies deterministic daylight time");
-   Assert (Rendered (Runtime, "en", "brisbane", Args) = "22:00",
+   Assert (Rendered (Runtime, "en", "brisbane", Args) =
+             "10:00" & U (16#202F#) & "PM",
            "Brisbane named zone remains on deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "perth", Args) = "20:00",
+   Assert (Rendered (Runtime, "en", "perth", Args) =
+             "8:00" & U (16#202F#) & "PM",
            "Perth named zone remains on deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "darwin", Args) = "21:30",
+   Assert (Rendered (Runtime, "en", "darwin", Args) =
+             "9:30" & U (16#202F#) & "PM",
            "Darwin named zone remains on deterministic fixed offset");
-   Assert (Rendered (Runtime, "en", "jerusalem", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "jerusalem", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Jerusalem named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "tehran", Args) = "15:30",
+   Assert (Rendered (Runtime, "en", "tehran", Args) =
+             "3:30" & U (16#202F#) & "PM",
            "Tehran named zone applies deterministic standard time");
    Messages.Arguments.Set (Args, "instant", "2024-03-28T23:59:00Z");
-   Assert (Rendered (Runtime, "en", "jerusalem", Args) = "01:59",
+   Assert (Rendered (Runtime, "en", "jerusalem", Args) =
+             "1:59" & U (16#202F#) & "AM",
            "Jerusalem DST boundary keeps standard offset before spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-03-29T00:00:00Z");
-   Assert (Rendered (Runtime, "en", "jerusalem", Args) = "03:00",
+   Assert (Rendered (Runtime, "en", "jerusalem", Args) =
+             "3:00" & U (16#202F#) & "AM",
            "Jerusalem DST boundary applies daylight offset at spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-10-26T22:59:00Z");
-   Assert (Rendered (Runtime, "en", "jerusalem", Args) = "01:59",
+   Assert (Rendered (Runtime, "en", "jerusalem", Args) =
+             "1:59" & U (16#202F#) & "AM",
            "Jerusalem tzdb boundary keeps daylight offset before autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-10-26T23:00:00Z");
-   Assert (Rendered (Runtime, "en", "jerusalem", Args) = "01:00",
+   Assert (Rendered (Runtime, "en", "jerusalem", Args) =
+             "1:00" & U (16#202F#) & "AM",
            "Jerusalem tzdb boundary restores standard offset at autumn transition");
    Messages.Arguments.Set (Args, "instant", "2021-03-21T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "tehran", Args) = "15:30",
+   Assert (Rendered (Runtime, "en", "tehran", Args) =
+             "3:30" & U (16#202F#) & "PM",
            "Tehran historical DST boundary keeps standard offset before spring transition");
    Messages.Arguments.Set (Args, "instant", "2021-03-22T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "tehran", Args) = "16:30",
+   Assert (Rendered (Runtime, "en", "tehran", Args) =
+             "4:30" & U (16#202F#) & "PM",
            "Tehran historical DST boundary applies daylight offset after spring transition");
    Messages.Arguments.Set (Args, "instant", "2021-09-21T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "tehran", Args) = "16:30",
+   Assert (Rendered (Runtime, "en", "tehran", Args) =
+             "4:30" & U (16#202F#) & "PM",
            "Tehran historical DST boundary keeps daylight offset before autumn transition");
    Messages.Arguments.Set (Args, "instant", "2021-09-22T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "tehran", Args) = "15:30",
+   Assert (Rendered (Runtime, "en", "tehran", Args) =
+             "3:30" & U (16#202F#) & "PM",
            "Tehran historical DST boundary restores standard offset after autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-04-06T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "auckland", Args) = "01:00",
+   Assert (Rendered (Runtime, "en", "auckland", Args) =
+             "1:00" & U (16#202F#) & "AM",
            "Auckland DST boundary keeps daylight offset before autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-04-07T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "auckland", Args) = "00:00",
+   Assert (Rendered (Runtime, "en", "auckland", Args) =
+             "12:00" & U (16#202F#) & "AM",
            "Auckland DST boundary restores standard offset after autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-09-28T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "auckland", Args) = "00:00",
+   Assert (Rendered (Runtime, "en", "auckland", Args) =
+             "12:00" & U (16#202F#) & "AM",
            "Auckland DST boundary keeps standard offset before spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-09-29T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "auckland", Args) = "01:00",
+   Assert (Rendered (Runtime, "en", "auckland", Args) =
+             "1:00" & U (16#202F#) & "AM",
            "Auckland DST boundary applies daylight offset after spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-04-06T15:59:00Z");
-   Assert (Rendered (Runtime, "en", "sydney", Args) = "02:59",
+   Assert (Rendered (Runtime, "en", "sydney", Args) =
+             "2:59" & U (16#202F#) & "AM",
            "Sydney DST boundary keeps daylight offset before autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-04-06T16:00:00Z");
-   Assert (Rendered (Runtime, "en", "sydney", Args) = "02:00",
+   Assert (Rendered (Runtime, "en", "sydney", Args) =
+             "2:00" & U (16#202F#) & "AM",
            "Sydney DST boundary restores standard offset at autumn transition");
    Messages.Arguments.Set (Args, "instant", "2024-10-05T15:59:00Z");
-   Assert (Rendered (Runtime, "en", "sydney", Args) = "01:59",
+   Assert (Rendered (Runtime, "en", "sydney", Args) =
+             "1:59" & U (16#202F#) & "AM",
            "Sydney DST boundary keeps standard offset before spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-10-05T16:00:00Z");
-   Assert (Rendered (Runtime, "en", "sydney", Args) = "03:00",
+   Assert (Rendered (Runtime, "en", "sydney", Args) =
+             "3:00" & U (16#202F#) & "AM",
            "Sydney DST boundary applies daylight offset at spring transition");
    Messages.Arguments.Set (Args, "instant", "2024-01-15T12:00:00Z");
-   Assert (Rendered (Runtime, "en", "london_winter", Args) = "12:00",
+   Assert (Rendered (Runtime, "en", "london_winter", Args) =
+             "12:00" & U (16#202F#) & "PM",
            "London named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "dublin", Args) = "12:00",
+   Assert (Rendered (Runtime, "en", "dublin", Args) =
+             "12:00" & U (16#202F#) & "PM",
            "Dublin named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "lisbon", Args) = "12:00",
+   Assert (Rendered (Runtime, "en", "lisbon", Args) =
+             "12:00" & U (16#202F#) & "PM",
            "Lisbon named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "canary", Args) = "12:00",
+   Assert (Rendered (Runtime, "en", "canary", Args) =
+             "12:00" & U (16#202F#) & "PM",
            "Canary named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "athens", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "athens", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Athens named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "helsinki", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "helsinki", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Helsinki named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "bucharest", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "bucharest", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Bucharest named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "sofia", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "sofia", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Sofia named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "vilnius", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "vilnius", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Vilnius named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "riga", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "riga", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Riga named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "tallinn", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "tallinn", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Tallinn named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "kyiv", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "kyiv", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Kyiv named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "paris_winter", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "paris_winter", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Paris named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "zurich_winter", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "zurich_winter", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Zurich named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "stockholm_winter", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "stockholm_winter", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Stockholm named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "warsaw_winter", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "warsaw_winter", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Warsaw named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "madrid_winter", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "madrid_winter", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Madrid named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "bratislava", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "bratislava", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Bratislava named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "belgrade", Args) = "13:00",
+   Assert (Rendered (Runtime, "en", "belgrade", Args) =
+             "1:00" & U (16#202F#) & "PM",
            "Belgrade named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "chisinau", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "chisinau", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Chisinau named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "nicosia", Args) = "14:00",
+   Assert (Rendered (Runtime, "en", "nicosia", Args) =
+             "2:00" & U (16#202F#) & "PM",
            "Nicosia named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "chicago_winter", Args) = "06:00",
+   Assert (Rendered (Runtime, "en", "chicago_winter", Args) =
+             "6:00" & U (16#202F#) & "AM",
            "Chicago named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "toronto", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "toronto", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Toronto named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "montreal", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "montreal", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Montreal named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "detroit", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "detroit", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Detroit named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "indianapolis", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "indianapolis", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Indianapolis named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "louisville", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "louisville", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Louisville named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "nassau", Args) = "07:00",
+   Assert (Rendered (Runtime, "en", "nassau", Args) =
+             "7:00" & U (16#202F#) & "AM",
            "Nassau named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "winnipeg", Args) = "06:00",
+   Assert (Rendered (Runtime, "en", "winnipeg", Args) =
+             "6:00" & U (16#202F#) & "AM",
            "Winnipeg named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "edmonton", Args) = "05:00",
+   Assert (Rendered (Runtime, "en", "edmonton", Args) =
+             "5:00" & U (16#202F#) & "AM",
            "Edmonton named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "boise", Args) = "05:00",
+   Assert (Rendered (Runtime, "en", "boise", Args) =
+             "5:00" & U (16#202F#) & "AM",
            "Boise named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "vancouver", Args) = "04:00",
+   Assert (Rendered (Runtime, "en", "vancouver", Args) =
+             "4:00" & U (16#202F#) & "AM",
            "Vancouver named zone applies deterministic standard time");
-   Assert (Rendered (Runtime, "en", "tijuana", Args) = "04:00",
+   Assert (Rendered (Runtime, "en", "tijuana", Args) =
+             "4:00" & U (16#202F#) & "AM",
            "Tijuana named zone applies deterministic standard time");
 
    Messages.Arguments.Set (Args, "day", "2024-02-29");
