@@ -498,6 +498,7 @@ begin
       & ASCII.LF
       & "en.time_skeleton = ""{clock, time, ::hhmmssa}""" & ASCII.LF
       & "en.preferred_hour = ""{clock, time, ::jmm}""" & ASCII.LF
+      & "und.cldr_hour_minute = ""{clock, time, ::jm}""" & ASCII.LF
       & "en.preferred_hour_explicit = ""{clock, time, ::jmma}"""
       & ASCII.LF
       & "en.preferred_hour_no_period = ""{clock, time, ::Jmm}"""
@@ -1629,6 +1630,13 @@ begin
    Assert (Rendered (Runtime, "en", "time_skeleton", Args) =
              "09:05:07 AM",
            "time skeleton renders 12-hour clock and day period");
+   --  A j skeleton CLDR has a format for resolves to the region's hour
+   --  cycle (timeData) and that format: "h:mm a" in the US, "HH:mm" in
+   --  Germany.
+   Assert (Rendered (Runtime, "en", "cldr_hour_minute", Args) = "9:05" & U (16#202F#) & "AM",
+           "jm skeleton is CLDR's US hm format");
+   Assert (Rendered (Runtime, "de", "cldr_hour_minute", Args) = "09:05",
+           "jm skeleton is CLDR's German Hm format");
    Assert (Rendered (Runtime, "en", "preferred_hour", Args) =
              "9:05 AM",
            "j skeleton uses English preferred 12-hour cycle");
