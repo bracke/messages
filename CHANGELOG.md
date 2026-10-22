@@ -12,6 +12,18 @@ commits; each of those says in its own message what changed and why.
 
 ## [Unreleased]
 
+### Changed
+
+- **`{offset, relative, unit}` uses CLDR's names for the offsets it has
+  them for**: `yesterday` / `gestern` / `í gær` for -1 day, `übermorgen` for
+  +2, `last week`, rather than `1 day ago` and `in 2 days` (ICU's and
+  ECMAScript's `numeric: auto`). A locale's runtime relative patterns still
+  win over the names.
+- **Catalog entries under `und` are locale-neutral**: found last, after the
+  default locale, they render in the requested locale rather than in the
+  one they were found under. One `und` entry written in CLDR-backed
+  arguments serves every locale.
+
 ### Added
 
 - A catalogue check a project can run **without writing Ada**, so a consumer

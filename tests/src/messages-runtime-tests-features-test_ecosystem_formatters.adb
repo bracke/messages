@@ -1256,6 +1256,7 @@ begin
       & "per-measure-unit/duration-hour}"""
       & ASCII.LF
       & "en.relative = ""{offset, relative, day}""" & ASCII.LF
+      & "und.neutral_relative = ""{offset, relative, day}""" & ASCII.LF
       & "bn.relative = ""{offset, relative, day}""" & ASCII.LF
       & "en-u-nu-beng.relative = ""{offset, relative, day}"""
       & ASCII.LF
@@ -3264,97 +3265,111 @@ begin
      ("ur", "relative-time formatter localizes Urdu past offsets");
    Assert_Localized_Relative
      ("sr", "relative-time formatter localizes Serbian past offsets");
+   Messages.Arguments.Set (Args, "offset", "-1");
+   Assert (Rendered (Runtime, "de", "relative", Args) = "gestern",
+           "relative-time formatter gives CLDR's name for the day before");
+   Assert (Rendered (Runtime, "is", "neutral_relative", Args) =
+             U (16#ED#) & " g" & U (16#E6#) & "r",
+           "an und entry renders in the locale asked for, not the one it falls back to");
+   Messages.Arguments.Set (Args, "offset", "3");
+   Assert (Rendered (Runtime, "de", "relative", Args) = "in 3 Tagen",
+           "relative-time formatter uses the German future pattern past CLDR's named offsets");
    Messages.Arguments.Set (Args, "offset", "2");
    Assert (Rendered (Runtime, "bn", "relative", Args) =
-             U (16#9E8#) & " " & U (16#9A6#) & U (16#9BF#)
-             & U (16#9A8#) & U (16#9C7#) & U (16#9B0#)
-             & " " & U (16#9AE#) & U (16#9A7#) & U (16#9CD#)
-             & U (16#9AF#) & U (16#9C7#),
-           "relative-time formatter uses generated Bengali future pattern");
-   Assert (Rendered (Runtime, "de", "relative", Args) = "in 2 Tagen",
-           "relative-time formatter localizes German future offsets");
+             U (16#986#) & U (16#997#) & U (16#9BE#) & U (16#9AE#) & U (16#9C0#) & " " & U (16#9AA#)
+             & U (16#9B0#) & U (16#9B6#) & U (16#9C1#),
+           "relative-time formatter gives Bengali's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "de", "relative", Args) =
+             U (16#FC#) & "bermorgen",
+           "relative-time formatter gives German's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "fr", "relative", Args) =
-             "dans 2 jours",
-           "relative-time formatter localizes French future offsets");
+             "apr" & U (16#E8#) & "s-demain",
+           "relative-time formatter gives French's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "es", "relative", Args) =
-             "dentro de 2 d" & U (16#ED#) & "as",
-           "relative-time formatter localizes Spanish future offsets");
+             "pasado ma" & U (16#F1#) & "ana",
+           "relative-time formatter gives Spanish's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "it", "relative", Args) =
-             "tra 2 giorni",
-           "relative-time formatter localizes Italian future offsets");
-   Assert (Rendered (Runtime, "pt", "relative", Args) = "em 2 dias",
-           "relative-time formatter localizes Portuguese future offsets");
-   Assert (Rendered (Runtime, "nl", "relative", Args) = "over 2 dagen",
-           "relative-time formatter localizes Dutch future offsets");
-   Assert (Rendered (Runtime, "ro", "relative", Args) = "peste 2 zile",
-           "relative-time formatter localizes Romanian future offsets");
+             "dopodomani",
+           "relative-time formatter gives Italian's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "pt", "relative", Args) =
+             "depois de amanh" & U (16#E3#),
+           "relative-time formatter gives Portuguese's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "nl", "relative", Args) =
+             "overmorgen",
+           "relative-time formatter gives Dutch's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "ro", "relative", Args) =
+             "poim" & U (16#E2#) & "ine",
+           "relative-time formatter gives Romanian's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "lt", "relative", Args) =
-             "po 2 dien" & U (16#173#),
-           "relative-time formatter localizes Lithuanian future offsets");
+             "poryt",
+           "relative-time formatter gives Lithuanian's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "sl", "relative", Args) =
-             U (16#10D#) & "ez 2 dneva",
-           "relative-time formatter localizes Slovenian future offsets");
-   Assert (Rendered (Runtime, "pl", "relative", Args) = "za 2 dni",
-           "relative-time formatter localizes Polish future offsets");
-   Assert (Rendered (Runtime, "cs", "relative", Args) = "za 2 dny",
-           "relative-time formatter localizes Czech future offsets");
+             "pojutri" & U (16#161#) & "njem",
+           "relative-time formatter gives Slovenian's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "pl", "relative", Args) =
+             "pojutrze",
+           "relative-time formatter gives Polish's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "cs", "relative", Args) =
+             "poz" & U (16#ED#) & "t" & U (16#159#) & U (16#ED#),
+           "relative-time formatter gives Czech's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "ru", "relative", Args) =
-             UTF8 ([16#447#, 16#435#, 16#440#, 16#435#, 16#437#])
-             & " 2 " & UTF8 ([16#434#, 16#43D#, 16#44F#]),
-           "relative-time formatter localizes Russian future offsets");
+             U (16#43F#) & U (16#43E#) & U (16#441#) & U (16#43B#) & U (16#435#) & U (16#437#)
+             & U (16#430#) & U (16#432#) & U (16#442#) & U (16#440#) & U (16#430#),
+           "relative-time formatter gives Russian's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "ar", "relative", Args) =
-             UTF8 ([16#62E#, 16#644#, 16#627#, 16#644#]) & " "
-             & U (16#0662#) & " "
-             & UTF8 ([16#64A#, 16#648#, 16#645#]),
-           "relative-time formatter localizes Arabic future offsets");
+             U (16#628#) & U (16#639#) & U (16#62F#) & " " & U (16#627#) & U (16#644#) & U (16#63A#)
+             & U (16#62F#),
+           "relative-time formatter gives Arabic's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "ja", "relative", Args) =
-             "2 " & UTF8 ([16#65E5#, 16#5F8C#]),
-           "relative-time formatter localizes Japanese future offsets");
+             U (16#660E#) & U (16#5F8C#) & U (16#65E5#),
+           "relative-time formatter gives Japanese's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "zh", "relative", Args) =
-             "2" & UTF8 ([16#5929#, 16#540E#]),
-           "relative-time formatter localizes Chinese future offsets");
+             U (16#540E#) & U (16#5929#),
+           "relative-time formatter gives Chinese's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "ko", "relative", Args) =
-             "2" & U (16#C77C#) & " " & U (16#D6C4#),
-           "relative-time formatter localizes Korean future offsets");
+             U (16#BAA8#) & U (16#B808#),
+           "relative-time formatter gives Korean's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "tr", "relative", Args) =
-             "2 " & UTF8 ([16#67#, 16#FC#, 16#6E#]) & " sonra",
-           "relative-time formatter localizes Turkish future offsets");
-   Assert (Rendered (Runtime, "sv", "relative", Args) = "om 2 dagar",
-           "relative-time formatter localizes Swedish future offsets");
-   Assert (Rendered (Runtime, "da", "relative", Args) = "om 2 dage",
-           "relative-time formatter localizes Danish future offsets");
+             U (16#F6#) & "b" & U (16#FC#) & "r g" & U (16#FC#) & "n",
+           "relative-time formatter gives Turkish's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "sv", "relative", Args) =
+             "i " & U (16#F6#) & "vermorgon",
+           "relative-time formatter gives Swedish's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "da", "relative", Args) =
+             "i overmorgen",
+           "relative-time formatter gives Danish's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "eo", "relative", Args) = "post 2 tagoj",
            "relative-time formatter localizes Esperanto future offsets");
    Assert (Rendered (Runtime, "vi", "relative", Args) =
-             "sau 2 " & UTF8 ([16#6E#, 16#67#, 16#E0#, 16#79#])
-             & " n" & U (16#1EEF#) & "a",
-           "relative-time formatter localizes Vietnamese future offsets");
+             "Ng" & U (16#E0#) & "y kia",
+           "relative-time formatter gives Vietnamese's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "hu", "relative", Args) =
-             "2 nap" & UTF8 ([16#20#, 16#6D#, 16#FA#, 16#6C#,
-                              16#76#, 16#61#]),
-           "relative-time formatter localizes Hungarian future offsets");
-   Assert (Rendered (Runtime, "sk", "relative", Args) = "o 2 dni",
-           "relative-time formatter localizes Slovak future offsets");
+             "holnaput" & U (16#E1#) & "n",
+           "relative-time formatter gives Hungarian's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "sk", "relative", Args) =
+             "pozajtra",
+           "relative-time formatter gives Slovak's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "fi", "relative", Args) =
-             "2 " & UTF8 ([16#70#, 16#E4#, 16#69#, 16#76#,
-                           16#E4#, 16#6E#])
-             & UTF8 ([16#20#, 16#70#, 16#E4#, 16#E4#,
-                      16#73#, 16#74#, 16#E4#]),
-           "relative-time formatter localizes Finnish future offsets");
+             "ylihuomenna",
+           "relative-time formatter gives Finnish's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "no", "relative", Args) =
-             "om 2 d" & U (16#F8#) & "gn",
-           "relative-time formatter localizes Norwegian future offsets");
-   Assert (Rendered (Runtime, "id", "relative", Args) = "dalam 2 hari",
-           "relative-time formatter localizes Indonesian future offsets");
-   Assert (Rendered (Runtime, "ms", "relative", Args) = "dalam 2 hari",
-           "relative-time formatter localizes Malay future offsets");
-   Assert (Rendered (Runtime, "af", "relative", Args) = "oor 2 dae",
-           "relative-time formatter localizes Afrikaans future offsets");
+             "i overmorgen",
+           "relative-time formatter gives Norwegian's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "id", "relative", Args) =
+             "lusa",
+           "relative-time formatter gives Indonesian's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "ms", "relative", Args) =
+             "lusa",
+           "relative-time formatter gives Malay's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "af", "relative", Args) =
+             "oorm" & U (16#F4#) & "re",
+           "relative-time formatter gives Afrikaans's CLDR name for two days ahead");
    Assert (Rendered (Runtime, "sw", "relative", Args) =
-             "baada ya siku 2",
-           "relative-time formatter localizes Swahili future offsets");
-   Assert (Rendered (Runtime, "eu", "relative", Args) = "2 egun barru",
-           "relative-time formatter localizes Basque future offsets");
+             "kesho kutwa",
+           "relative-time formatter gives Swahili's CLDR name for two days ahead");
+   Assert (Rendered (Runtime, "eu", "relative", Args) =
+             "etzi",
+           "relative-time formatter gives Basque's CLDR name for two days ahead");
    Assert_Localized_Relative
      ("bg", "relative-time formatter localizes Bulgarian future offsets");
    Assert_Localized_Relative

@@ -1229,7 +1229,8 @@ package body Messages.Runtime is
    end Index_Lookup;
 
    --  Walk the deterministic fallback chain (locale -> parent -> ... -> default
-   --  locale). Bounded by locale fallback depth with O(1) per-locale lookup.
+   --  locale -> und). Bounded by locale fallback depth with O(1) per-locale
+   --  lookup.
    procedure Resolve_Entry
      (Item            : Runtime;
       Locale          : String;
@@ -1265,6 +1266,17 @@ package body Messages.Runtime is
            (Item, To_String (Item.Default_Locale), Key, Hit, Idx);
          if Hit then
             Resolved_Locale := Item.Default_Locale;
+            return;
+         end if;
+      end if;
+
+      --  Last, an entry under und: a locale-neutral pattern, written in CLDR
+      --  terms alone ("{offset, relative, day}"), so it renders in the locale
+      --  asked for rather than in one it fell back to.
+      if Requested /= "und" then
+         Index_Lookup (Item, "und", Key, Hit, Idx);
+         if Hit then
+            Resolved_Locale := To_Unbounded_String (Requested);
             return;
          end if;
       end if;

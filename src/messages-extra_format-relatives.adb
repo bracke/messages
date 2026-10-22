@@ -53,6 +53,22 @@ package body Relatives is
          else I18N.Relative_Format.Current_Name (Locale, Base, Width));
    end Relative_Current;
 
+   function Runtime_Relative_Override_Present
+     (Locale   : String;
+      Base     : String;
+      Category : String;
+      Future   : Boolean)
+      return Boolean;
+
+   function Runtime_Relative_Time_Pattern
+     (Locale   : String;
+      Base     : String;
+      Width    : String;
+      Category : String;
+      Future   : Boolean;
+      Found    : out Boolean)
+      return String;
+
    function Relative_Exact
      (Locale : String;
       Option : String;
@@ -62,12 +78,35 @@ package body Relatives is
    is
       Base : constant String := Option_Base (Option);
       Width : constant String := Relative_Width_Key (Option);
+      Override : constant String :=
+        I18N.Runtime_Data.Locale_Text
+          (Locale,
+           "relative_exact." & Base & "." & Width & "."
+           & Signed_Integer_Image (Offset),
+           Found);
    begin
-      return I18N.Runtime_Data.Locale_Text
-        (Locale,
-         "relative_exact." & Base & "." & Width & "."
-         & Signed_Integer_Image (Offset),
-         Found);
+      if Found then
+         return Override;
+      elsif Offset = 0 or else abs Offset > 2 then
+         --  0 is the current period's name (Relative_Current); CLDR names
+         --  no offset past two.
+         return "";
+      end if;
+      --  A locale whose runtime data gives its own relative patterns for the
+      --  unit keeps them: CLDR's names stand in only for CLDR's patterns.
+      declare
+         Pattern_Found : Boolean;
+         Pattern : constant String :=
+           Runtime_Relative_Time_Pattern (Locale, Base, Width, "other", Offset > 0, Pattern_Found);
+         pragma Unreferenced (Pattern);
+      begin
+         if Pattern_Found or else Runtime_Relative_Override_Present (Locale, Base, "other", Offset > 0) then
+            Found := False;
+            return "";
+         end if;
+      end;
+      --  CLDR's own name for the offset: "yesterday", not "1 day ago".
+      return I18N.Relative_Format.Exact_Name (Locale, Base, Width, Integer (Offset), Found);
    end Relative_Exact;
 
    function Relative_Unit_Name

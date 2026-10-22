@@ -60,8 +60,15 @@ Rules:
 For requested locale `de-AT`, fallback order is:
 
 ```text
-de-AT -> de -> default locale
+de-AT -> de -> default locale -> und
 ```
+
+A message renders in the locale it was found under: a `de` entry found for
+`de-AT` uses `de` plural rules and data. An entry under `und` is the
+exception. It is a locale-neutral pattern, written only in CLDR-backed
+arguments such as `{offset, relative, day}` or `{n, unit, hour}`, and it
+renders in the locale that was asked for. So one `und` entry serves every
+locale CLDR covers, and a catalog need not repeat it per language.
 
 Catalog locale prefixes, `default_locale`, and public render/resolve requests
 are canonicalized before lookup: language subtags are lower-case, script
