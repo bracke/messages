@@ -1439,7 +1439,7 @@ begin
    Assert (Rendered (Runtime, "de", "unit", Args) = "2 Kilometer",
            "unit formatter localizes German full unit names");
    Assert (Rendered (Runtime, "fr", "unit", Args) =
-             "2 kilom" & U (16#E8#) & "tres",
+             "2" & U (16#A0#) & "kilom" & U (16#E8#) & "tres",
            "unit formatter localizes French full unit names");
    Assert (Rendered (Runtime, "es", "unit", Args) =
              "2 kil" & U (16#F3#) & "metros",
@@ -1472,8 +1472,8 @@ begin
                        16#62A#, 16#631#]),
            "unit formatter localizes Arabic full unit names");
    Assert (Rendered (Runtime, "ja", "unit", Args) =
-             "2" & UTF8 ([16#30AD#, 16#30ED#, 16#30E1#, 16#30FC#,
-                           16#30C8#, 16#30EB#]),
+             "2 " & U (16#30AD#) & U (16#30ED#) & U (16#30E1#) & U (16#30FC#) & U (16#30C8#)
+             & U (16#30EB#),
            "unit formatter localizes Japanese full unit names");
    Assert (Rendered (Runtime, "zh", "unit", Args) =
              "2" & UTF8 ([16#516C#, 16#91CC#]),
@@ -1640,7 +1640,7 @@ begin
            "unit formatter accepts energy-therm-us alias");
    Messages.Arguments.Set (Args, "share", "50");
    Assert (Rendered (Runtime, "en", "unit_permille_short", Args) =
-             "50 " & U (16#2030#),
+             "50" & U (16#2030#),
            "unit formatter accepts short concentr-permille alias");
    Assert (Rendered (Runtime, "en", "unit_permillion", Args) =
              "50 parts per million",
@@ -1717,7 +1717,7 @@ begin
              "2 kn",
            "unit formatter accepts short speed-knot alias");
    Assert (Rendered (Runtime, "en", "unit_beaufort", Args) =
-             "2 Beaufort",
+             "Beaufort 2",
            "unit formatter accepts speed-beaufort alias");
    Messages.Arguments.Set (Args, "pressure", "2");
    Assert (Rendered (Runtime, "en", "unit_psi_short", Args) =
@@ -1837,10 +1837,10 @@ begin
              "1.5 nautical miles",
            "measure-unit skeleton accepts length-nautical-mile");
    Assert (Rendered (Runtime, "de", "measure_nautical_mile", Args) =
-             "1,5 Seemeilen",
+             "1,5" & U (16#A0#) & "Seemeilen",
            "measure-unit skeleton localizes German nautical miles");
    Assert (Rendered (Runtime, "fr", "measure_nautical_mile", Args) =
-             "1,5 mille marin",
+             "1,5" & U (16#A0#) & "mille marin",
            "measure-unit skeleton localizes French nautical miles");
    Assert (Rendered (Runtime, "es", "measure_nautical_mile", Args) =
              "1,5 millas n" & U (16#E1#) & "uticas",
@@ -1879,7 +1879,7 @@ begin
              "1,5 Astronomische Einheiten",
            "measure-unit skeleton localizes German astronomical units");
    Assert (Rendered (Runtime, "fr", "measure_astronomical_unit", Args) =
-             "1,5 unit" & U (16#E9#) & " astronomique",
+             "1,5" & U (16#A0#) & "unit" & U (16#E9#) & " astronomique",
            "measure-unit skeleton localizes French astronomical units");
    Assert (Rendered (Runtime, "es", "measure_astronomical_unit", Args) =
              "1,5 unidades astron" & U (16#F3#) & "micas",
@@ -1921,7 +1921,7 @@ begin
              "1,5 Lichtjahre",
            "measure-unit skeleton localizes German light years");
    Assert (Rendered (Runtime, "fr", "measure_light_year", Args) =
-             "1,5 ann" & U (16#E9#) & "e-lumi" & U (16#E8#) & "re",
+             "1,5" & U (16#A0#) & "ann" & U (16#E9#) & "e-lumi" & U (16#E8#) & "re",
            "measure-unit skeleton localizes French light years");
    Assert (Rendered (Runtime, "es", "measure_light_year", Args) =
              "1,5 a" & U (16#F1#) & "os luz",
@@ -1964,10 +1964,10 @@ begin
              "1.5 light years",
            "measure-unit skeleton accepts length-light-year");
    Assert (Rendered (Runtime, "de", "measure_parsec", Args) =
-             "1,5 Parsec",
+             "1,5" & U (16#A0#) & "Parsec",
            "measure-unit skeleton localizes German parsecs");
    Assert (Rendered (Runtime, "fr", "measure_parsec", Args) =
-             "1,5 parsec",
+             "1,5" & U (16#A0#) & "parsec",
            "measure-unit skeleton localizes French parsecs");
    Assert (Rendered (Runtime, "es", "measure_parsec", Args) =
              "1,5 parsecs",
@@ -2007,7 +2007,7 @@ begin
              "1.5 fathoms",
            "unit formatter accepts length-fathom alias");
    Assert (Rendered (Runtime, "de", "unit_fathom_alias", Args) =
-             "1,5 Faden",
+             "1,5" & U (16#A0#) & "Faden",
            "unit formatter localizes German fathoms");
    Assert (Rendered (Runtime, "fr", "unit_fathom_alias", Args) =
              "1,5 brasse",
@@ -2052,7 +2052,7 @@ begin
              "1.5 pixels",
            "measure-unit skeleton accepts length-pixel");
    Assert (Rendered (Runtime, "de", "measure_pixel", Args) =
-             "1,5 Pixel",
+             "1,5" & U (16#A0#) & "Pixel",
            "measure-unit skeleton localizes German pixels");
    Assert (Rendered (Runtime, "fr", "measure_pixel", Args) =
              "1,5 pixel",
@@ -2098,10 +2098,10 @@ begin
              "1.5 solar radii",
            "measure-unit skeleton accepts length-solar-radius");
    Assert (Rendered (Runtime, "de", "measure_solar_radius", Args) =
-             "1,5 Sonnenradien",
+             "1,5" & U (16#A0#) & "Sonnenradien",
            "measure-unit skeleton localizes German solar radii");
    Assert (Rendered (Runtime, "fr", "measure_solar_radius", Args) =
-             "1,5 rayon solaire",
+             "1,5" & U (16#A0#) & "rayon solaire",
            "measure-unit skeleton localizes French solar radii");
    Assert (Rendered (Runtime, "es", "measure_solar_radius", Args) =
              "1,5 radios solares",
@@ -2140,7 +2140,8 @@ begin
    Messages.Arguments.Set (Args, "volume", "1");
    Assert (Rendered (Runtime, "en", "measure_liter", Args) = "1 liter",
            "measure-unit skeleton accepts volume-liter");
-   Assert (Rendered (Runtime, "fr", "measure_liter", Args) = "1 litre",
+   Assert (Rendered (Runtime, "fr", "measure_liter", Args) =
+             "1" & U (16#A0#) & "litre",
            "measure-unit skeleton localizes French liters");
    Messages.Arguments.Set (Args, "volume", "2");
    Assert (Rendered (Runtime, "es", "measure_liter", Args) = "2 litros",
@@ -2216,7 +2217,7 @@ begin
              "2 teaspoons",
            "measure-unit skeleton accepts volume-teaspoon");
    Assert (Rendered (Runtime, "de", "measure_fluid_ounce", Args) =
-             "2 Fl" & U (16#FC#) & "ssigunzen",
+             "2" & U (16#A0#) & "Fl" & U (16#FC#) & "ssigunzen",
            "measure-unit skeleton localizes German fluid ounces");
    Assert (Rendered (Runtime, "fr", "measure_fluid_ounce", Args) =
              "2 onces liquides",
@@ -2260,7 +2261,7 @@ begin
              "2 quarts",
            "measure-unit skeleton accepts volume-quart");
    Assert (Rendered (Runtime, "de", "measure_quart", Args) =
-             "2 Quart",
+             "2" & U (16#A0#) & "Quart",
            "measure-unit skeleton localizes German quarts");
    Assert (Rendered (Runtime, "fr", "measure_quart", Args) =
              "2 quarts",
@@ -2407,7 +2408,8 @@ begin
              "1.5 km/h",
            "short measure-unit skeleton renders the named short rate");
    Messages.Arguments.Set (Args, "weight", "2");
-   Assert (Rendered (Runtime, "en", "measure_narrow", Args) = "2 kg",
+   Assert (Rendered (Runtime, "en", "measure_narrow", Args) =
+             "2kg",
            "measure-unit skeleton accepts mass units and narrow width");
    Assert (Rendered (Runtime, "en", "measure_narrow_slash", Args) =
              Rendered (Runtime, "en", "measure_narrow", Args),
@@ -2419,10 +2421,10 @@ begin
              "2 milligrams",
            "unit formatter accepts mass-milligram alias");
    Assert (Rendered (Runtime, "de", "unit_milligram_alias", Args) =
-             "2 Milligramm",
+             "2" & U (16#A0#) & "Milligramm",
            "unit formatter localizes German milligrams");
    Assert (Rendered (Runtime, "fr", "unit_milligram_alias", Args) =
-             "2 milligrammes",
+             "2" & U (16#A0#) & "milligrammes",
            "unit formatter localizes French milligrams");
    Assert (Rendered (Runtime, "es", "unit_milligram_alias", Args) =
              "2 miligramos",
@@ -2463,10 +2465,10 @@ begin
    Assert (Rendered (Runtime, "en", "measure_tonne_short", Args) = "2 t",
            "measure-unit skeleton accepts mass-tonne short output");
    Assert (Rendered (Runtime, "de", "measure_tonne", Args) =
-             "2 Tonnen",
+             "2" & U (16#A0#) & "Tonnen",
            "measure-unit skeleton localizes German tonnes");
    Assert (Rendered (Runtime, "fr", "measure_tonne", Args) =
-             "2 tonnes",
+             "2" & U (16#A0#) & "tonnes",
            "measure-unit skeleton localizes French tonnes");
    Assert (Rendered (Runtime, "es", "measure_tonne", Args) =
              "2 toneladas",
@@ -2505,7 +2507,7 @@ begin
              "2 stones",
            "unit formatter accepts mass-stone alias");
    Assert (Rendered (Runtime, "de", "unit_stone_alias", Args) =
-             "2 Stones",
+             "2" & U (16#A0#) & "Stones",
            "unit formatter localizes German stones");
    Assert (Rendered (Runtime, "fr", "unit_stone_alias", Args) =
              "2 stones",
@@ -2604,10 +2606,10 @@ begin
              "1 " & UTF8 ([16#430#, 16#43A#, 16#440#]),
            "unit formatter uses source-backed Russian acre one form");
    Assert (Rendered (Runtime, "ar", "unit_acre_alias", Args) =
-             U (16#661#) & " " & UTF8 ([16#641#, 16#62F#, 16#627#, 16#646#]),
+             U (16#641#) & U (16#62F#) & U (16#627#) & U (16#646#),
            "unit formatter uses source-backed Arabic acre one form");
    Assert (Rendered (Runtime, "ja", "unit_acre_alias", Args) =
-             "1" & UTF8 ([16#30A8#, 16#30FC#, 16#30AB#, 16#30FC#]),
+             "1 " & U (16#30A8#) & U (16#30FC#) & U (16#30AB#) & U (16#30FC#),
            "unit formatter uses source-backed Japanese acre one form");
    Assert (Rendered (Runtime, "zh", "unit_acre_alias", Args) =
              "1" & UTF8 ([16#82F1#, 16#4EA9#]),
@@ -2632,7 +2634,7 @@ begin
              "12,5 Quadratfu" & U (16#DF#),
            "measure-unit skeleton localizes German square feet");
    Assert (Rendered (Runtime, "fr", "measure_square_foot", Args) =
-             "12,5 pieds carr" & U (16#E9#) & "s",
+             "12,5" & U (16#A0#) & "pieds carr" & U (16#E9#) & "s",
            "measure-unit skeleton localizes French square feet");
    Assert (Rendered (Runtime, "es", "measure_square_foot", Args) =
              "12,5 pies cuadrados",
@@ -2676,7 +2678,7 @@ begin
              "12,5 Quadratmeilen",
            "measure-unit skeleton localizes German square miles");
    Assert (Rendered (Runtime, "fr", "measure_square_mile", Args) =
-             "12,5 milles carr" & U (16#E9#) & "s",
+             "12,5" & U (16#A0#) & "milles carr" & U (16#E9#) & "s",
            "measure-unit skeleton localizes French square miles");
    Assert (Rendered (Runtime, "es", "measure_square_mile", Args) =
              "12,5 millas cuadradas",
@@ -2715,7 +2717,7 @@ begin
              "12,5 Hektar",
            "measure-unit skeleton localizes German hectares");
    Assert (Rendered (Runtime, "fr", "measure_hectare", Args) =
-             "12,5 hectares",
+             "12,5" & U (16#A0#) & "hectares",
            "measure-unit skeleton localizes French hectares");
    Assert (Rendered (Runtime, "es", "measure_hectare", Args) =
              "12,5 hect" & U (16#E1#) & "reas",
@@ -2734,7 +2736,7 @@ begin
              "21 degrees Celsius",
            "measure-unit skeleton accepts temperature-celsius");
    Assert (Rendered (Runtime, "en", "measure_fahrenheit_short", Args) =
-             "21 " & U (16#B0#) & "F",
+             "21" & U (16#B0#) & "F",
            "measure-unit skeleton accepts temperature-fahrenheit short output");
    Messages.Arguments.Set (Args, "angle", "90");
    Assert (Rendered (Runtime, "en", "measure_degree_short", Args) =
@@ -2748,7 +2750,8 @@ begin
            "unit formatter accepts digital-bit alias");
    Assert (Rendered (Runtime, "de", "unit_bit_alias", Args) = "2 Bit",
            "unit formatter localizes German bits");
-   Assert (Rendered (Runtime, "fr", "unit_bit_alias", Args) = "2 bits",
+   Assert (Rendered (Runtime, "fr", "unit_bit_alias", Args) =
+             "2" & U (16#A0#) & "bits",
            "unit formatter localizes French bits");
    Assert (Rendered (Runtime, "es", "unit_bit_alias", Args) = "2 bits",
            "unit formatter localizes Spanish bits");
@@ -2785,7 +2788,7 @@ begin
              "2 Gigabit",
            "measure-unit skeleton localizes German gigabits");
    Assert (Rendered (Runtime, "fr", "measure_gigabit", Args) =
-             "2 gigabits",
+             "2" & U (16#A0#) & "gigabits",
            "measure-unit skeleton localizes French gigabits");
    Assert (Rendered (Runtime, "es", "measure_gigabit", Args) =
              "2 gigabits",
@@ -2854,10 +2857,10 @@ begin
              "2 US therms",
            "measure-unit skeleton accepts energy-therm-us");
    Assert (Rendered (Runtime, "de", "measure_kilowatt_hour", Args) =
-             "2 Kilowattstunden",
+             "2" & U (16#A0#) & "Kilowattstunden",
            "measure-unit skeleton localizes German kilowatt-hours");
    Assert (Rendered (Runtime, "fr", "measure_joule", Args) =
-             "2 joules",
+             "2" & U (16#A0#) & "joules",
            "measure-unit skeleton localizes French joules");
    Assert (Rendered (Runtime, "es", "measure_calorie", Args) =
              "2 calor" & U (16#ED#) & "as",
@@ -2883,8 +2886,8 @@ begin
              UTF8 ([16#648#, 16#627#, 16#637#]) & "/" & UTF8 ([16#633#, 16#627#, 16#639#, 16#629#]),
            "measure-unit skeleton localizes Arabic kilowatt-hours");
    Assert (Rendered (Runtime, "ja", "measure_kilojoule", Args) =
-             "2" & UTF8 ([16#30AD#, 16#30ED#, 16#30B8#,
-                           16#30E5#, 16#30FC#, 16#30EB#]),
+             "2 " & U (16#30AD#) & U (16#30ED#) & U (16#30B8#) & U (16#30E5#) & U (16#30FC#)
+             & U (16#30EB#),
            "measure-unit skeleton localizes Japanese kilojoules");
    Assert (Rendered (Runtime, "ko", "measure_kilowatt_hour", Args) =
              "2" & UTF8 ([16#D0AC#, 16#B85C#, 16#C640#,
@@ -2895,7 +2898,7 @@ begin
                             16#440#, 16#438#, 16#438#]),
            "measure-unit skeleton localizes Russian calories");
    Assert (Rendered (Runtime, "ja", "measure_calorie", Args) =
-             "2" & UTF8 ([16#30AB#, 16#30ED#, 16#30EA#, 16#30FC#]),
+             "2 " & U (16#30AB#) & U (16#30ED#) & U (16#30EA#) & U (16#30FC#),
            "measure-unit skeleton localizes Japanese calories");
    Assert (Rendered (Runtime, "ko", "measure_calorie", Args) =
              "2" & UTF8 ([16#CE7C#, 16#B85C#, 16#B9AC#]),
@@ -2911,7 +2914,7 @@ begin
              "1 watt",
            "unit formatter localizes Romanian power-watt alias");
    Assert (Rendered (Runtime, "ja", "unit_watt_alias", Args) =
-             "1" & UTF8 ([16#30EF#, 16#30C3#, 16#30C8#]),
+             "1 " & U (16#30EF#) & U (16#30C3#) & U (16#30C8#),
            "unit formatter localizes Japanese power-watt alias");
    Messages.Arguments.Set (Args, "power", "2");
    Assert (Rendered (Runtime, "en", "measure_kilowatt_short", Args) =
@@ -2926,8 +2929,7 @@ begin
                        16#648#, 16#627#, 16#637#]),
            "measure-unit skeleton localizes Arabic kilowatts");
    Assert (Rendered (Runtime, "ja", "measure_kilowatt", Args) =
-             "2" & UTF8 ([16#30AD#, 16#30ED#, 16#30EF#,
-                           16#30C3#, 16#30C8#]),
+             "2 " & U (16#30AD#) & U (16#30ED#) & U (16#30EF#) & U (16#30C3#) & U (16#30C8#),
            "measure-unit skeleton localizes Japanese kilowatts");
    Assert (Rendered (Runtime, "ko", "measure_kilowatt", Args) =
              "2" & UTF8 ([16#D0AC#, 16#B85C#, 16#C640#, 16#D2B8#]),
@@ -2956,8 +2958,7 @@ begin
              UTF8 ([16#647#, 16#631#, 16#62A#, 16#632#]),
            "measure-unit skeleton localizes Arabic megahertz");
    Assert (Rendered (Runtime, "ja", "measure_megahertz", Args) =
-             "2" & UTF8 ([16#30E1#, 16#30AC#, 16#30D8#,
-                           16#30EB#, 16#30C4#]),
+             "2 " & U (16#30E1#) & U (16#30AC#) & U (16#30D8#) & U (16#30EB#) & U (16#30C4#),
            "measure-unit skeleton localizes Japanese megahertz");
    Assert (Rendered (Runtime, "ko", "measure_megahertz", Args) =
              "2" & UTF8 ([16#BA54#, 16#AC00#, 16#D5E4#,
@@ -2992,8 +2993,7 @@ begin
              UTF8 ([16#628#, 16#627#, 16#631#]),
            "measure-unit skeleton localizes Arabic millibars");
    Assert (Rendered (Runtime, "ja", "measure_millibar", Args) =
-             "1,013" & UTF8 ([16#30DF#, 16#30EA#, 16#30D0#,
-                              16#30FC#, 16#30EB#]),
+             "1,013 " & U (16#30DF#) & U (16#30EA#) & U (16#30D0#) & U (16#30FC#) & U (16#30EB#),
            "measure-unit skeleton localizes Japanese millibars");
    Assert (Rendered (Runtime, "ko", "measure_millibar", Args) =
              "1,013" & UTF8 ([16#BC00#, 16#B9AC#, 16#BC14#]),
@@ -3035,17 +3035,16 @@ begin
              "50 " & UTF8 ([16#43F#, 16#440#, 16#43E#, 16#446#, 16#435#, 16#43D#, 16#442#, 16#43E#, 16#432#]),
            "measure-unit skeleton localizes Russian percent");
    Assert (Rendered (Runtime, "ar", "measure_percent", Args) =
-             UTF8 ([16#665#, 16#660#]) & " " & U (16#66A#),
+             U (16#665#) & U (16#660#) & U (16#66A#),
            "measure-unit skeleton localizes Arabic percent");
    Assert (Rendered (Runtime, "ja", "measure_percent", Args) =
-             "50" & UTF8 ([16#30D1#, 16#30FC#, 16#30BB#,
-                            16#30F3#, 16#30C8#]),
+             "50 " & U (16#30D1#) & U (16#30FC#) & U (16#30BB#) & U (16#30F3#) & U (16#30C8#),
            "measure-unit skeleton localizes Japanese percent");
    Assert (Rendered (Runtime, "ko", "measure_percent", Args) =
              "50%",
            "measure-unit skeleton localizes Korean percent");
    Assert (Rendered (Runtime, "en", "measure_percent_short", Args) =
-             "50 %",
+             "50%",
            "measure-unit skeleton accepts direct percent short output");
    Assert (Rendered (Runtime, "en", "measure_permille", Args) =
              "50 permille",
@@ -3112,7 +3111,7 @@ begin
              "2 knots",
            "measure-unit skeleton accepts speed-knot");
    Assert (Rendered (Runtime, "en", "measure_beaufort_short", Args) =
-             "2 B",
+             "B 2",
            "measure-unit skeleton accepts short speed-beaufort");
    Messages.Arguments.Set (Args, "pressure", "2");
    Assert (Rendered (Runtime, "en", "measure_psi", Args) =

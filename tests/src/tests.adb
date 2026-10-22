@@ -25,7 +25,6 @@ with Messages.Runtime.Tests.Strict;
 procedure Tests is
    use type AUnit.Status;
 
-
    function To_Lower (Value : String) return String is
       Lowered : String (Value'Range) := Value;
    begin

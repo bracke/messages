@@ -494,11 +494,27 @@ package body Messages.Extra_Format is
                  "unit_pattern." & Base & "." & Width & ".other",
                  Found);
          begin
-            return Other_Value;
+            if Found then
+               return Other_Value;
+            end if;
          end;
-      else
-         return "";
       end if;
+      --  A locale with runtime unit names of its own keeps composing them;
+      --  else CLDR's pattern where it is not the value, a space and the name.
+      declare
+         Name_Found : Boolean;
+         Name : constant String :=
+           I18N.Runtime_Data.Locale_Text
+             (Locale, "unit." & Base & "." & Width & "." & Plural_Category_Name (Category), Name_Found);
+         pragma Unreferenced (Name);
+      begin
+         if Name_Found then
+            Found := False;
+            return "";
+         end if;
+      end;
+      return I18N.Unit_Format.Pattern
+        (Locale, Base, Width, Plural_Category_Name (Category), Found);
    end Runtime_Unit_Pattern;
 
    function Unit_Option_Is_Valid (Option : String) return Boolean is
@@ -580,8 +596,10 @@ package body Messages.Extra_Format is
          end if;
       end loop;
 
+      --  A pattern that names the count in words (Arabic "ساعتان") is the
+      --  whole text.
       if Arg = 0 then
-         Overflow := True;
+         Put (Target, Last, Overflow, Pattern);
          return;
       end if;
 
