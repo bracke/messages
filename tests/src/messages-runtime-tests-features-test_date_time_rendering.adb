@@ -1751,8 +1751,8 @@ begin
              "GMT-04:00|-04:00|-04:00|America/New_York",
            "time zone skeleton widths render long offsets and zone IDs");
    Assert (Rendered (Runtime, "fr", "zone_widths", Args) =
-             "UTC-04:00|-04:00|-04:00|America/New_York",
-           "time zone skeleton uses full CLDR French GMT prefix data");
+             "UTC" & U (16#2212#) & "04:00|-04:00|-04:00|America/New_York",
+           "time zone skeleton uses full CLDR French GMT prefix and hour-format sign data");
    Messages.Arguments.Set (Args, "instant", "2024-07-01T12:00:00+02:00:30");
    declare
       Zone_Second_Widths : constant String :=
@@ -1769,8 +1769,8 @@ begin
              "America/New_York|America/New_York|New York|heure : New York",
            "V skeleton widths use full CLDR French location pattern data");
    Assert (Rendered (Runtime, "en", "utc_v_widths", Args) =
-             "UTC|UTC|UTC|UTC",
-           "V skeleton widths keep UTC labels stable");
+             "UTC|UTC|UTC|GMT",
+           "V skeleton widths keep UTC labels stable; UTC has no location, so VVVV is the GMT format");
    Assert (Rendered (Runtime, "en", "zone_short_gmt", Args) =
              "GMT-4",
            "short localized GMT skeleton omits hour padding");
@@ -1790,110 +1790,96 @@ begin
              "EDT|ET|Eastern Time|America/New_York",
            "short z and v zone skeletons render deterministic abbreviations");
    Assert (Rendered (Runtime, "en", "zone_long_names", Args) =
-             "Eastern Time|Eastern Time|America/New_York",
+             "Eastern Daylight Time|Eastern Time|America/New_York",
            "long z zone skeleton renders deterministic generic names");
    Assert (Rendered (Runtime, "fr", "zone_long_names", Args) =
-             "heure de l" & U (16#2019#) & "Est nord-am" & U (16#E9#)
-             & "ricain|heure de l" & U (16#2019#) & "Est nord-am"
+             "heure d" & U (16#2019#) & U (16#E9#) & "t" & U (16#E9#) & " de l" & U (16#2019#)
+             & "Est nord-am" & U (16#E9#) & "ricain|heure de l" & U (16#2019#) & "Est nord-am"
              & U (16#E9#) & "ricain|America/New_York",
            "long z zone skeleton uses generated CLDR metazone rows");
    Assert (Rendered (Runtime, "en", "berlin_zone_names", Args) =
-             "GMT+2|GMT+2|Central European Time|Europe/Berlin",
+             "GMT+2|Germany Time|Central European Time|Europe/Berlin",
            "European short z and v skeletons render abbreviations");
    Assert (Rendered (Runtime, "de", "berlin_zone_names", Args) =
-             "Mitteleurop" & U (16#E4#) & "ische Zeit|Mitteleurop"
-             & U (16#E4#) & "ische Zeit|Europe/Berlin",
+             "Mitteleurop" & U (16#E4#) & "ische Sommerzeit|Mitteleurop" & U (16#E4#)
+             & "ische Zeit|Europe/Berlin",
            "European zone skeleton names localize German generic names");
    Assert (Rendered (Runtime, "de", "berlin_short_zone_names", Args) =
              "MESZ|MEZ|Europe/Berlin",
            "European short zone skeleton names use generated CLDR fallback");
    Assert (Rendered (Runtime, "de-AT", "berlin_zone_names", Args) =
-             "Mitteleurop" & U (16#E4#) & "ische Zeit|Mitteleurop"
-             & U (16#E4#) & "ische Zeit|Europe/Berlin",
+             "Mitteleurop" & U (16#E4#) & "ische Sommerzeit|Mitteleurop" & U (16#E4#)
+             & "ische Zeit|Europe/Berlin",
            "European zone skeleton names fall back through source-backed German family rows");
    Assert (Rendered (Runtime, "en-AU", "lord_howe_short_names", Args) =
              "LHST|LHT|Lord Howe Time|Australia/Lord_Howe",
            "Lord Howe zone skeleton names use generated CLDR short family rows");
    Assert (Rendered (Runtime, "de", "lord_howe_zone_names", Args) =
-             "Lord-Howe-Zeit|Lord-Howe-Zeit|Australia/Lord_Howe",
+             "Lord-Howe-Normalzeit|Lord-Howe-Zeit|Australia/Lord_Howe",
            "Lord Howe zone skeleton names localize German generic names");
    Assert (Rendered (Runtime, "de", "brisbane_zone_names", Args) =
-             "Ostaustralische Zeit|Ostaustralische Zeit|Australia/Brisbane",
+             "Ostaustralische Normalzeit|Ostaustralische Normalzeit|Australia/Brisbane",
            "Brisbane zone skeleton names use generated CLDR eastern Australia rows");
    Assert (Rendered (Runtime, "de", "darwin_zone_names", Args) =
-             "Zentralaustralische Zeit|Zentralaustralische Zeit|Australia/Darwin",
+             "Zentralaustralische Normalzeit|Zentralaustralische Normalzeit|Australia/Darwin",
            "Darwin zone skeleton names use generated CLDR central Australia rows");
    Assert (Rendered (Runtime, "de", "perth_zone_names", Args) =
-             "Westaustralische Zeit|Westaustralische Zeit|Australia/Perth",
+             "Westaustralische Normalzeit|Westaustralische Normalzeit|Australia/Perth",
            "Perth zone skeleton names use generated CLDR western Australia rows");
    Assert (Rendered (Runtime, "de", "eucla_zone_names", Args) =
-             "Zentral-/Westaustralische Zeit|Zentral-/Westaustralische Zeit|Australia/Eucla",
+             "Zentral-/Westaustralische Normalzeit|Zentral-/Westaustralische Normalzeit|Australia/Eucla",
            "Eucla zone skeleton names use generated CLDR central-western Australia rows");
    Assert (Rendered (Runtime, "ru", "zone_names", Args) =
-             UTF8 ([16#412#, 16#43E#, 16#441#, 16#442#, 16#43E#,
-                    16#447#, 16#43D#, 16#430#, 16#44F#, 16#20#,
-                    16#410#, 16#43C#, 16#435#, 16#440#, 16#438#,
-                    16#43A#, 16#430#])
-             & "|"
-             & UTF8 ([16#412#, 16#43E#, 16#441#, 16#442#, 16#43E#,
-                      16#447#, 16#43D#, 16#430#, 16#44F#, 16#20#,
-                      16#410#, 16#43C#, 16#435#, 16#440#, 16#438#,
-                      16#43A#, 16#430#])
+             U (16#412#) & U (16#43E#) & U (16#441#) & U (16#442#) & U (16#43E#) & U (16#447#)
+             & U (16#43D#) & U (16#430#) & U (16#44F#) & " " & U (16#410#) & U (16#43C#)
+             & U (16#435#) & U (16#440#) & U (16#438#) & U (16#43A#) & U (16#430#) & ", "
+             & U (16#43B#) & U (16#435#) & U (16#442#) & U (16#43D#) & U (16#435#) & U (16#435#)
+             & " " & U (16#432#) & U (16#440#) & U (16#435#) & U (16#43C#) & U (16#44F#) & "|"
+             & U (16#412#) & U (16#43E#) & U (16#441#) & U (16#442#) & U (16#43E#) & U (16#447#)
+             & U (16#43D#) & U (16#430#) & U (16#44F#) & " " & U (16#410#) & U (16#43C#)
+             & U (16#435#) & U (16#440#) & U (16#438#) & U (16#43A#) & U (16#430#)
              & "|America/New_York",
            "zone skeleton names localize Russian generic names");
    Assert (Rendered (Runtime, "ar", "zone_names", Args) =
-             UTF8 ([16#627#, 16#644#, 16#62A#, 16#648#, 16#642#,
-                    16#64A#, 16#62A#, 16#20#, 16#627#, 16#644#,
-                    16#634#, 16#631#, 16#642#, 16#64A#, 16#20#,
-                    16#644#, 16#623#, 16#645#, 16#631#, 16#64A#,
-                    16#643#, 16#627#, 16#20#, 16#627#, 16#644#,
-                    16#634#, 16#645#, 16#627#, 16#644#, 16#64A#,
-                    16#629#])
-             & "|"
-             & UTF8 ([16#627#, 16#644#, 16#62A#, 16#648#, 16#642#,
-                      16#64A#, 16#62A#, 16#20#, 16#627#, 16#644#,
-                      16#634#, 16#631#, 16#642#, 16#64A#, 16#20#,
-                      16#644#, 16#623#, 16#645#, 16#631#, 16#64A#,
-                      16#643#, 16#627#, 16#20#, 16#627#, 16#644#,
-                      16#634#, 16#645#, 16#627#, 16#644#, 16#64A#,
-                      16#629#])
-             & "|America/New_York",
+             U (16#627#) & U (16#644#) & U (16#62A#) & U (16#648#) & U (16#642#) & U (16#64A#)
+             & U (16#62A#) & " " & U (16#627#) & U (16#644#) & U (16#635#) & U (16#64A#)
+             & U (16#641#) & U (16#64A#) & " " & U (16#627#) & U (16#644#) & U (16#634#)
+             & U (16#631#) & U (16#642#) & U (16#64A#) & " " & U (16#644#) & U (16#623#)
+             & U (16#645#) & U (16#631#) & U (16#64A#) & U (16#643#) & U (16#627#) & " "
+             & U (16#627#) & U (16#644#) & U (16#634#) & U (16#645#) & U (16#627#) & U (16#644#)
+             & U (16#64A#) & U (16#629#) & "|" & U (16#627#) & U (16#644#) & U (16#62A#)
+             & U (16#648#) & U (16#642#) & U (16#64A#) & U (16#62A#) & " " & U (16#627#)
+             & U (16#644#) & U (16#634#) & U (16#631#) & U (16#642#) & U (16#64A#) & " "
+             & U (16#644#) & U (16#623#) & U (16#645#) & U (16#631#) & U (16#64A#) & U (16#643#)
+             & U (16#627#) & " " & U (16#627#) & U (16#644#) & U (16#634#) & U (16#645#)
+             & U (16#627#) & U (16#644#) & U (16#64A#) & U (16#629#) & "|America/New_York",
            "zone skeleton names localize Arabic generic names");
    Assert (Rendered (Runtime, "ja", "zone_names", Args) =
-             UTF8 ([16#7C73#, 16#56FD#, 16#6771#, 16#90E8#,
-                    16#6642#, 16#9593#])
-             & "|"
-             & UTF8 ([16#7C73#, 16#56FD#, 16#6771#, 16#90E8#,
-                      16#6642#, 16#9593#])
-             & "|America/New_York",
+             U (16#7C73#) & U (16#56FD#) & U (16#6771#) & U (16#90E8#) & U (16#590F#) & U (16#6642#)
+             & U (16#9593#) & "|" & U (16#7C73#) & U (16#56FD#) & U (16#6771#) & U (16#90E8#)
+             & U (16#6642#) & U (16#9593#) & "|America/New_York",
            "zone skeleton names localize Japanese generic names");
    Assert (Rendered (Runtime, "zh", "zone_names", Args) =
-             UTF8 ([16#5317#, 16#7F8E#, 16#4E1C#, 16#90E8#,
-                    16#65F6#, 16#95F4#])
-             & "|"
-             & UTF8 ([16#5317#, 16#7F8E#, 16#4E1C#, 16#90E8#,
-                      16#65F6#, 16#95F4#])
-             & "|America/New_York",
+             U (16#5317#) & U (16#7F8E#) & U (16#4E1C#) & U (16#90E8#) & U (16#590F#) & U (16#4EE4#)
+             & U (16#65F6#) & U (16#95F4#) & "|" & U (16#5317#) & U (16#7F8E#) & U (16#4E1C#)
+             & U (16#90E8#) & U (16#65F6#) & U (16#95F4#) & "|America/New_York",
            "zone skeleton names localize Chinese generic names");
    Assert (Rendered (Runtime, "ko", "zone_names", Args) =
-             UTF8 ([16#BBF8#, 16#20#, 16#B3D9#, 16#BD80#,
-                    16#20#, 16#C2DC#, 16#AC04#])
-             & "|"
-             & UTF8 ([16#BBF8#, 16#20#, 16#B3D9#, 16#BD80#,
-                      16#20#, 16#C2DC#, 16#AC04#])
-             & "|America/New_York",
+             U (16#BBF8#) & " " & U (16#B3D9#) & U (16#BD80#) & " " & U (16#D558#) & U (16#ACC4#)
+             & " " & U (16#D45C#) & U (16#C900#) & U (16#C2DC#) & "|" & U (16#BBF8#) & " "
+             & U (16#B3D9#) & U (16#BD80#) & " " & U (16#C2DC#) & U (16#AC04#) & "|America/New_York",
            "zone skeleton names localize Korean generic names");
    Assert (Rendered (Runtime, "en", "tokyo_short_generic", Args) =
-             "GMT+9|Japan Time|Asia/Tokyo",
+             "Japan Time|Japan Standard Time|Asia/Tokyo",
            "short v skeleton falls back to short GMT for fixed zones");
    Assert (Rendered (Runtime, "de", "tokyo_location_names", Args) =
-             "Tokio|Tokio (Ortszeit)",
+             "Tokio|Japan (Ortszeit)",
            "VVV and VVVV zone skeletons use generated CLDR exemplar locations");
    Assert (Rendered (Runtime, "de", "tokyo_zone_names", Args) =
-             "Japanische Zeit|Japanische Zeit|Asia/Tokyo",
+             "Japanische Normalzeit|Japanische Normalzeit|Asia/Tokyo",
            "fixed zone skeleton names localize German names");
    Assert (Rendered (Runtime, "de-AT", "tokyo_zone_names", Args) =
-             "Japanische Zeit|Japanische Zeit|Asia/Tokyo",
+             "Japanische Normalzeit|Japanische Normalzeit|Asia/Tokyo",
            "fixed zone skeleton names fall back through source-backed German zone rows");
    Assert (Rendered (Runtime, "de", "dubai_zone_names", Args) =
              "Golf-Zeit|Golf-Zeit|Asia/Dubai",
@@ -1905,56 +1891,53 @@ begin
              "Nepalesische Zeit|Nepalesische Zeit|Asia/Kathmandu",
            "fixed Nepal zone skeleton names use generated CLDR metazone rows");
    Assert (Rendered (Runtime, "de", "bogota_zone_names", Args) =
-             "Kolumbianische Zeit|Kolumbianische Zeit|America/Bogota",
+             "Kolumbianische Normalzeit|Kolumbianische Normalzeit|America/Bogota",
            "fixed Colombia zone skeleton names use generated CLDR metazone rows");
    Assert (Rendered (Runtime, "de", "nairobi_zone_names", Args) =
              "Ostafrikanische Zeit|Ostafrikanische Zeit|Africa/Nairobi",
            "fixed east Africa zone skeleton names use generated CLDR metazone rows");
    Assert (Rendered (Runtime, "de", "manila_zone_names", Args) =
-             "Philippinische Zeit|Philippinische Zeit|Asia/Manila",
+             "Philippinische Normalzeit|Philippinische Normalzeit|Asia/Manila",
            "fixed Philippines zone skeleton names use generated CLDR metazone rows");
    Assert (Rendered (Runtime, "de", "yangon_zone_names", Args) =
              "Myanmar-Zeit|Myanmar-Zeit|Asia/Yangon",
            "fixed Myanmar zone skeleton names use generated CLDR metazone rows");
    Assert (Rendered (Runtime, "de", "honolulu_zone_names", Args) =
-             "Hawaii-Aleuten-Zeit|Hawaii-Aleuten-Zeit|Pacific/Honolulu",
+             "Hawaii-Aleuten-Normalzeit|Hawaii-Aleuten-Normalzeit|Pacific/Honolulu",
            "fixed Hawaii-Aleutian zone skeleton names use generated CLDR metazone rows");
    Assert (Rendered (Runtime, "ru", "tokyo_zone_names", Args) =
-             UTF8 ([16#42F#, 16#43F#, 16#43E#, 16#43D#, 16#438#,
-                    16#44F#])
-             & "|"
-             & UTF8 ([16#42F#, 16#43F#, 16#43E#, 16#43D#, 16#438#,
-                      16#44F#])
+             U (16#42F#) & U (16#43F#) & U (16#43E#) & U (16#43D#) & U (16#438#) & U (16#44F#)
+             & ", " & U (16#441#) & U (16#442#) & U (16#430#) & U (16#43D#) & U (16#434#)
+             & U (16#430#) & U (16#440#) & U (16#442#) & U (16#43D#) & U (16#43E#) & U (16#435#)
+             & " " & U (16#432#) & U (16#440#) & U (16#435#) & U (16#43C#) & U (16#44F#) & "|"
+             & U (16#42F#) & U (16#43F#) & U (16#43E#) & U (16#43D#) & U (16#438#) & U (16#44F#)
+             & ", " & U (16#441#) & U (16#442#) & U (16#430#) & U (16#43D#) & U (16#434#)
+             & U (16#430#) & U (16#440#) & U (16#442#) & U (16#43D#) & U (16#43E#) & U (16#435#)
+             & " " & U (16#432#) & U (16#440#) & U (16#435#) & U (16#43C#) & U (16#44F#)
              & "|Asia/Tokyo",
            "fixed zone skeleton names localize Russian names");
    Assert (Rendered (Runtime, "ar", "tokyo_zone_names", Args) =
-             UTF8 ([16#62A#, 16#648#, 16#642#, 16#64A#, 16#62A#,
-                    16#20#, 16#627#, 16#644#, 16#64A#, 16#627#,
-                    16#628#, 16#627#, 16#646#])
-             & "|"
-             & UTF8 ([16#62A#, 16#648#, 16#642#, 16#64A#, 16#62A#,
-                      16#20#, 16#627#, 16#644#, 16#64A#, 16#627#,
-                      16#628#, 16#627#, 16#646#])
-             & "|Asia/Tokyo",
+             U (16#62A#) & U (16#648#) & U (16#642#) & U (16#64A#) & U (16#62A#) & " " & U (16#627#)
+             & U (16#644#) & U (16#64A#) & U (16#627#) & U (16#628#) & U (16#627#) & U (16#646#)
+             & " " & U (16#627#) & U (16#644#) & U (16#631#) & U (16#633#) & U (16#645#)
+             & U (16#64A#) & "|" & U (16#62A#) & U (16#648#) & U (16#642#) & U (16#64A#)
+             & U (16#62A#) & " " & U (16#627#) & U (16#644#) & U (16#64A#) & U (16#627#)
+             & U (16#628#) & U (16#627#) & U (16#646#) & " " & U (16#627#) & U (16#644#)
+             & U (16#631#) & U (16#633#) & U (16#645#) & U (16#64A#) & "|Asia/Tokyo",
            "fixed zone skeleton names localize Arabic names");
    Assert (Rendered (Runtime, "ja", "tokyo_zone_names", Args) =
-             UTF8 ([16#65E5#, 16#672C#, 16#6642#, 16#9593#])
-             & "|"
-             & UTF8 ([16#65E5#, 16#672C#, 16#6642#, 16#9593#])
+             U (16#65E5#) & U (16#672C#) & U (16#6A19#) & U (16#6E96#) & U (16#6642#) & "|"
+             & U (16#65E5#) & U (16#672C#) & U (16#6A19#) & U (16#6E96#) & U (16#6642#)
              & "|Asia/Tokyo",
            "fixed zone skeleton names localize Japanese names");
    Assert (Rendered (Runtime, "zh", "tokyo_zone_names", Args) =
-             UTF8 ([16#65E5#, 16#672C#, 16#65F6#, 16#95F4#])
-             & "|"
-             & UTF8 ([16#65E5#, 16#672C#, 16#65F6#, 16#95F4#])
-             & "|Asia/Tokyo",
+             U (16#65E5#) & U (16#672C#) & U (16#6807#) & U (16#51C6#) & U (16#65F6#) & U (16#95F4#)
+             & "|" & U (16#65E5#) & U (16#672C#) & U (16#6807#) & U (16#51C6#) & U (16#65F6#)
+             & U (16#95F4#) & "|Asia/Tokyo",
            "fixed zone skeleton names localize Chinese names");
    Assert (Rendered (Runtime, "ko", "tokyo_zone_names", Args) =
-             UTF8 ([16#C77C#, 16#BCF8#, 16#20#, 16#C2DC#,
-                    16#AC04#])
-             & "|"
-             & UTF8 ([16#C77C#, 16#BCF8#, 16#20#, 16#C2DC#,
-                      16#AC04#])
+             U (16#C77C#) & U (16#BCF8#) & " " & U (16#D45C#) & U (16#C900#) & U (16#C2DC#) & "|"
+             & U (16#C77C#) & U (16#BCF8#) & " " & U (16#D45C#) & U (16#C900#) & U (16#C2DC#)
              & "|Asia/Tokyo",
            "fixed zone skeleton names localize Korean names");
    Assert (Rendered (Runtime, "en", "utc_zone_widths", Args) =
