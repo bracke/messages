@@ -275,7 +275,9 @@ package body Lists is
       end Put_Item;
    begin
       Ok := False;
-      if Total = 0 then
+      --  Without i18n's formats data a list of several items would run them
+      --  together; fail so the caller can fall back.
+      if Total = 0 or else (Total > 1 and then not I18N.Data_Store.Available ("formats")) then
          return;
       end if;
 

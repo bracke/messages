@@ -1,5 +1,6 @@
 with I18N.Byte_Size_Format;
 with I18N.Duration_Format;
+with I18N.Data_Store;
 with I18N.List_Format;
 with I18N.Number_Format;
 with I18N.Relative_Format;
@@ -520,7 +521,20 @@ package body Messages.Extra_Format is
    function Unit_Option_Is_Valid (Option : String) return Boolean is
       Per_Unit : constant String := Option_Per_Unit (Option);
       Width    : constant String := Option_Width (Option);
+
+      --  A CLDR unit identifier's shape: lower-case letters, digits and
+      --  hyphens.
+      function Well_Formed (Unit : String) return Boolean is
+        (Unit'Length > 0
+         and then (for all C of Unit => C in 'a' .. 'z' | '0' .. '9' | '-'));
    begin
+      --  Without i18n's unit data no unit has a name; a catalog must still
+      --  load, so the identifier's shape decides, and an unknown unit fails
+      --  when it renders.
+      if Unit_Name ("meter/" & Width, True) = "" then
+         return Well_Formed (Option_Base (Option))
+           and then (Per_Unit = "" or else Well_Formed (Option_Base (Per_Unit & "/" & Width)));
+      end if;
       return Unit_Name (Option, True) /= ""
         and then
           (Per_Unit = ""
@@ -795,6 +809,11 @@ package body Messages.Extra_Format is
                    (Locale, Option_Base (Per_Unit), Width, Per_Found));
          Numerator_First : constant Positive := Last + 1;
       begin
+         --  Nothing names the unit -- i18n's data is missing -- so a bare number
+         --  would pass for the measure; fail instead.
+         if Compound_Name = "" and then not Pattern_Found and then Text = "" then
+            return;
+         end if;
          if Compound_Name /= "" then
             --  Some languages seat the value inside the rate's name rather than
             --  in front of it -- Japanese "時速 {0} キロメートル". Such a row is

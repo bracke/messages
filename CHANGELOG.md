@@ -41,6 +41,12 @@ commits; each of those says in its own message what changed and why.
 
 ### Fixed
 
+- A catalog with `unit` entries loads when i18n's data directory is missing:
+  the unit identifier's shape decides validity there, instead of every unit
+  counting as unknown and the whole catalog being rejected. Rendering such a
+  unit, or a list of several items, then fails instead of printing a bare
+  number or items run together, so a caller can fall back.
+
 - Currency, grouping and Thai-digit expectations follow i18n's CLDR
   formatting, each checked against ICU or the CLDR 48 data: no-break
   spaces at the symbol, per-locale symbols, bidi marks, half-even rounding
