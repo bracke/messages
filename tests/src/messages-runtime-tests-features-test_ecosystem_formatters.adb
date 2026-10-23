@@ -1517,7 +1517,7 @@ begin
              U (16#09E7#) & "." & U (16#09EB#) & " kilometers",
            "unit formatter honors explicit numbering-system digits");
    Assert (Rendered (Runtime, "ar-u-nu-latn", "unit_decimal", Args) =
-             "1" & U (16#066B#) & "5 "
+             "1.5 "
              & UTF8 ([16#643#, 16#64A#, 16#644#, 16#648#,
                       16#645#, 16#62A#, 16#631#]),
            "unit formatter honors explicit Latin digits");
@@ -2422,7 +2422,7 @@ begin
              & UTF8 ([16#641#, 16#64A#]) & " " & UTF8 ([16#627#, 16#644#, 16#633#, 16#627#, 16#639#, 16#629#]),
            "measure-unit skeleton localizes Arabic per-unit output");
    Assert (Rendered (Runtime, "ar-u-nu-latn", "measure_per", Args) =
-             "1" & U (16#66B#) & "5 " & UTF8 ([16#643#, 16#64A#, 16#644#, 16#648#, 16#645#, 16#62A#, 16#631#])
+             "1.5 " & UTF8 ([16#643#, 16#64A#, 16#644#, 16#648#, 16#645#, 16#62A#, 16#631#])
              & " " & UTF8 ([16#641#, 16#64A#]) & " "
              & UTF8 ([16#627#, 16#644#, 16#633#, 16#627#, 16#639#, 16#629#]),
            "measure-unit skeleton honors explicit Latin digits");

@@ -680,7 +680,7 @@ package body Messages.Runtime.Tests.Features is
       begin
          Set_Common (Count);
          Assert (Rendered (Runtime, Requested, "matrix", Args) = Expected,
-                 Requested & " formatted output");
+                 Requested & " formatted output: " & Rendered (Runtime, Requested, "matrix", Args));
       end Assert_Render;
    begin
       Messages.Runtime.Load_Text
@@ -742,13 +742,16 @@ package body Messages.Runtime.Tests.Features is
 
       Assert_Render
         ("de-AT", "1",
-         "de 1.234.567,89 1.234.567,80" & U (16#A0#) & U (16#20AC#)
+         --  de-AT's own symbols through the de entry, as ICU: a space groups
+         --  numbers, "." groups money.
+         "de 1" & U (16#A0#) & "234" & U (16#A0#) & "567,89 " & U (16#20AC#) & U (16#A0#) & "1.234.567,80"
          & " 29.02.24 09:05 one");
       Assert_Render
         ("fr-CA", "0",
-         "fr 1" & U (16#202F#) & "234" & U (16#202F#) & "567,89 1"
-         & U (16#202F#) & "234" & U (16#202F#) & "567,80" & U (16#A0#) & U (16#20AC#)
-         & " 29 f" & U (16#E9#) & "vrier 2024 09:05 one");
+         --  fr-CA's own symbols and time ("09 h 05") through the fr entry, as ICU.
+         "fr 1" & U (16#A0#) & "234" & U (16#A0#) & "567,89 1"
+         & U (16#A0#) & "234" & U (16#A0#) & "567,80" & U (16#A0#) & U (16#20AC#)
+         & " 29 f" & U (16#E9#) & "vrier 2024 09 h 05 one");
       Assert_Render
         ("hi-IN-x-test", "2",
          "hi 12,34,567.89 " & U (16#20B9#) & "12,34,567.80 29 "

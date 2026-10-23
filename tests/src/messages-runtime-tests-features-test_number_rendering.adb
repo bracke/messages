@@ -567,10 +567,11 @@ begin
            "Persian numbers use Persian digits");
    Assert (Rendered (Runtime, "th", "total", Args) = "1,234,567.89",
            "Thai numbers use Latin digits, CLDR's default for Thai");
-   Assert (Rendered (Runtime, "ar-u-nu-latn", "total", Args) =
-             "1" & U (16#66C#) & "234" & U (16#66C#) & "567"
-             & U (16#66B#) & "89",
-           "latn numbering-system extension overrides Arabic digits");
+   --  Latin digits take the Latin system's separators too (as ICU).
+   Assert (Rendered (Runtime, "ar-u-nu-latn", "total", Args) = "1,234,567.89",
+           "latn numbering-system extension overrides Arabic digits and separators");
+   Assert (Rendered (Runtime, "ar-MA", "total", Args) = "1.234.567,89",
+           "Moroccan Arabic writes Latin digits, CLDR's default there: " & Rendered (Runtime, "ar-MA", "total", Args));
    Assert (Rendered (Runtime, "ar-u-nu-deva", "total", Args) =
              Devanagari_Arabic_Total,
            "numbering-system extension overrides language default digits");

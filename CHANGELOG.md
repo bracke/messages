@@ -14,6 +14,11 @@ commits; each of those says in its own message what changed and why.
 
 ### Changed
 
+- A message found along the requested locale's fallback chain formats in the
+  requested locale (an ar entry renders ar-MA's Latin digits, a de entry
+  de-AT's grouping and currency separators, a pt entry pt-PT's plural rules),
+  as ICU does; one reached only as the default locale keeps its own.
+
 - An entry lookup falls back along CLDR's locale tree: CLDR's parent where it
   names one (es-MX -> es-419, pt-AO -> pt-PT), a region's likely script
   (zh-TW, zh-HK -> zh-Hant), then the tag less its last subtag as before.

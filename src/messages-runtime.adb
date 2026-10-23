@@ -1290,6 +1290,19 @@ package body Messages.Runtime is
       return Truncated;
    end Fallback_Parent;
 
+   --  The locale a message renders in: Requested where Resolved, the locale
+   --  its entry came from, is of the same language; else Resolved.
+   function Formatting_Locale (Requested, Resolved : String) return String is
+      function Language (Tag : String) return String is
+        (Ada.Characters.Handling.To_Lower
+           (Tag (Tag'First .. (if Ada.Strings.Fixed.Index (Tag, "-") = 0 then Tag'Last
+                               else Ada.Strings.Fixed.Index (Tag, "-") - 1))));
+      Canonical : constant String := Canonical_Locale (Requested);
+   begin
+      return (if Resolved'Length > 0 and then Canonical'Length > 0 and then Language (Canonical) = Language (Resolved)
+              then Canonical else Resolved);
+   end Formatting_Locale;
+
    procedure Resolve_Entry
      (Item            : Runtime;
       Locale          : String;
@@ -1978,13 +1991,15 @@ package body Messages.Runtime is
       Resolve_Entry (Item, Locale, Key, Hit, Resolved_Locale, Idx);
 
       if Hit then
-         --  Plural/ordinal selection uses the locale the message resolved in
-         --  (for example a de message resolved for de-AT uses de rules).
+         --  An entry found along the requested locale's own chain formats in
+         --  the requested locale -- ar-MA's Latin digits through an ar entry,
+         --  pt-PT's plural rules through a pt one -- as ICU does; one reached
+         --  only as the default locale's formats in its own.
          return
            Render_Compiled
              (Root      => Item.Catalog.Element (Idx).Root,
               Arguments => Arguments,
-              Locale    => To_String (Resolved_Locale));
+              Locale    => Formatting_Locale (Locale, To_String (Resolved_Locale)));
       end if;
 
       return Messages.Result.Failure (Messages.Result.Missing_Key);
@@ -2077,7 +2092,7 @@ package body Messages.Runtime is
             Sink        => Sink,
             Status      => RStatus,
             Diagnostics => Diagnostics,
-            Locale      => To_String (Resolved_Locale));
+            Locale      => Formatting_Locale (Locale, To_String (Resolved_Locale)));
          Messages.Observability.Emit (Messages.Observability.Message_End, "");
 
          --  The sink rendered into its own fixed buffer; copy the written prefix
