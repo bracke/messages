@@ -9,13 +9,6 @@ is
    Target  : String (1 .. 48) := [others => Character'Val (0)];
    Last    : Natural := 0;
    Status  : Messages.Result.Render_Status;
-   Arabic_Full : constant String :=
-     U (16#627#) & U (16#644#) & U (16#62E#) & U (16#645#) & U (16#64A#)
-     & U (16#633#) & U (16#60C#) & " " & U (16#662#) & U (16#669#) & " "
-     & U (16#641#) & U (16#628#) & U (16#631#) & U (16#627#)
-     & U (16#64A#) & U (16#631#) & " " & U (16#662#) & U (16#660#)
-     & U (16#662#) & U (16#664#) & " " & U (16#660#) & U (16#669#) & ":"
-     & U (16#660#) & U (16#665#) & ":" & U (16#660#) & U (16#667#);
 begin
    Messages.Runtime.Load_Text
      (Runtime, "base",

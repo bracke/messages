@@ -5,6 +5,7 @@ is
    pragma Unreferenced (T);
    Runtime : Messages.Runtime.Instance;
    Args    : Messages.Arguments.Arguments;
+   SH      : constant String := U (16#AD#);  --  CLDR's soft hyphen
    Result  : Messages.Runtime.Load_Result;
    Target  : String (1 .. 32) := [others => Character'Val (0)];
    Last    : Natural := 0;
@@ -1165,8 +1166,9 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "de", "spellout", Args) =
-             "zweitausenddreihundertf" & U (16#FC#) & "nfundvierzig",
-           "spellout number skeleton renders deterministic German words");
+             "zwei" & SH & "tausend" & SH & "drei" & SH & "hundert" & SH & "f" & U (16#FC#) & "nf" & SH & "und" & SH
+             & "vierzig",
+           "spellout number skeleton renders CLDR's German words with their soft hyphens");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "de", "spellout", Args) =
              "eine Million eins",
@@ -1190,8 +1192,8 @@ begin
            "spellout number skeleton renders deterministic French words");
    Messages.Arguments.Set (Args, "value", "71");
    Assert (Rendered (Runtime, "fr", "spellout", Args) =
-             "soixante et onze",
-           "spellout number skeleton renders French septante-range words");
+             "soixante-et-onze",
+           "spellout number skeleton renders French seventy-one with CLDR's hyphens");
    Messages.Arguments.Set (Args, "value", "80");
    Assert (Rendered (Runtime, "fr", "spellout", Args) =
              "quatre-vingts",
@@ -1287,7 +1289,7 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "it", "spellout", Args) =
-             "duemilatrecentoquarantacinque",
+             "due" & SH & "mila" & SH & "tre" & SH & "cento" & SH & "quaranta" & SH & "cinque",
            "spellout number skeleton renders deterministic Italian words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "it", "spellout", Args) =
@@ -1295,7 +1297,7 @@ begin
            "spellout number skeleton renders Italian million words");
    Messages.Arguments.Set (Args, "value", "23");
    Assert (Rendered (Runtime, "it", "spellout", Args) =
-             "ventitr" & U (16#E9#),
+             "venti" & SH & "tr" & U (16#E9#),
            "spellout number skeleton renders accented Italian words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "it", "ordinal_words", Args) =
@@ -1312,7 +1314,7 @@ begin
            "spellout number skeleton renders deterministic Portuguese words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "pt", "spellout", Args) =
-             "um milh" & U (16#E3#) & "o um",
+             "um milh" & U (16#E3#) & "o e um",
            "spellout number skeleton renders Portuguese million words");
    Messages.Arguments.Set (Args, "value", "3");
    Assert (Rendered (Runtime, "pt", "spellout", Args) =
@@ -1329,7 +1331,7 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "nl", "spellout", Args) =
-             "tweeduizend driehonderd vijfenveertig",
+             "twee" & SH & "duizend" & SH & "drie" & SH & "honderd" & SH & "vijf" & SH & "en" & SH & "veertig",
            "spellout number skeleton renders deterministic Dutch words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "nl", "spellout", Args) =
@@ -1337,7 +1339,7 @@ begin
            "spellout number skeleton renders Dutch million words");
    Messages.Arguments.Set (Args, "value", "23");
    Assert (Rendered (Runtime, "nl", "spellout", Args) =
-             "drie" & U (16#EB#) & "ntwintig",
+             "drie" & SH & U (16#EB#) & "n" & SH & "twintig",
            "spellout number skeleton renders accented Dutch words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "nl", "ordinal_words", Args) =
@@ -1355,7 +1357,7 @@ begin
            "spellout number skeleton renders deterministic Polish words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "pl", "spellout", Args) =
-             "jeden milion jeden",
+             "milion jeden",
            "spellout number skeleton renders Polish million words");
    Messages.Arguments.Set (Args, "value", "23");
    Assert (Rendered (Runtime, "pl", "spellout", Args) =
@@ -1373,13 +1375,12 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "cs", "spellout", Args) =
-             "dva tis" & U (16#ED#) & "ce t" & U (16#159#)
-             & "i sta " & U (16#10D#) & "ty" & U (16#159#)
-             & "icet p" & U (16#11B#) & "t",
+             "dv" & U (16#11B#) & " tis" & U (16#ED#) & "ce t" & U (16#159#) & "i sta " & U (16#10D#) & "ty"
+             & U (16#159#) & "icet p" & U (16#11B#) & "t",
            "spellout number skeleton renders deterministic Czech words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "cs", "spellout", Args) =
-             "jeden milion jeden",
+             "jeden mili" & U (16#F3#) & "n jeden",
            "spellout number skeleton renders Czech million words");
    Messages.Arguments.Set (Args, "value", "23");
    Assert (Rendered (Runtime, "cs", "spellout", Args) =
@@ -1440,13 +1441,10 @@ begin
    Messages.Arguments.Set (Args, "value", "12345");
    Assert (Rendered (Runtime, "uk", "spellout", Args) =
              UTF8
-               ([16#434#, 16#432#, 16#430#, 16#43D#, 16#430#,
-                 16#434#, 16#446#, 16#44F#, 16#442#, 16#44C#,
-                 16#20#, 16#442#, 16#438#, 16#441#, 16#44F#,
-                 16#447#, 16#20#, 16#442#, 16#440#, 16#438#,
-                 16#441#, 16#442#, 16#430#, 16#20#, 16#441#,
-                 16#43E#, 16#440#, 16#43E#, 16#43A#, 16#20#,
-                 16#43F#, 16#27#, 16#44F#, 16#442#, 16#44C#]),
+               ([16#434#, 16#432#, 16#430#, 16#43D#, 16#430#, 16#434#, 16#446#, 16#44F#, 16#442#,
+                 16#44C#, 16#20#, 16#442#, 16#438#, 16#441#, 16#44F#, 16#447#, 16#20#, 16#442#,
+                 16#440#, 16#438#, 16#441#, 16#442#, 16#430#, 16#20#, 16#441#, 16#43E#, 16#440#,
+                 16#43E#, 16#43A#, 16#20#, 16#43F#, 16#2BC#, 16#44F#, 16#442#, 16#44C#]),
            "spellout number skeleton renders deterministic Ukrainian words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "uk", "spellout", Args) =
@@ -1553,10 +1551,9 @@ begin
    Messages.Arguments.Set (Args, "value", "123456789");
    Assert (Rendered (Runtime, "ko", "spellout", Args) =
              UTF8
-               ([16#C77C#, 16#C5B5#, 16#C774#, 16#CC9C#, 16#C0BC#,
-                 16#BC31#, 16#C0AC#, 16#C2ED#, 16#C624#, 16#B9CC#,
-                 16#C721#, 16#CC9C#, 16#CE60#, 16#BC31#, 16#D314#,
-                 16#C2ED#, 16#AD6C#]),
+               ([16#C77C#, 16#C5B5#, 16#20#, 16#C774#, 16#CC9C#, 16#C0BC#, 16#BC31#, 16#C0AC#,
+                 16#C2ED#, 16#C624#, 16#B9CC#, 16#20#, 16#C721#, 16#CC9C#, 16#CE60#, 16#BC31#,
+                 16#D314#, 16#C2ED#, 16#AD6C#]),
            "spellout number skeleton renders Korean eok and man groups");
    Messages.Arguments.Set (Args, "value", "1001");
    Assert (Rendered (Runtime, "ko", "spellout", Args) =
@@ -1598,7 +1595,7 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "sv", "spellout", Args) =
-             "tv" & U (16#E5#) & " tusen tre hundra fyrtio fem",
+             "tv" & U (16#E5#) & SH & "tusen tre" & SH & "hundra" & SH & "fyrtio" & SH & "fem",
            "spellout number skeleton renders deterministic Swedish words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "sv", "spellout", Args) =
@@ -1606,7 +1603,7 @@ begin
            "spellout number skeleton renders Swedish million words");
    Messages.Arguments.Set (Args, "value", "28");
    Assert (Rendered (Runtime, "sv", "spellout", Args) =
-             "tjugo " & U (16#E5#) & "tta",
+             "tjugo" & SH & U (16#E5#) & "tta",
            "spellout number skeleton renders Swedish accented words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "sv", "ordinal_words", Args) =
@@ -1619,15 +1616,15 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "da", "spellout", Args) =
-             "to tusind tre hundrede femogfyrre",
+             "to tusind tre" & SH & "hundrede og fem" & SH & "og" & SH & "fyrre",
            "spellout number skeleton renders deterministic Danish words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "da", "spellout", Args) =
-             "en million en",
+             "en million et",
            "spellout number skeleton renders Danish million words");
    Messages.Arguments.Set (Args, "value", "23");
    Assert (Rendered (Runtime, "da", "spellout", Args) =
-             "treogtyve",
+             "tre" & SH & "og" & SH & "tyve",
            "spellout number skeleton renders Danish reversed tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "da", "ordinal_words", Args) =
@@ -1640,15 +1637,15 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "no", "spellout", Args) =
-             "to tusen tre hundre f" & U (16#F8#) & "rtifem",
+             "to tusen tre hundre og f" & U (16#F8#) & "rti" & SH & "fem",
            "spellout number skeleton renders deterministic Norwegian words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "no", "spellout", Args) =
-             "en million en",
+             U (16#E9#) & "n million " & U (16#E9#) & "n",
            "spellout number skeleton renders Norwegian million words");
    Messages.Arguments.Set (Args, "value", "28");
    Assert (Rendered (Runtime, "no", "spellout", Args) =
-             "tjue" & U (16#E5#) & "tte",
+             "tjue" & SH & U (16#E5#) & "tte",
            "spellout number skeleton renders Norwegian compact tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "no", "ordinal_words", Args) =
@@ -1661,16 +1658,16 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "fi", "spellout", Args) =
-             "kaksituhatta kolmesataa nelj" & U (16#E4#)
-             & "kymment" & U (16#E4#) & "viisi",
+             "kaksi" & SH & "tuhatta" & SH & "kolme" & SH & "sataa" & SH & "nelj" & U (16#E4#) & SH
+             & "kymment" & U (16#E4#) & SH & "viisi",
            "spellout number skeleton renders deterministic Finnish words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "fi", "spellout", Args) =
-             "miljoona yksi",
+             "yksi miljoona yksi",
            "spellout number skeleton renders Finnish million words");
    Messages.Arguments.Set (Args, "value", "28");
    Assert (Rendered (Runtime, "fi", "spellout", Args) =
-             "kaksikymment" & U (16#E4#) & "kahdeksan",
+             "kaksi" & SH & "kymment" & U (16#E4#) & SH & "kahdeksan",
            "spellout number skeleton renders Finnish compound tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "fi", "ordinal_words", Args) =
@@ -1688,7 +1685,7 @@ begin
            "spellout number skeleton renders Indonesian words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "id", "spellout", Args) =
-             "sejuta satu",
+             "satu juta satu",
            "spellout number skeleton renders Indonesian sejuta words");
    Messages.Arguments.Set (Args, "value", "1111");
    Assert (Rendered (Runtime, "id", "spellout", Args) =
@@ -1705,7 +1702,7 @@ begin
 
    Messages.Arguments.Set (Args, "value", "0");
    Assert (Rendered (Runtime, "ms", "spellout", Args) =
-             "sifar",
+             "kosong",
            "spellout number skeleton renders Malay zero word");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "ms", "spellout", Args) =
@@ -1753,8 +1750,7 @@ begin
            "spellout number skeleton renders deterministic Vietnamese words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "vi", "spellout", Args) =
-             "m" & U (16#1ED9#) & "t tri" & U (16#1EC7#)
-             & "u m" & U (16#1ED9#) & "t",
+             "m" & U (16#1ED9#) & "t tri" & U (16#1EC7#) & "u l" & U (16#1EBB#) & " m" & U (16#1ED9#) & "t",
            "spellout number skeleton renders Vietnamese million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "vi", "spellout", Args) =
@@ -1763,8 +1759,7 @@ begin
            "spellout number skeleton renders Vietnamese mot compound");
    Messages.Arguments.Set (Args, "value", "105");
    Assert (Rendered (Runtime, "vi", "spellout", Args) =
-             "m" & U (16#1ED9#) & "t tr" & U (16#103#)
-             & "m linh n" & U (16#103#) & "m",
+             "m" & U (16#1ED9#) & "t tr" & U (16#103#) & "m l" & U (16#1EBB#) & " n" & U (16#103#) & "m",
            "spellout number skeleton renders Vietnamese linh gap");
    Messages.Arguments.Set (Args, "value", "1");
    Assert (Rendered (Runtime, "vi", "ordinal_words", Args) =
@@ -1784,11 +1779,11 @@ begin
            "spellout number skeleton renders Swahili zero word");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "sw", "spellout", Args) =
-             "elfu mbili mia tatu arobaini na tano",
+             "elfu mbili, mia tatu na arobaini na tano",
            "spellout number skeleton renders deterministic Swahili words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "sw", "spellout", Args) =
-             "milioni moja moja",
+             "milioni moja, moja",
            "spellout number skeleton renders Swahili million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "sw", "spellout", Args) =
@@ -1805,7 +1800,7 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "af", "spellout", Args) =
-             "twee duisend drie honderd vyf en veertig",
+             "twee" & SH & "duisend driehonderd vyf-en-veertig",
            "spellout number skeleton renders deterministic Afrikaans words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "af", "spellout", Args) =
@@ -1813,7 +1808,7 @@ begin
            "spellout number skeleton renders Afrikaans million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "af", "spellout", Args) =
-             "een en twintig",
+             "een-en-twintig",
            "spellout number skeleton renders Afrikaans reversed tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "af", "ordinal_words", Args) =
@@ -1847,11 +1842,11 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "ro", "spellout", Args) =
-             "doi mii trei sute patruzeci " & U (16#219#) & "i cinci",
+             "dou" & U (16#103#) & " mii trei sute patruzeci " & U (16#219#) & "i cinci",
            "spellout number skeleton renders deterministic Romanian words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "ro", "spellout", Args) =
-             "un milion unu",
+             "unu milion unu",
            "spellout number skeleton renders Romanian million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "ro", "spellout", Args) =
@@ -1874,11 +1869,11 @@ begin
            "spellout number skeleton renders deterministic Catalan words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "ca", "spellout", Args) =
-             "un mili" & U (16#F3#) & " un",
+             "un mili" & U (16#F3#) & " u",
            "spellout number skeleton renders Catalan million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "ca", "spellout", Args) =
-             "vint-i-un",
+             "vint-i-u",
            "spellout number skeleton renders Catalan vint-i compounds");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "ca", "ordinal_words", Args) =
@@ -1891,16 +1886,16 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "hu", "spellout", Args) =
-             "k" & U (16#E9#) & "tezer-h" & U (16#E1#)
-             & "romsz" & U (16#E1#) & "znegyven" & U (16#F6#) & "t",
+             "k" & U (16#E9#) & "t" & SH & "ezer" & SH & "h" & U (16#E1#) & "rom" & SH & "sz" & U (16#E1#)
+             & "z" & SH & "negyven" & SH & U (16#F6#) & "t",
            "spellout number skeleton renders deterministic Hungarian words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "hu", "spellout", Args) =
-             "egymilli" & U (16#F3#) & "-egy",
+             "egy" & SH & "milli" & U (16#F3#) & SH & "egy",
            "spellout number skeleton renders Hungarian million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "hu", "spellout", Args) =
-             "huszonegy",
+             "huszon" & SH & "egy",
            "spellout number skeleton renders Hungarian huszon compounds");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "hu", "ordinal_words", Args) =
@@ -1915,8 +1910,7 @@ begin
 
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "sk", "spellout", Args) =
-             "dva tis" & U (16#ED#) & "ce tristo "
-             & U (16#161#) & "tyridsa" & U (16#165#) & " p"
+             "dve tis" & U (16#ED#) & "c tri" & SH & "sto " & U (16#161#) & "tyridsa" & U (16#165#) & SH & "p"
              & U (16#E4#) & U (16#165#),
            "spellout number skeleton renders deterministic Slovak words");
    Messages.Arguments.Set (Args, "value", "1000001");
@@ -1925,7 +1919,7 @@ begin
            "spellout number skeleton renders Slovak million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "sk", "spellout", Args) =
-             "dvadsa" & U (16#165#) & " jeden",
+             "dvadsa" & U (16#165#) & SH & "jeden",
            "spellout number skeleton renders Slovak compound tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "sk", "ordinal_words", Args) =
@@ -1940,27 +1934,21 @@ begin
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "bg", "spellout", Args) =
              UTF8
-               ([16#434#, 16#432#, 16#435#, 16#20#, 16#445#,
-                 16#438#, 16#43B#, 16#44F#, 16#434#, 16#438#,
-                 16#20#, 16#442#, 16#440#, 16#438#, 16#441#,
-                 16#442#, 16#430#, 16#20#, 16#447#, 16#435#,
-                 16#442#, 16#438#, 16#440#, 16#438#, 16#434#,
-                 16#435#, 16#441#, 16#435#, 16#442#, 16#20#,
-                 16#438#, 16#20#, 16#43F#, 16#435#, 16#442#]),
+               ([16#434#, 16#432#, 16#435#, 16#20#, 16#445#, 16#438#, 16#43B#, 16#44F#, 16#434#,
+                 16#438#, 16#20#, 16#442#, 16#440#, 16#438#, 16#441#, 16#442#, 16#430#, 16#20#,
+                 16#447#, 16#435#, 16#442#, 16#438#, 16#440#, 16#435#, 16#441#, 16#435#, 16#442#,
+                 16#20#, 16#438#, 16#20#, 16#43F#, 16#435#, 16#442#]),
            "spellout number skeleton renders deterministic Bulgarian words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "bg", "spellout", Args) =
              UTF8
-               ([16#435#, 16#434#, 16#438#, 16#43D#, 16#20#,
-                 16#43C#, 16#438#, 16#43B#, 16#438#, 16#43E#,
-                 16#43D#, 16#20#, 16#435#, 16#434#, 16#43D#,
-                 16#43E#]),
+               ([16#435#, 16#434#, 16#438#, 16#43D#, 16#20#, 16#43C#, 16#438#, 16#43B#, 16#438#,
+                 16#43E#, 16#43D#, 16#20#, 16#438#, 16#20#, 16#435#, 16#434#, 16#43D#, 16#43E#]),
            "spellout number skeleton renders Bulgarian million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "bg", "spellout", Args) =
              UTF8
-               ([16#434#, 16#432#, 16#430#, 16#434#, 16#435#,
-                 16#441#, 16#435#, 16#442#, 16#20#, 16#438#,
+               ([16#434#, 16#432#, 16#430#, 16#439#, 16#441#, 16#435#, 16#442#, 16#20#, 16#438#,
                  16#20#, 16#435#, 16#434#, 16#43D#, 16#43E#]),
            "spellout number skeleton renders Bulgarian compound tens");
    Messages.Arguments.Set (Args, "value", "21");
@@ -1987,11 +1975,9 @@ begin
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "ar", "spellout", Args) =
              UTF8
-               ([16#623#, 16#644#, 16#641#, 16#627#, 16#646#,
-                 16#20#, 16#648#, 16#62B#, 16#644#, 16#627#,
-                 16#62B#, 16#645#, 16#627#, 16#626#, 16#629#,
-                 16#20#, 16#648#, 16#62E#, 16#645#, 16#633#,
-                 16#629#, 16#20#, 16#648#, 16#623#, 16#631#,
+               ([16#623#, 16#644#, 16#641#, 16#64A#, 16#646#, 16#20#, 16#648#, 16#62B#, 16#644#,
+                 16#627#, 16#62B#, 16#629#, 16#20#, 16#645#, 16#627#, 16#626#, 16#629#, 16#20#,
+                 16#648#, 16#62E#, 16#645#, 16#633#, 16#629#, 16#20#, 16#648#, 16#623#, 16#631#,
                  16#628#, 16#639#, 16#648#, 16#646#]),
            "spellout number skeleton renders deterministic Arabic words");
    Messages.Arguments.Set (Args, "value", "1000001");
@@ -2046,18 +2032,16 @@ begin
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "th", "spellout", Args) =
              UTF8
-               ([16#E2A#, 16#E2D#, 16#E07#, 16#E1E#, 16#E31#,
-                 16#E19#, 16#E2A#, 16#E32#, 16#E21#, 16#E23#,
-                 16#E49#, 16#E2D#, 16#E22#, 16#E2A#, 16#E35#,
-                 16#E48#, 16#E2A#, 16#E34#, 16#E1A#, 16#E2B#,
-                 16#E49#, 16#E32#]),
+               ([16#E2A#, 16#E2D#, 16#E07#, 16#200B#, 16#E1E#, 16#E31#, 16#E19#, 16#200B#, 16#E2A#,
+                 16#E32#, 16#E21#, 16#200B#, 16#E23#, 16#E49#, 16#E2D#, 16#E22#, 16#200B#, 16#E2A#,
+                 16#E35#, 16#E48#, 16#200B#, 16#E2A#, 16#E34#, 16#E1A#, 16#200B#, 16#E2B#, 16#E49#,
+                 16#E32#]),
            "spellout number skeleton renders deterministic Thai words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "th", "spellout", Args) =
              UTF8
-               ([16#E2B#, 16#E19#, 16#E36#, 16#E48#, 16#E07#,
-                 16#E25#, 16#E49#, 16#E32#, 16#E19#, 16#E2B#,
-                 16#E19#, 16#E36#, 16#E48#, 16#E07#]),
+               ([16#E2B#, 16#E19#, 16#E36#, 16#E48#, 16#E07#, 16#200B#, 16#E25#, 16#E49#, 16#E32#,
+                 16#E19#, 16#200B#, 16#E2B#, 16#E19#, 16#E36#, 16#E48#, 16#E07#]),
            "spellout number skeleton renders Thai million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "th", "ordinal_words", Args) =
@@ -2079,12 +2063,9 @@ begin
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "hi", "spellout", Args) =
              UTF8
-               ([16#926#, 16#94B#, 16#20#, 16#939#, 16#91C#,
-                 16#93C#, 16#93E#, 16#930#, 16#20#, 16#924#,
-                 16#940#, 16#928#, 16#20#, 16#938#, 16#94C#,
-                 16#20#, 16#91A#, 16#93E#, 16#932#, 16#940#,
-                 16#938#, 16#20#, 16#92A#, 16#93E#, 16#901#,
-                 16#91A#]),
+               ([16#926#, 16#94B#, 16#20#, 16#939#, 16#91C#, 16#93C#, 16#93E#, 16#930#, 16#20#,
+                 16#924#, 16#940#, 16#928#, 16#20#, 16#938#, 16#94C#, 16#20#, 16#92A#, 16#948#,
+                 16#902#, 16#924#, 16#93E#, 16#932#, 16#940#, 16#938#]),
            "spellout number skeleton renders deterministic Hindi words");
    Messages.Arguments.Set (Args, "value", "100001");
    Assert (Rendered (Runtime, "hi", "spellout", Args) =
@@ -2112,14 +2093,10 @@ begin
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "el", "spellout", Args) =
              UTF8
-               ([16#3B4#, 16#3CD#, 16#3BF#, 16#20#, 16#3C7#,
-                 16#3B9#, 16#3BB#, 16#3B9#, 16#3AC#, 16#3B4#,
-                 16#3B5#, 16#3C2#, 16#20#, 16#3C4#, 16#3C1#,
-                 16#3B9#, 16#3B1#, 16#3BA#, 16#3CC#, 16#3C3#,
-                 16#3B9#, 16#3B1#, 16#20#, 16#3C3#, 16#3B1#,
-                 16#3C1#, 16#3AC#, 16#3BD#, 16#3C4#, 16#3B1#,
-                 16#20#, 16#3C0#, 16#3AD#, 16#3BD#, 16#3C4#,
-                 16#3B5#]),
+               ([16#3B4#, 16#3CD#, 16#3BF#, 16#20#, 16#3C7#, 16#3AF#, 16#3BB#, 16#3B9#, 16#3AC#,
+                 16#3B4#, 16#3B5#, 16#3C2#, 16#20#, 16#3C4#, 16#3C1#, 16#3B9#, 16#3B1#, 16#3BA#,
+                 16#3CC#, 16#3C3#, 16#3B9#, 16#3B1#, 16#20#, 16#3C3#, 16#3B1#, 16#3C1#, 16#3AC#,
+                 16#3BD#, 16#3C4#, 16#3B1#, 16#20#, 16#3C0#, 16#3AD#, 16#3BD#, 16#3C4#, 16#3B5#]),
            "spellout number skeleton renders deterministic Greek words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "el", "spellout", Args) =
@@ -2152,19 +2129,16 @@ begin
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "he", "spellout", Args) =
              UTF8
-               ([16#5D0#, 16#5DC#, 16#5E4#, 16#5D9#, 16#5D9#,
-                 16#5DD#, 16#20#, 16#5E9#, 16#5DC#, 16#5D5#,
-                 16#5E9#, 16#20#, 16#5DE#, 16#5D0#, 16#5D5#,
-                 16#5EA#, 16#20#, 16#5D0#, 16#5E8#, 16#5D1#,
-                 16#5E2#, 16#5D9#, 16#5DD#, 16#20#, 16#5D7#,
-                 16#5DE#, 16#5E9#]),
+               ([16#5D0#, 16#5DC#, 16#5E4#, 16#5D9#, 16#5D9#, 16#5DD#, 16#20#, 16#5E9#, 16#5DC#,
+                 16#5D5#, 16#5E9#, 16#20#, 16#5DE#, 16#5D0#, 16#5D5#, 16#5EA#, 16#20#, 16#5D0#,
+                 16#5E8#, 16#5D1#, 16#5E2#, 16#5D9#, 16#5DD#, 16#20#, 16#5D5#, 16#5D7#, 16#5DE#,
+                 16#5E9#]),
            "spellout number skeleton renders deterministic Hebrew words");
    Messages.Arguments.Set (Args, "value", "1000001");
    Assert (Rendered (Runtime, "he", "spellout", Args) =
              UTF8
-               ([16#5D0#, 16#5D7#, 16#5D3#, 16#20#, 16#5DE#,
-                 16#5D9#, 16#5DC#, 16#5D9#, 16#5D5#, 16#5DF#,
-                 16#20#, 16#5D0#, 16#5D7#, 16#5D3#]),
+               ([16#5DE#, 16#5D9#, 16#5DC#, 16#5D9#, 16#5D5#, 16#5DF#, 16#20#, 16#5D5#, 16#5D0#,
+                 16#5D7#, 16#5EA#]),
            "spellout number skeleton renders Hebrew million words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "he", "ordinal_words", Args) =
