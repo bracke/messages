@@ -14,6 +14,10 @@ commits; each of those says in its own message what changed and why.
 
 ### Changed
 
+- Rendering keeps 16 nested plural/selectordinal number texts (was 128) and
+  no longer clears them first: Render_Into's frame drops from 538 KB to
+  80 KB -- half of Windows' 1 MiB main stack before -- and each render
+  skips a 512 KiB zero fill. Deeper nesting fails with Parse_Error.
 - A language-region tag without a script falls back to the same region in
   its likely script before the bare script: zh-HK reaches a zh-Hant-HK entry
   (and zh-MO one through zh-Hant-MO), then zh-Hant, as CLDR has it.

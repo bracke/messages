@@ -115,6 +115,10 @@ package body Messages.Fast_Render is
       end loop;
    end Append_Text_With_Number_Substitution;
 
+   --  Plural and selectordinal blocks nested inside each other; deeper
+   --  nesting fails to render with Parse_Error.
+   Max_Number_Depth : constant := 16;
+
    type Number_Text_Stack is
      array (Positive range <>) of String (1 .. Messages.Buffer.Default_Capacity);
    type Number_Last_Stack is array (Positive range <>) of Natural;
@@ -215,10 +219,12 @@ package body Messages.Fast_Render is
         [others => Character'Val (0)];
       Number_Last    : Natural := 0;
       Number_Active  : Boolean := False;
-      Number_Texts   : Number_Text_Stack (1 .. 128) :=
-        [others => [others => Character'Val (0)]];
-      Number_Lasts   : Number_Last_Stack (1 .. 128) := [others => 0];
-      Number_Actives : Number_Active_Stack (1 .. 128) := [others => False];
+      --  Saved number texts, one per enclosing plural: written before read
+      --  (Push_Number_Context), so not cleared -- a cleared 128-deep stack
+      --  was a 512 KiB frame zero-filled on every render.
+      Number_Texts   : Number_Text_Stack (1 .. Max_Number_Depth);
+      Number_Lasts   : Number_Last_Stack (1 .. Max_Number_Depth) := [others => 0];
+      Number_Actives : Number_Active_Stack (1 .. Max_Number_Depth) := [others => False];
       Stack_Top      : Natural := 0;
       Arg_Buffer     : String (1 .. Messages.Buffer.Default_Capacity);
       Arg_Last       : Natural := 0;
