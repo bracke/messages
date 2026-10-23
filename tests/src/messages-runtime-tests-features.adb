@@ -630,8 +630,9 @@ package body Messages.Runtime.Tests.Features is
 
       function Persian_Currency return String is
       begin
+         --  CLDR's Persian currency pattern leads with a left-to-right mark.
          return
-           "$" & U (16#6F1#) & U (16#66C#) & U (16#6F2#) & U (16#6F3#)
+           U (16#200E#) & "$" & U (16#6F1#) & U (16#66C#) & U (16#6F2#) & U (16#6F3#)
            & U (16#6F4#) & U (16#66C#) & U (16#6F5#)
            & U (16#6F6#) & U (16#6F7#) & U (16#66B#)
            & U (16#6F8#) & U (16#6F0#);
@@ -741,12 +742,12 @@ package body Messages.Runtime.Tests.Features is
 
       Assert_Render
         ("de-AT", "1",
-         "de 1.234.567,89 1.234.567,80 " & U (16#20AC#)
+         "de 1.234.567,89 1.234.567,80" & U (16#A0#) & U (16#20AC#)
          & " 29.02.24 09:05 one");
       Assert_Render
         ("fr-CA", "0",
          "fr 1" & U (16#202F#) & "234" & U (16#202F#) & "567,89 1"
-         & U (16#202F#) & "234" & U (16#202F#) & "567,80 " & U (16#20AC#)
+         & U (16#202F#) & "234" & U (16#202F#) & "567,80" & U (16#A0#) & U (16#20AC#)
          & " 29 f" & U (16#E9#) & "vrier 2024 09:05 one");
       Assert_Render
         ("hi-IN-x-test", "2",
@@ -758,9 +759,9 @@ package body Messages.Runtime.Tests.Features is
          "ar " & U (16#661#) & U (16#66C#) & U (16#662#) & U (16#663#)
          & U (16#664#) & U (16#66C#) & U (16#665#) & U (16#666#)
          & U (16#667#) & U (16#66B#) & U (16#668#) & U (16#669#) & " "
-         & U (16#661#) & U (16#66C#) & U (16#662#) & U (16#663#)
+         & U (16#200F#) & U (16#661#) & U (16#66C#) & U (16#662#) & U (16#663#)
          & U (16#664#) & U (16#66C#) & U (16#665#) & U (16#666#)
-         & U (16#667#) & U (16#66B#) & U (16#668#) & U (16#660#) & " $ "
+         & U (16#667#) & U (16#66B#) & U (16#668#) & U (16#660#) & U (16#A0#) & "US$ "
          & U (16#662#) & U (16#669#) & U (16#200F#) & "/" & U (16#662#)
          & U (16#200F#) & "/" & U (16#662#) & U (16#660#) & U (16#662#)
          & U (16#664#) & " " & U (16#669#) & ":"
@@ -771,24 +772,23 @@ package body Messages.Runtime.Tests.Features is
          & Persian_Date & " " & Persian_Time & " one");
       Assert_Render
         ("ro-MD", "2",
-         "ro 1.234.567,89 1.234.567,80 " & U (16#20AC#)
+         "ro 1.234.567,89 1.234.567,80" & U (16#A0#) & "EUR"
          & " 29 februarie 2024 09:05 few");
       Assert_Render
         ("lt-LT", "2",
          "lt 1" & U (16#A0#) & "234" & U (16#A0#) & "567,89 1"
-         & U (16#A0#) & "234" & U (16#A0#) & "567,80 " & U (16#20AC#)
+         & U (16#A0#) & "234" & U (16#A0#) & "567,80" & U (16#A0#) & U (16#20AC#)
          & " 2024 m. vasario 29 d. 09:05 few");
       Assert_Render
         ("sl-SI", "2",
-         "sl 1.234.567,89 1.234.567,80 " & U (16#20AC#)
+         "sl 1.234.567,89 1.234.567,80" & U (16#A0#) & U (16#20AC#)
          & " 29. februar 2024 09:05 two");
       Assert_Render
         ("th-u-ca-buddhist-extra", "2",
-         "th " & U (16#E52#) & U (16#E59#) & " " & U (16#E01#)
+         "th 29 " & U (16#E01#)
          & U (16#E38#) & U (16#E21#) & U (16#E20#) & U (16#E32#)
          & U (16#E1E#) & U (16#E31#) & U (16#E19#) & U (16#E18#)
-         & U (16#E4C#) & " " & U (16#E52#) & U (16#E55#) & U (16#E56#)
-         & U (16#E57#));
+         & U (16#E4C#) & " 2567");
       Assert_Render
         ("ja-u-ca-japanese-extra", "2",
          "ja " & U (16#4EE4#) & U (16#548C#) & " 6"
@@ -1711,11 +1711,13 @@ package body Messages.Runtime.Tests.Features is
       Assert (Result.Status = Messages.Runtime.Loaded,
               "valid currency catalog should load");
 
-      Expect_Invalid ("12.345", "too many fractional digits are invalid");
+      --  Digits beyond the currency's own round half-even, as ICU does.
+      Messages.Arguments.Set (Args, "amount", "12.345");
+      Assert (Rendered (Runtime, "en", "price", Args) = "$12.34",
+              "fractional digits beyond the currency's round half-even");
       Messages.Arguments.Set (Args, "amount", "12.34567");
-      Assert (Status_Of (Runtime, "en", "clf_price", Args) =
-                Messages.Result.Invalid_Argument,
-              "four-minor-unit currencies reject five fractional digits");
+      Assert (Rendered (Runtime, "en", "clf_price", Args) = "CLF" & U (16#A0#) & "12.3457",
+              "four-minor-unit currencies round a fifth fractional digit");
       Expect_Invalid ("", "empty currency amount is invalid");
       Expect_Invalid ("+", "sign-only currency amount is invalid");
       Expect_Invalid (".99", "currency amount requires an integer part");
@@ -1724,7 +1726,9 @@ package body Messages.Runtime.Tests.Features is
       Expect_Invalid ("1.2.3", "currency amount rejects duplicate decimals");
       Expect_Invalid ("1e3", "currency amount rejects exponent notation");
       Expect_Invalid ("12 USD", "currency amount rejects unit suffix text");
-      Expect_Invalid ("-12.345", "negative amounts still obey minor units");
+      Messages.Arguments.Set (Args, "amount", "-12.345");
+      Assert (Rendered (Runtime, "en", "price", Args) = "-$12.34",
+              "negative amounts round to the currency's minor units");
       Expect_Invalid ("--12", "currency amount rejects duplicate signs");
 
       Messages.Arguments.Clear (Args);
@@ -2384,7 +2388,7 @@ package body Messages.Runtime.Tests.Features is
       Messages.Arguments.Set (Args, "channel", "email");
       Messages.Arguments.Set (Args, "count", "0");
       Assert (Rendered (Runtime, "fr", "summary", Args) =
-                "un courriel pour 1" & U (16#202F#) & "234,50 "
+                "un courriel pour 1" & U (16#202F#) & "234,50" & U (16#A0#)
                 & U (16#20AC#),
               "French cardinal zero uses one branch with currency formatting");
 
@@ -2422,9 +2426,9 @@ package body Messages.Runtime.Tests.Features is
               "Arabic two branch nests localized number formatting");
       Messages.Arguments.Set (Args, "count", "3");
       Assert (Rendered (Runtime, "ar", "summary", Args) =
-                "few " & U (16#661#) & U (16#66C#) & U (16#662#)
+                "few " & U (16#200F#) & U (16#661#) & U (16#66C#) & U (16#662#)
                 & U (16#663#) & U (16#664#) & U (16#66B#)
-                & U (16#665#) & U (16#660#) & " $",
+                & U (16#665#) & U (16#660#) & U (16#A0#) & "US$",
               "Arabic few branch nests localized currency formatting");
 
       Messages.Runtime.Render_Into
@@ -2432,9 +2436,9 @@ package body Messages.Runtime.Tests.Features is
       Assert (Status = Messages.Result.Success,
               "bounded localized corpus render succeeds");
       Assert (Target (1 .. Last) =
-                "few " & U (16#661#) & U (16#66C#) & U (16#662#)
+                "few " & U (16#200F#) & U (16#661#) & U (16#66C#) & U (16#662#)
                 & U (16#663#) & U (16#664#) & U (16#66B#)
-                & U (16#665#) & U (16#660#) & " $",
+                & U (16#665#) & U (16#660#) & U (16#A0#) & "US$",
               "bounded localized corpus render matches materialized output");
    end Test_Localized_Select_Plural_Corpus;
 

@@ -801,12 +801,12 @@ begin
              --  CLDR th buddhist long is "d MMMM y" -- no point after the
              --  day, and no era (the gregorian pattern has one, buddhist
              --  does not).
-             U (16#E52#) & U (16#E59#) & " "
+             --  Latin digits: CLDR's default numbering system for Thai.
+             "29 "
              & U (16#E01#) & U (16#E38#) & U (16#E21#)
              & U (16#E20#) & U (16#E32#) & U (16#E1E#)
              & U (16#E31#) & U (16#E19#) & U (16#E18#)
-             & U (16#E4C#) & " "
-             & U (16#E52#) & U (16#E55#) & U (16#E56#) & U (16#E57#),
+             & U (16#E4C#) & " 2567",
            "Buddhist calendar year is formatted from locale extension");
    Assert (Rendered (Runtime, "ja-u-ca-japanese", "japanese", Args) =
              U (16#4EE4#) & U (16#548C#) & " 6" & U (16#5E74#)
@@ -1861,9 +1861,7 @@ begin
              "9:05 " & U (16#C624#) & U (16#C804#),
            "C skeleton uses Korean preferred 12-hour cycle");
    Assert (Rendered (Runtime, "th", "time_skeleton", Args) =
-             U (16#E50#) & U (16#E59#) & ":"
-             & U (16#E50#) & U (16#E55#) & ":"
-             & U (16#E50#) & U (16#E57#) & " AM",
+             "09:05:07 AM",
            "time skeleton uses full CLDR Thai abbreviated day-period names");
    Assert (Rendered (Runtime, "uk", "time_skeleton", Args) =
              "09:05:07 " & U (16#434#) & U (16#43F#),
@@ -2206,11 +2204,8 @@ begin
              & U (16#6F0#) & ":" & U (16#6F0#) & U (16#6F7#),
            "datetime skeleton localizes Persian digits");
    Assert (Rendered (Runtime, "th", "datetime_skeleton", Args) =
-             U (16#E52#) & U (16#E50#) & U (16#E52#) & U (16#E54#) & " "
-             & U (16#E52#) & " " & U (16#E52#) & U (16#E59#) & " "
-             & U (16#E52#) & U (16#E51#) & ":" & U (16#E53#)
-             & U (16#E50#) & ":" & U (16#E50#) & U (16#E57#),
-           "datetime skeleton localizes Thai digits");
+             "2024 2 29 21:30:07",
+           "datetime skeleton keeps Thai's default Latin digits");
    Assert (Rendered (Runtime, "en-u-nu-deva", "datetime_skeleton", Args) =
              U (16#968#) & U (16#966#) & U (16#968#) & U (16#96A#) & " "
              & U (16#968#) & " " & U (16#968#) & U (16#96F#) & " "

@@ -41,6 +41,11 @@ commits; each of those says in its own message what changed and why.
 
 ### Fixed
 
+- Currency, grouping and Thai-digit expectations follow i18n's CLDR
+  formatting, each checked against ICU or the CLDR 48 data: no-break
+  spaces at the symbol, per-locale symbols, bidi marks, half-even rounding
+  of extra fraction digits, "1234" where minimum grouping is 2.
+
 - Ordinal words follow CLDR's rules (33 expectations, verified with ICU):
   Greek "εικοστός πρώτος", Hungarian "huszonegyedik", Portuguese "dois
   milésimo...", and soft hyphens in German, Dutch and Finnish compounds.

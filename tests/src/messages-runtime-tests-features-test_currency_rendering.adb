@@ -10,8 +10,8 @@ is
    Last    : Natural := 0;
    Status  : Messages.Result.Render_Status;
    Arabic_USD : constant String :=
-     U (16#661#) & U (16#662#) & U (16#66B#)
-     & U (16#663#) & U (16#660#) & " $";
+     U (16#200F#) & U (16#661#) & U (16#662#) & U (16#66B#)
+     & U (16#663#) & U (16#660#) & U (16#A0#) & "US$";
 begin
    Messages.Runtime.Load_Text
      (Runtime, "base",
@@ -245,7 +245,7 @@ begin
    Messages.Arguments.Set (Args, "amount", "12.3");
    Assert (Rendered (Runtime, "en", "price", Args) = "Total $12.30",
            "English currency uses symbol prefix and dot decimal");
-   Assert (Rendered (Runtime, "de", "price", Args) = "Summe 12,30 " & U (16#20AC#),
+   Assert (Rendered (Runtime, "de", "price", Args) = "Summe 12,30" & U (16#A0#) & U (16#20AC#),
            "German currency uses comma decimal and symbol suffix");
 
    Messages.Runtime.Render_Into
@@ -281,7 +281,7 @@ begin
    Assert (Rendered (Runtime, "en", "unit_narrow_slash", Args) =
              Rendered (Runtime, "en", "unit_narrow", Args),
            "currency unit-width/narrow option uses narrow symbols");
-   Assert (Rendered (Runtime, "en", "aed", Args) = "AED 12.30",
+   Assert (Rendered (Runtime, "en", "aed", Args) = "AED" & U (16#A0#) & "12.30",
            "code-like currency symbols are spaced before the number");
    Assert (Rendered (Runtime, "en", "sgd_narrow", Args) = "$12.30",
            "Singapore dollar narrow symbol uses built-in metadata");
@@ -290,7 +290,7 @@ begin
    Assert (Rendered (Runtime, "en", "php_narrow", Args) =
              U (16#20B1#) & "12.30",
            "Philippine peso narrow symbol uses built-in metadata");
-   Assert (Rendered (Runtime, "en", "thb", Args) = "THB 12.30",
+   Assert (Rendered (Runtime, "en", "thb", Args) = "THB" & U (16#A0#) & "12.30",
            "Thai baht standard symbol uses generated CLDR metadata");
    Assert (Rendered (Runtime, "en", "thb_narrow", Args) =
              U (16#E3F#) & "12.30",
@@ -303,34 +303,34 @@ begin
            "Bangladeshi taka narrow symbol uses built-in metadata");
    Assert (Rendered (Runtime, "bn", "bdt", Args) =
              U (16#9E7#) & U (16#9E8#)
-             & "." & U (16#9E9#) & U (16#9E6#) & " BDT",
+             & "." & U (16#9E9#) & U (16#9E6#) & U (16#9F3#),
            "Bengali currency uses Bengali digits and generated CLDR symbol");
    Assert (Rendered (Runtime, "bn", "bdt_iso", Args) =
              U (16#9E7#) & U (16#9E8#)
-             & "." & U (16#9E9#) & U (16#9E6#) & " BDT",
+             & "." & U (16#9E9#) & U (16#9E6#) & U (16#A0#) & "BDT",
            "Bengali currency ISO code follows the locale currency pattern");
    Assert (Rendered (Runtime, "en-u-nu-beng", "bdt", Args) =
-             "BDT " & U (16#9E7#) & U (16#9E8#)
+             "BDT" & U (16#A0#) & U (16#9E7#) & U (16#9E8#)
              & "." & U (16#9E9#) & U (16#9E6#),
            "currency honors explicit Bengali numbering-system digits");
    Messages.Arguments.Set (Args, "amount", "1234.5");
    Assert (Rendered (Runtime, "bn", "bdt", Args) =
              U (16#9E7#) & "," & U (16#9E8#)
              & U (16#9E9#) & U (16#9EA#) & "." & U (16#9EB#)
-             & U (16#9E6#) & " BDT",
+             & U (16#9E6#) & U (16#9F3#),
            "Bengali currency uses Indian grouping");
    Messages.Arguments.Set (Args, "amount", "12.3");
-   Assert (Rendered (Runtime, "en", "khr", Args) = "KHR 12.30",
+   Assert (Rendered (Runtime, "en", "khr", Args) = "KHR" & U (16#A0#) & "12.30",
            "Cambodian riel standard symbol uses generated CLDR metadata");
    Assert (Rendered (Runtime, "en", "khr_narrow", Args) =
              U (16#17DB#) & "12.30",
            "Cambodian riel narrow symbol uses generated CLDR metadata");
-   Assert (Rendered (Runtime, "en", "gel", Args) = "GEL 12.30",
+   Assert (Rendered (Runtime, "en", "gel", Args) = "GEL" & U (16#A0#) & "12.30",
            "Georgian lari standard symbol uses generated CLDR metadata");
    Assert (Rendered (Runtime, "en", "gel_narrow", Args) =
              U (16#20BE#) & "12.30",
            "Georgian lari narrow symbol uses generated CLDR metadata");
-   Assert (Rendered (Runtime, "en", "iso", Args) = "USD 12.30",
+   Assert (Rendered (Runtime, "en", "iso", Args) = "USD" & U (16#A0#) & "12.30",
            "currency unit-width-iso-code option renders ISO code");
    Assert (Rendered (Runtime, "en", "iso_slash", Args) =
              Rendered (Runtime, "en", "iso", Args),
@@ -347,21 +347,21 @@ begin
              Args) =
              Rendered (Runtime, "en", "precision_standard_alias", Args),
            "currency precision-currency/standard alias preserves standard precision");
-   Assert (Rendered (Runtime, "de", "iso", Args) = "12,30 EUR",
+   Assert (Rendered (Runtime, "de", "iso", Args) = "12,30" & U (16#A0#) & "EUR",
            "currency ISO-code option follows locale symbol position");
    Assert (Rendered (Runtime, "ja", "symbol", Args) = "$12.30",
            "Japanese currency symbols render before the amount");
-   Assert (Rendered (Runtime, "zh", "symbol", Args) = "$12.30",
+   Assert (Rendered (Runtime, "zh", "symbol", Args) = "US$12.30",
            "Chinese currency symbols render before the amount");
-   Assert (Rendered (Runtime, "ko", "symbol", Args) = "$12.30",
+   Assert (Rendered (Runtime, "ko", "symbol", Args) = "US$12.30",
            "Korean currency symbols render before the amount");
-   Assert (Rendered (Runtime, "ja", "iso", Args) = "USD 12.30",
+   Assert (Rendered (Runtime, "ja", "iso", Args) = "USD" & U (16#A0#) & "12.30",
            "Japanese ISO currency code renders before the amount");
-   Assert (Rendered (Runtime, "zh", "iso", Args) = "USD 12.30",
+   Assert (Rendered (Runtime, "zh", "iso", Args) = "USD" & U (16#A0#) & "12.30",
            "Chinese ISO currency code renders before the amount");
-   Assert (Rendered (Runtime, "ko", "iso", Args) = "USD 12.30",
+   Assert (Rendered (Runtime, "ko", "iso", Args) = "USD" & U (16#A0#) & "12.30",
            "Korean ISO currency code renders before the amount");
-   Assert (Rendered (Runtime, "en", "skeleton_iso", Args) = "USD 12.30",
+   Assert (Rendered (Runtime, "en", "skeleton_iso", Args) = "USD" & U (16#A0#) & "12.30",
            "number currency skeleton accepts unit-width-iso-code option");
    Assert (Rendered (Runtime, "en", "skeleton_iso_slash", Args) =
              Rendered (Runtime, "en", "skeleton_iso", Args),
@@ -588,7 +588,7 @@ begin
              "2 Andorran pesetas",
            "currency metadata covers CLDR historic zero-minor codes");
    Assert (Rendered (Runtime, "en", "xcg_symbol", Args) =
-             "Cg.2.00",
+             "Cg." & U (16#A0#) & "2.00",
            "currency metadata covers CLDR 46.1 Caribbean guilder symbol");
    Assert (Rendered (Runtime, "en", "ved_name", Args) =
              "2.00 Bol" & U (16#ED#) & "var Soberanos",
@@ -776,14 +776,14 @@ begin
    Assert (Rendered (Runtime, "ar", "price", Args) = Arabic_USD,
            "Arabic currency uses localized digits and decimal separator");
    Assert (Rendered (Runtime, "ar-u-nu-latn", "price", Args) =
-             "12" & U (16#66B#) & "30 $",
+             U (16#200F#) & "12" & U (16#66B#) & "30" & U (16#A0#) & "US$",
            "currency numbering-system extension overrides Arabic digits");
 
    Messages.Arguments.Set (Args, "amount", "1.234");
-   Assert (Rendered (Runtime, "en", "kuwait", Args) = "KWD 1.234",
+   Assert (Rendered (Runtime, "en", "kuwait", Args) = "KWD" & U (16#A0#) & "1.234",
            "three-minor-unit currencies preserve three fraction digits");
    Messages.Arguments.Set (Args, "amount", "1.2345");
-   Assert (Rendered (Runtime, "en", "clf", Args) = "CLF 1.2345",
+   Assert (Rendered (Runtime, "en", "clf", Args) = "CLF" & U (16#A0#) & "1.2345",
            "four-minor-unit currencies preserve four fraction digits");
 
    Messages.Arguments.Set (Args, "amount", "-12.3");
@@ -816,37 +816,37 @@ begin
            "number currency skeleton accepts separate accounting tokens");
 
    Messages.Arguments.Set (Args, "amount", "1.03");
-   Assert (Rendered (Runtime, "en", "cash", Args) = "CHF 1.05",
+   Assert (Rendered (Runtime, "en", "cash", Args) = "CHF" & U (16#A0#) & "1.05",
            "currency cash option rounds to the cash increment");
    Assert (Rendered (Runtime, "en", "cash_slash", Args) =
              Rendered (Runtime, "en", "cash", Args),
            "currency precision-currency/cash option rounds to the cash increment");
    Assert (Rendered (Runtime, "en", "skeleton_precision_cash", Args) =
-             "CHF 1.05",
+             "CHF" & U (16#A0#) & "1.05",
            "number currency skeleton accepts precision-currency-cash");
    Assert (Rendered (Runtime, "en", "skeleton_precision_cash_slash",
              Args) =
              Rendered (Runtime, "en", "skeleton_precision_cash", Args),
            "number currency skeleton accepts precision/currency-cash");
    Assert (Rendered (Runtime, "en", "skeleton_precision_standard", Args) =
-             "CHF 1.03",
+             "CHF" & U (16#A0#) & "1.03",
            "precision-currency-standard resets cash rounding");
    Assert (Rendered (Runtime, "en", "skeleton_precision_standard_slash",
              Args) =
              Rendered (Runtime, "en", "skeleton_precision_standard", Args),
            "precision/currency-standard resets cash rounding");
-   Assert (Rendered (Runtime, "en", "cad_cash", Args) = "CAD 1.05",
+   Assert (Rendered (Runtime, "en", "cad_cash", Args) = "CAD" & U (16#A0#) & "1.05",
            "Canadian dollar cash option rounds to the cash increment");
    Assert (Rendered (Runtime, "en", "cad_cash_slash", Args) =
              Rendered (Runtime, "en", "cad_cash", Args),
            "currency cash/unit-width/iso-code option rounds to the cash increment");
-   Assert (Rendered (Runtime, "en", "huf_cash", Args) = "HUF 0",
+   Assert (Rendered (Runtime, "en", "huf_cash", Args) = "HUF" & U (16#A0#) & "0",
            "Hungarian forint cash option uses CLDR cash metadata");
    Messages.Arguments.Set (Args, "amount", "1.26");
-   Assert (Rendered (Runtime, "en", "dkk_cash", Args) = "DKK 1.50",
+   Assert (Rendered (Runtime, "en", "dkk_cash", Args) = "DKK" & U (16#A0#) & "1.50",
            "Danish krone cash option rounds to the cash increment");
    Messages.Arguments.Set (Args, "amount", "1.51");
-   Assert (Rendered (Runtime, "en", "sek_cash", Args) = "SEK 1.51",
+   Assert (Rendered (Runtime, "en", "sek_cash", Args) = "SEK" & U (16#A0#) & "1.51",
            "Swedish krona cash option uses CLDR cash metadata");
    Messages.Arguments.Set (Args, "amount", "-1.03");
    Assert (Rendered (Runtime, "en", "skeleton_cash_accounting", Args) =

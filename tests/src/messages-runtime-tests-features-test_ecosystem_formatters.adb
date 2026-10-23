@@ -2994,8 +2994,8 @@ begin
              "1.013 Millibar",
            "measure-unit skeleton localizes German millibars");
    Assert (Rendered (Runtime, "sl", "measure_millibar", Args) =
-             "1.013 milibarov",
-           "measure-unit skeleton localizes Slovenian millibars");
+             "1013 milibarov",
+           "measure-unit skeleton localizes Slovenian millibars (grouping from 5 digits, CLDR 48)");
    Assert (Rendered (Runtime, "ru", "measure_millibar", Args) =
              "1" & UTF8 ([16#A0#]) & "013 "
              & UTF8 ([16#43C#, 16#438#, 16#43B#, 16#43B#, 16#438#, 16#431#, 16#430#, 16#440#]),

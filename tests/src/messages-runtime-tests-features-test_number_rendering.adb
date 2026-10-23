@@ -34,8 +34,6 @@ is
      U (16#E51#) & "," & U (16#E52#) & U (16#E53#)
      & U (16#E54#) & "," & U (16#E55#) & U (16#E56#)
      & U (16#E57#) & "." & U (16#E58#) & U (16#E59#);
-   Thai_Decimal : constant String :=
-     U (16#E54#) & U (16#E52#) & "." & U (16#E50#);
    Devanagari_Total : constant String :=
      U (16#967#) & "," & U (16#968#) & U (16#969#)
      & U (16#96A#) & "," & U (16#96B#) & U (16#96C#)
@@ -567,8 +565,8 @@ begin
            "Arabic numbers use Arabic-Indic digits and separators");
    Assert (Rendered (Runtime, "fa", "total", Args) = Persian_Total,
            "Persian numbers use Persian digits");
-   Assert (Rendered (Runtime, "th", "total", Args) = Thai_Total,
-           "Thai numbers use Thai digits from CLDR data");
+   Assert (Rendered (Runtime, "th", "total", Args) = "1,234,567.89",
+           "Thai numbers use Latin digits, CLDR's default for Thai");
    Assert (Rendered (Runtime, "ar-u-nu-latn", "total", Args) =
              "1" & U (16#66C#) & "234" & U (16#66C#) & "567"
              & U (16#66B#) & "89",
@@ -989,9 +987,8 @@ begin
    Assert (Rendered (Runtime, "fa", "decimal_always", Args) =
              Persian_Decimal,
            "decimal-always localizes Persian digits");
-   Assert (Rendered (Runtime, "th", "decimal_always", Args) =
-             Thai_Decimal,
-           "decimal-always localizes Thai digits");
+   Assert (Rendered (Runtime, "th", "decimal_always", Args) = "42.0",
+           "decimal-always keeps Thai's default Latin digits");
    Assert (Rendered (Runtime, "en", "trailing_auto", Args) = "42.00",
            "trailing-zero-display/auto keeps fixed fractional zeroes");
    Assert (Rendered (Runtime, "en", "trailing_strip", Args) = "42",
