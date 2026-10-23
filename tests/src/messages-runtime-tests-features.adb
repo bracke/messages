@@ -1150,8 +1150,8 @@ package body Messages.Runtime.Tests.Features is
               "English decimal 1.0 uses fractional cardinal operands");
 
       Messages.Arguments.Set (Args, "count", "1.5");
-      Assert (Rendered (Runtime, "fr", "items", Args) = "one 1.5",
-              "French decimal 1.5 uses CLDR fractional operands");
+      Assert (Rendered (Runtime, "fr", "items", Args) = "one 1,5",
+              "French decimal 1.5 uses CLDR fractional operands, written the French way");
 
       Messages.Runtime.Render_Into
         (Runtime, "en", "items", Args, Target, Last, Status);
@@ -1501,12 +1501,12 @@ package body Messages.Runtime.Tests.Features is
       Assert (Result.Status = Messages.Runtime.Loaded,
               "plural with all category branches should load");
 
-      Assert (Count ("0") = "zero/0", "zero branch renders");
-      Assert (Count ("1") = "one/1", "one branch renders");
-      Assert (Count ("2") = "two/2", "two branch renders");
-      Assert (Count ("3") = "few/3", "few branch renders");
-      Assert (Count ("11") = "many/11", "many branch renders");
-      Assert (Count ("100") = "other/100", "other branch renders");
+      Assert (Count ("0") = "zero/" & U (16#660#), "zero branch renders");
+      Assert (Count ("1") = "one/" & U (16#661#), "one branch renders");
+      Assert (Count ("2") = "two/" & U (16#662#), "two branch renders");
+      Assert (Count ("3") = "few/" & U (16#663#), "few branch renders");
+      Assert (Count ("11") = "many/" & U (16#661#) & U (16#661#), "many branch renders");
+      Assert (Count ("100") = "other/" & U (16#661#) & U (16#660#) & U (16#660#), "other branch renders");
       Assert (Slovene_Count ("1") = "one/1", "sl one branch renders");
       Assert (Slovene_Count ("2") = "two/2", "sl two branch renders");
       Assert (Slovene_Count ("3") = "few/3", "sl few branch renders");

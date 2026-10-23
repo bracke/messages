@@ -1146,7 +1146,7 @@ begin
            "ordinal-word number skeleton renders deterministic English million words");
    Messages.Arguments.Set (Args, "value", "-42");
    Assert (Rendered (Runtime, "en", "spellout", Args) =
-             "- forty-two",
+             "minus forty-two",
            "spellout number skeleton renders signed English words");
    Messages.Arguments.Set (Args, "value", "-21");
    Assert (Rendered (Runtime, "en", "ordinal_words", Args) =
@@ -1161,7 +1161,7 @@ begin
            "spellout number skeleton preserves decimal fraction digits");
    Messages.Arguments.Set (Args, "value", "-0.5");
    Assert (Rendered (Runtime, "en", "spellout", Args) =
-             "- zero point five",
+             "minus zero point five",
            "spellout number skeleton renders signed decimal values");
 
    Messages.Arguments.Set (Args, "value", "2345");

@@ -41,6 +41,10 @@ commits; each of those says in its own message what changed and why.
 
 ### Fixed
 
+- A plural's `#` shows the count as the locale writes numbers, as ICU
+  does: Arabic "٢١", French "1,5", grouping included. A negative number
+  spelled out reads "minus forty-two" (CLDR's rule), not "- forty-two".
+
 - A rate CLDR has no name for (megabit per second) puts the numerator into
   the denominator's own `perUnitPattern`, as ICU does: "1.5 Mb/s", not
   "1.5 Mb/sec"; Japanese "Mb/秒". Spell-out goes through CLDR's RBNF rules

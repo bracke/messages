@@ -973,6 +973,28 @@ package body Messages.Runtime is
             end if;
          end;
       end if;
+      --  '#' shows the count as the locale writes numbers, as ICU does:
+      --  "١٢٬٣٤٥", "12.345", "1,5".
+      if Valid and then Length (Rendered) > 0 then
+         declare
+            Formatted : String (1 .. I18N.Number_Format.Max_Formatted_Length);
+            Last      : Natural;
+            Ok        : Boolean;
+            Overflow  : Boolean;
+         begin
+            I18N.Number_Format.Format_Into
+              (Value_Text => To_String (Rendered),
+               Locale     => Locale,
+               Style      => "",
+               Target     => Formatted,
+               Last       => Last,
+               Ok         => Ok,
+               Overflow   => Overflow);
+            if Ok and then not Overflow and then Last > 0 then
+               Rendered := To_Unbounded_String (Formatted (1 .. Last));
+            end if;
+         end;
+      end if;
    exception
       when Constraint_Error =>
          Valid := False;
