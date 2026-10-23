@@ -600,17 +600,6 @@ package body Messages.Extra_Format is
       return Unit_Name (Unit, Category = I18N.Plurals.One);
    end Localized_Unit_Name;
 
-   function Localized_Unit_Name_For_Value
-     (Locale : String;
-      Unit   : String;
-      Value  : String)
-      return String
-   is
-   begin
-      return Localized_Unit_Name
-        (Locale, Unit, Unit_Category_For_Value (Locale, Value));
-   end Localized_Unit_Name_For_Value;
-
    procedure Put_Runtime_Unit_Pattern
      (Target   : in out String;
       Last     : in out Natural;
@@ -790,22 +779,40 @@ package body Messages.Extra_Format is
       Ok       : out Boolean;
       Overflow : in out Boolean)
    is
+      --  A range "low/high" ("1/2" hours): its numbers as the locale writes a
+      --  range, and the unit as for the upper bound -- CLDR's plural ranges
+      --  take the end's category in the common cases -- except an end of
+      --  zero, one or two, which the "other" form counts (Arabic "١–٢ ساعة",
+      --  not the dual "ساعتان").
+      Slash : Natural := 0;
    begin
       Ok := False;
-      if not Is_Decimal_Text (Value)
+      for Index in Value'First + 1 .. Value'Last - 1 loop
+         if Value (Index) = '/' then
+            Slash := Index;
+            exit;
+         end if;
+      end loop;
+      if (Slash = 0 and then not Is_Decimal_Text (Value))
+        or else (Slash /= 0
+                 and then not (Is_Decimal_Text (Value (Value'First .. Slash - 1))
+                               and then Is_Decimal_Text (Value (Slash + 1 .. Value'Last))))
         or else not Unit_Option_Is_Valid (Option)
       then
          return;
       end if;
 
       declare
+         High     : constant String := (if Slash = 0 then Value else Value (Slash + 1 .. Value'Last));
          Base     : constant String := Option_Base (Option);
-         Text : constant String :=
-           Localized_Unit_Name_For_Value (Locale, Option, Value);
+         High_Category : constant I18N.Plurals.Plural_Category :=
+           Unit_Category_For_Value (Locale, High);
+         Category : constant I18N.Plurals.Plural_Category :=
+           (if Slash /= 0 and then High_Category in I18N.Plurals.Zero | I18N.Plurals.One | I18N.Plurals.Two
+            then I18N.Plurals.Other else High_Category);
+         Text : constant String := Localized_Unit_Name (Locale, Option, Category);
          Per_Unit : constant String := Option_Per_Unit (Option);
          Width    : constant String := Option_Width (Option);
-         Category : constant I18N.Plurals.Plural_Category :=
-           Unit_Category_For_Value (Locale, Value);
          Pattern_Found : Boolean;
          Pattern : constant String :=
            Runtime_Unit_Pattern

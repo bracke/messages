@@ -45,6 +45,9 @@ commits; each of those says in its own message what changed and why.
 
 ### Added
 
+- A unit with a range value "low/high" writes the unit once, in the
+  locale's range ("1–2 Stunden", "2–5 часов", Arabic "١–٢ ساعة"): the unit
+  as for the end, an end of zero, one or two in the "other" form.
 - A unit option may name a grammatical case after `@`:
   `{n, unit, week/unit-width-long@accusative}` renders CLDR's pattern for
   that case ("1 неделю"), and the nominative where the locale has none.

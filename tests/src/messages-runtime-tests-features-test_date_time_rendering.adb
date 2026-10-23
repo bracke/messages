@@ -19,6 +19,9 @@ begin
       & "en.short_skeleton_alias = ""{day, date, ::short} {clock, time, ::short}"""
       & ASCII.LF
       & "de.span = ""{span, date, ::yMMMd}""" & ASCII.LF
+      & "de.hours = ""{span, unit, hour/unit-width-long}""" & ASCII.LF
+      & "ar.hours = ""{span, unit, hour/unit-width-long}""" & ASCII.LF
+      & "ru.hours = ""{span, unit, hour/unit-width-long}""" & ASCII.LF
       & "en.short_named_skeleton_alias = ""{day, date, ::date-short} {clock, time, ::time-short}"""
       & ASCII.LF
       & "en.short_slash_skeleton_alias = ""{day, date, ::date/short} {clock, time, ::time/short}"""
@@ -689,6 +692,17 @@ begin
    Messages.Arguments.Set (Args, "span", "2026-10-09/2026-10-15");
    Assert (Rendered (Runtime, "de", "span", Args) = "9." & U (16#2013#) & "15. Okt. 2026",
            "a date interval writes the month and year once");
+   --  A unit with a range "low/high" writes the unit once, as for its end.
+   Messages.Arguments.Set (Args, "span", "1/2");
+   Assert (Rendered (Runtime, "de", "hours", Args) = "1" & U (16#2013#) & "2 Stunden",
+           "a German range of hours");
+   Assert (Rendered (Runtime, "ar", "hours", Args)
+           = U (16#661#) & U (16#2013#) & U (16#662#) & " " & U (16#633#) & U (16#627#) & U (16#639#) & U (16#629#),
+           "an Arabic range of hours takes the counted form, not the dual word");
+   Messages.Arguments.Set (Args, "span", "2/5");
+   Assert (Rendered (Runtime, "ru", "hours", Args)
+           = "2" & U (16#2013#) & "5 " & U (16#447#) & U (16#430#) & U (16#441#) & U (16#43E#) & U (16#432#),
+           "a Russian range of hours declines for its end");
    Assert (Rendered (Runtime, "en", "short_skeleton_alias", Args) =
              Rendered (Runtime, "en", "short", Args),
            "short skeleton style aliases match date/time styles");
