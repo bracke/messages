@@ -18,6 +18,7 @@ begin
       & ASCII.LF
       & "en.short_skeleton_alias = ""{day, date, ::short} {clock, time, ::short}"""
       & ASCII.LF
+      & "de.span = ""{span, date, ::yMMMd}""" & ASCII.LF
       & "en.short_named_skeleton_alias = ""{day, date, ::date-short} {clock, time, ::time-short}"""
       & ASCII.LF
       & "en.short_slash_skeleton_alias = ""{day, date, ::date/short} {clock, time, ::time/short}"""
@@ -684,6 +685,10 @@ begin
    Assert (Rendered (Runtime, "en", "short", Args) =
              "2/29/24 9:05" & U (16#202F#) & "AM",
            "short date/time styles render deterministically");
+   --  An ISO 8601 interval value renders by CLDR's interval formats.
+   Messages.Arguments.Set (Args, "span", "2026-10-09/2026-10-15");
+   Assert (Rendered (Runtime, "de", "span", Args) = "9." & U (16#2013#) & "15. Okt. 2026",
+           "a date interval writes the month and year once");
    Assert (Rendered (Runtime, "en", "short_skeleton_alias", Args) =
              Rendered (Runtime, "en", "short", Args),
            "short skeleton style aliases match date/time styles");
