@@ -1562,11 +1562,12 @@ begin
            "spellout number skeleton renders Korean omitted one before unit");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "ko", "ordinal_words", Args) =
-             UTF8 ([16#C81C#, 16#C774#, 16#C2ED#, 16#C77C#]),
-           "ordinal-word number skeleton renders Korean ordinal prefix");
+             UTF8 ([16#C2A4#, 16#BB3C#, 16#D55C#, 16#C9F8#]),
+           "ordinal-word number skeleton renders CLDR's native Korean ordinal (as ICU)");
    Messages.Arguments.Set (Args, "value", "10001");
    Assert (Rendered (Runtime, "ko", "ordinal_words", Args) =
-             UTF8 ([16#C81C#, 16#B9CC#, 16#C77C#]),
+             UTF8
+               ([16#B9CC#, 16#20#, 16#D55C#, 16#C9F8#]),
            "ordinal-word number skeleton renders Korean man group");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1629,11 +1630,11 @@ begin
            "spellout number skeleton renders Danish reversed tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "da", "ordinal_words", Args) =
-             "enogtyvende",
+             "et" & SH & "og" & SH & "tyvende",
            "ordinal-word number skeleton renders deterministic Danish words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "da", "ordinal_words", Args) =
-             "to tusind tre hundrede femogfyrretyvende",
+             "to tusind tre hundrede og fem" & SH & "og" & SH & "fyrrende",
            "ordinal-word number skeleton renders Danish compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1654,7 +1655,7 @@ begin
            "ordinal-word number skeleton renders Norwegian words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "nb", "ordinal_words", Args) =
-             "to tusen tre hundre f" & U (16#F8#) & "rtifemte",
+             "to" & SH & "tusen tre" & SH & "hundre f" & U (16#F8#) & "rti" & SH & "femte",
            "ordinal-word number skeleton renders Norwegian nb alias");
 
    Messages.Arguments.Set (Args, "value", "2345");
