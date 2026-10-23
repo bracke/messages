@@ -1172,7 +1172,7 @@ begin
            "spellout number skeleton renders German million words");
    Messages.Arguments.Set (Args, "value", "1.5");
    Assert (Rendered (Runtime, "de", "spellout", Args) =
-             "eins komma f" & U (16#FC#) & "nf",
+             "eins Komma f" & U (16#FC#) & "nf",
            "spellout number skeleton renders German decimal words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "de", "ordinal_words", Args) =
