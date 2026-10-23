@@ -154,6 +154,18 @@ begin
       & ASCII.LF
       & "ru.unit_week_accusative = ""{distance, unit, week/unit-width-long@accusative}"""
       & ASCII.LF
+      & "zh.variant = ""hans"""
+      & ASCII.LF
+      & "zh-Hant.variant = ""hant"""
+      & ASCII.LF
+      & "pt.variant = ""br"""
+      & ASCII.LF
+      & "pt-PT.variant = ""pt"""
+      & ASCII.LF
+      & "es.variant = ""es"""
+      & ASCII.LF
+      & "es-419.variant = ""latam"""
+      & ASCII.LF
       & "de.unit_year_dative = ""{distance, unit, year/unit-width-long@dative}"""
       & ASCII.LF
       & "fr.unit_year_dative = ""{distance, unit, year/unit-width-long@dative}"""
@@ -1533,6 +1545,14 @@ begin
    Assert (Rendered (Runtime, "de", "unit_centimetre_alias", Args) =
              "1,5 Zentimeter",
            "unit formatter accepts British length-centimetre alias");
+   --  Fallback follows CLDR: a region's likely script, then CLDR's parent.
+   Assert (Rendered (Runtime, "zh-TW", "variant", Args) = "hant", "zh-TW falls back to zh-Hant");
+   Assert (Rendered (Runtime, "zh-HK", "variant", Args) = "hant", "zh-HK falls back to zh-Hant");
+   Assert (Rendered (Runtime, "zh-CN", "variant", Args) = "hans", "zh-CN falls back to zh");
+   Assert (Rendered (Runtime, "pt-AO", "variant", Args) = "pt", "pt-AO falls back to pt-PT");
+   Assert (Rendered (Runtime, "pt-BR", "variant", Args) = "br", "pt-BR falls back to pt");
+   Assert (Rendered (Runtime, "es-MX", "variant", Args) = "latam", "es-MX falls back to es-419");
+   Assert (Rendered (Runtime, "es-ES", "variant", Args) = "es", "es-ES falls back to es");
    --  A unit in a grammatical case: CLDR's pattern for the case where the
    --  locale has one, else the nominative.
    Messages.Arguments.Set (Args, "distance", "1");

@@ -14,6 +14,10 @@ commits; each of those says in its own message what changed and why.
 
 ### Changed
 
+- An entry lookup falls back along CLDR's locale tree: CLDR's parent where it
+  names one (es-MX -> es-419, pt-AO -> pt-PT), a region's likely script
+  (zh-TW, zh-HK -> zh-Hant), then the tag less its last subtag as before.
+
 - **`{offset, relative, unit}` uses CLDR's names for the offsets it has
   them for**: `yesterday` / `gestern` / `í gær` for -1 day, `übermorgen` for
   +2, `last week`, rather than `1 day ago` and `in 2 days` (ICU's and

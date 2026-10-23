@@ -1,3 +1,4 @@
+with Ada.Characters.Handling;
 with Ada.Directories;
 with Ada.Strings;
 with Ada.Strings.Fixed;
@@ -8,6 +9,7 @@ with I18N.Currency;
 with I18N.Date_Time_Format;
 with Messages.Extra_Format;
 with I18N.Number_Format;
+with I18N.Parent_Locales;
 with Messages.Result; use Messages.Result;
 with Messages.Parser;
 with Messages.Observability;
@@ -1253,6 +1255,41 @@ package body Messages.Runtime is
    --  Walk the deterministic fallback chain (locale -> parent -> ... -> default
    --  locale -> und). Bounded by locale fallback depth with O(1) per-locale
    --  lookup.
+   --  The locale an entry lookup falls back to from Current (Requested
+   --  being where the walk began): CLDR's parent where it names one other than
+   --  root (es-MX -> es-419, pt-AO -> pt-PT); for a language-region tag whose
+   --  likely script is not its language's, the language in that script
+   --  (zh-TW -> zh-Hant); else the tag less its last subtag (zh-Hant -> zh,
+   --  es-419 -> es). "" past the language.
+   function Fallback_Parent (Current, Requested : String) return String is
+      pragma Unreferenced (Requested);
+      Lower : constant String := Ada.Characters.Handling.To_Lower (Current);
+      CLDR  : constant String := I18N.Parent_Locales.Parent (Lower);
+      Truncated : constant String := I18N.Locales.Parent (Current);
+   begin
+      if CLDR'Length > 0 and then CLDR /= "root" then
+         return Canonical_Locale (CLDR);
+      end if;
+      --  A language-region tag (no script of its own): its likely script.
+      if Truncated'Length > 0 and then I18N.Locales.Parent (Truncated)'Length = 0
+        and then Ada.Strings.Fixed.Count (Current, "-") = 1
+        and then Current'Length - Truncated'Length - 1 /= 4
+      then
+         declare
+            Own      : constant String := I18N.Locales.Maximize (Current);
+            Language : constant String := I18N.Locales.Maximize (Truncated);
+            function Script (Maximized : String) return String is
+              (if Maximized'Length >= 8 and then Maximized (Maximized'First + 2) = '-'
+               then Maximized (Maximized'First + 3 .. Maximized'First + 6) else "");
+         begin
+            if Script (Own) /= "" and then Script (Own) /= Script (Language) then
+               return Canonical_Locale (Truncated & "-" & Script (Own));
+            end if;
+         end;
+      end if;
+      return Truncated;
+   end Fallback_Parent;
+
    procedure Resolve_Entry
      (Item            : Runtime;
       Locale          : String;
@@ -1275,8 +1312,7 @@ package body Messages.Runtime is
          end if;
 
          declare
-            Parent : constant String :=
-              I18N.Locales.Parent (To_String (Current));
+            Parent : constant String := Fallback_Parent (To_String (Current), Requested);
          begin
             exit when Parent'Length = 0;
             Current := To_Unbounded_String (Parent);
