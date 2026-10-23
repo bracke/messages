@@ -14,6 +14,10 @@ commits; each of those says in its own message what changed and why.
 
 ### Changed
 
+- Date-time skeletons render as ICU joins a date and a time ("2/29/2024,
+  21:30:07", Arabic "٢٩‏/٢‏/٢٠٢٤، ٢١:٣٠:٠٧") through i18n; the expectations and
+  the ICU conformance fixture that pinned the old field-by-field form
+  ("2024 2 29 21:30:00 UTC") follow ICU 78.
 - Rendering keeps 16 nested plural/selectordinal number texts (was 128) and
   no longer clears them first: Render_Into's frame drops from 538 KB to
   80 KB -- half of Windows' 1 MiB main stack before -- and each render

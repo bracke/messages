@@ -860,14 +860,14 @@ begin
            "Coptic calendar date is converted from Gregorian input");
    Messages.Arguments.Set (Args, "instant", "2024-09-11T00:00:00Z");
    Assert (Rendered (Runtime, "en-u-ca-coptic", "coptic_datetime", Args) =
-             "A.M. 1741 01 01 00:00",
+             "A.M. 1741 01 01, 00:00",
            "Coptic calendar conversion applies to datetime skeletons");
    Assert (Rendered (Runtime, "en-u-ca-ethiopic", "ethiopic", Args) =
              "A.M. 2017 01 01",
            "Ethiopic calendar date is converted from Gregorian input");
    Assert
      (Rendered (Runtime, "en-u-ca-ethiopic", "ethiopic_datetime", Args) =
-      "A.M. 2017 01 01 00:00",
+      "A.M. 2017 01 01, 00:00",
       "Ethiopic calendar conversion applies to datetime skeletons");
    Assert (Rendered (Runtime, "en-u-ca-ethioaa", "ethioaa", Args) =
              "A.A. 7517 01 01",
@@ -880,7 +880,7 @@ begin
    Assert
      (Rendered
         (Runtime, "en-u-ca-islamic-civil", "islamic_datetime", Args) =
-      "AH 1445 09 01 00:00",
+      "AH 1445 09 01, 00:00",
       "Islamic civil calendar conversion applies to datetime skeletons");
    Messages.Arguments.Set (Args, "day", "2024-03-11");
    Assert (Rendered (Runtime, "en-u-ca-islamic", "islamic_alias", Args) =
@@ -900,7 +900,7 @@ begin
    Messages.Arguments.Set (Args, "instant", "2024-03-21T00:00:00Z");
    Assert
      (Rendered (Runtime, "en-u-ca-indian", "indian_datetime", Args) =
-      "Saka 1946 01 01 00:00",
+      "Saka 1946 01 01, 00:00",
       "Indian national calendar conversion applies to datetime skeletons");
    Messages.Arguments.Set (Args, "day", "2024-03-20");
    Assert (Rendered (Runtime, "en-u-ca-persian", "persian", Args) =
@@ -912,7 +912,7 @@ begin
    Messages.Arguments.Set (Args, "instant", "2024-03-20T00:00:00Z");
    Assert
      (Rendered (Runtime, "en-u-ca-persian", "persian_datetime", Args) =
-      "AP 1403 01 01 00:00",
+      "AP 1403 01 01, 00:00",
       "Persian calendar conversion applies to datetime skeletons");
    Messages.Arguments.Set (Args, "day", "2023-09-16");
    Assert (Rendered (Runtime, "en-u-ca-hebrew", "hebrew", Args) =
@@ -928,7 +928,7 @@ begin
    Messages.Arguments.Set (Args, "instant", "2024-02-29T00:00:00Z");
    Assert
      (Rendered (Runtime, "en-u-ca-hebrew", "hebrew_datetime", Args) =
-      "AM 5784 06 20 00:00",
+      "AM 5784 06 20, 00:00",
       "Hebrew calendar conversion applies to datetime skeletons");
 
    Messages.Arguments.Set (Args, "instant", "2024-02-29T23:30:00+02:00");
@@ -1094,20 +1094,20 @@ begin
              "5:00" & U (16#202F#) & "AM",
            "US/Pacific aliases America/Los_Angeles");
    Assert (Rendered (Runtime, "en", "new_york_offset", Args) =
-             "2024 07 01 08:00 -0400",
+             "2024 07 01, 08:00 -0400",
            "New York skeleton zone offset applies daylight time");
    Assert (Rendered (Runtime, "en", "chatham_winter", Args) =
-             "2024 07 02 00:45 +1245",
+             "2024 07 02, 00:45 +1245",
            "generated tzdb table converts Pacific/Chatham standard offset");
    Assert (Rendered (Runtime, "en", "cairo_tzdb", Args) =
-             "2024 07 01 15:00 +0300",
+             "2024 07 01, 15:00 +0300",
            "generated tzdb table converts Africa/Cairo daylight offset");
    Assert (Rendered (Runtime, "en", "st_johns_tzdb", Args) =
-             "2024 07 01 09:30 -0230",
+             "2024 07 01, 09:30 -0230",
            "generated tzdb table converts America/St_Johns half-hour offset");
    Messages.Arguments.Set (Args, "instant", "2024-01-01T12:00:00Z");
    Assert (Rendered (Runtime, "en", "chatham_summer", Args) =
-             "2024 01 02 01:45 +1345",
+             "2024 01 02, 01:45 +1345",
            "generated tzdb table converts Pacific/Chatham daylight offset");
    Messages.Arguments.Set (Args, "instant", "2024-03-10T06:59:00Z");
    Assert (Rendered (Runtime, "en", "new_york_summer", Args) =
@@ -2166,10 +2166,10 @@ begin
            "time-zone formatter uses generated French UTC display name");
    Messages.Arguments.Set (Args, "instant", "2024-02-29T23:30:07+02:00");
    Assert (Rendered (Runtime, "en", "full_skeleton", Args) =
-             "AD 2024 Q1 060 9 5 5 Thu in the evening 11:30:7.0 84607000 +0200",
+             "AD 2024 Q1 060 9 5 5 Thu, in the evening 11:30:7.0 84607000 +0200",
            "expanded date/time skeleton fields render deterministically");
    Assert (Rendered (Runtime, "en", "datetime_skeleton", Args) =
-             "2024 2 29 21:30:07",
+             "2/29/2024, 21:30:07",
            "datetime skeleton combines date and time fields");
    Messages.Arguments.Set
      (Args, "instant", "2024-02-29T23:30:07.987654321+02:00");
@@ -2184,64 +2184,37 @@ begin
              "2024-02-29T21:30:07 Z",
            "datetime skeleton renders quoted literals and zone offset");
    Assert (Rendered (Runtime, "ar", "datetime_skeleton", Args) =
-             U (16#662#) & U (16#660#) & U (16#662#) & U (16#664#) & " "
-             & U (16#662#) & " " & U (16#662#) & U (16#669#) & " "
-             & U (16#662#) & U (16#661#) & ":" & U (16#663#)
-             & U (16#660#) & ":" & U (16#660#) & U (16#667#),
+             U (16#662#) & U (16#669#) & U (16#200F#) & "/" & U (16#662#) & U (16#200F#) & "/" & U (16#662#) & U (16#660#) & U (16#662#) & U (16#664#) & U (16#60C#) & " " & U (16#662#) & U (16#661#) & ":" & U (16#663#) & U (16#660#) & ":" & U (16#660#) & U (16#667#),
            "datetime skeleton localizes digits");
    Assert (Rendered (Runtime, "ar-u-nu-latn", "datetime_skeleton", Args) =
-             "2024 2 29 21:30:07",
+             "29" & U (16#200F#) & "/2" & U (16#200F#) & "/2024" & U (16#60C#) & " 21:30:07",
            "latn numbering-system extension overrides Arabic datetime digits");
    Assert (Rendered (Runtime, "ar-u-nu-deva", "datetime_skeleton", Args) =
-             U (16#968#) & U (16#966#) & U (16#968#) & U (16#96A#) & " "
-             & U (16#968#) & " " & U (16#968#) & U (16#96F#) & " "
-             & U (16#968#) & U (16#967#) & ":" & U (16#969#)
-             & U (16#966#) & ":" & U (16#966#) & U (16#96D#),
+             U (16#968#) & U (16#96F#) & U (16#200F#) & "/" & U (16#968#) & U (16#200F#) & "/" & U (16#968#) & U (16#966#) & U (16#968#) & U (16#96A#) & U (16#60C#) & " " & U (16#968#) & U (16#967#) & ":" & U (16#969#) & U (16#966#) & ":" & U (16#966#) & U (16#96D#),
            "numbering-system extension overrides Arabic datetime digits");
    Assert (Rendered (Runtime, "en-u-nu-arab", "datetime_skeleton", Args) =
-             U (16#662#) & U (16#660#) & U (16#662#) & U (16#664#) & " "
-             & U (16#662#) & " " & U (16#662#) & U (16#669#) & " "
-             & U (16#662#) & U (16#661#) & ":" & U (16#663#)
-             & U (16#660#) & ":" & U (16#660#) & U (16#667#),
+             U (16#662#) & "/" & U (16#662#) & U (16#669#) & "/" & U (16#662#) & U (16#660#) & U (16#662#) & U (16#664#) & ", " & U (16#662#) & U (16#661#) & ":" & U (16#663#) & U (16#660#) & ":" & U (16#660#) & U (16#667#),
            "arab numbering-system extension localizes datetime digits");
    Assert (Rendered (Runtime, "en-u-nu-arabext", "datetime_skeleton", Args) =
-             U (16#6F2#) & U (16#6F0#) & U (16#6F2#) & U (16#6F4#) & " "
-             & U (16#6F2#) & " " & U (16#6F2#) & U (16#6F9#) & " "
-             & U (16#6F2#) & U (16#6F1#) & ":" & U (16#6F3#)
-             & U (16#6F0#) & ":" & U (16#6F0#) & U (16#6F7#),
+             U (16#6F2#) & "/" & U (16#6F2#) & U (16#6F9#) & "/" & U (16#6F2#) & U (16#6F0#) & U (16#6F2#) & U (16#6F4#) & ", " & U (16#6F2#) & U (16#6F1#) & ":" & U (16#6F3#) & U (16#6F0#) & ":" & U (16#6F0#) & U (16#6F7#),
            "arabext numbering-system extension localizes datetime digits");
    Assert (Rendered (Runtime, "en-u-nu-thai", "datetime_skeleton", Args) =
-             U (16#E52#) & U (16#E50#) & U (16#E52#) & U (16#E54#) & " "
-             & U (16#E52#) & " " & U (16#E52#) & U (16#E59#) & " "
-             & U (16#E52#) & U (16#E51#) & ":" & U (16#E53#)
-             & U (16#E50#) & ":" & U (16#E50#) & U (16#E57#),
+             U (16#E52#) & "/" & U (16#E52#) & U (16#E59#) & "/" & U (16#E52#) & U (16#E50#) & U (16#E52#) & U (16#E54#) & ", " & U (16#E52#) & U (16#E51#) & ":" & U (16#E53#) & U (16#E50#) & ":" & U (16#E50#) & U (16#E57#),
            "thai numbering-system extension localizes datetime digits");
    Assert (Rendered (Runtime, "fa", "datetime_skeleton", Args) =
-             U (16#6F2#) & U (16#6F0#) & U (16#6F2#) & U (16#6F4#) & " "
-             & U (16#6F2#) & " " & U (16#6F2#) & U (16#6F9#) & " "
-             & U (16#6F2#) & U (16#6F1#) & ":" & U (16#6F3#)
-             & U (16#6F0#) & ":" & U (16#6F0#) & U (16#6F7#),
+             U (16#6F2#) & U (16#6F0#) & U (16#6F2#) & U (16#6F4#) & "/" & U (16#6F2#) & "/" & U (16#6F2#) & U (16#6F9#) & U (16#60C#) & U (16#200F#) & " " & U (16#6F2#) & U (16#6F1#) & ":" & U (16#6F3#) & U (16#6F0#) & ":" & U (16#6F0#) & U (16#6F7#),
            "datetime skeleton localizes Persian digits");
    Assert (Rendered (Runtime, "th", "datetime_skeleton", Args) =
-             "2024 2 29 21:30:07",
+             "29/2/2024 21:30:07",
            "datetime skeleton keeps Thai's default Latin digits");
    Assert (Rendered (Runtime, "en-u-nu-deva", "datetime_skeleton", Args) =
-             U (16#968#) & U (16#966#) & U (16#968#) & U (16#96A#) & " "
-             & U (16#968#) & " " & U (16#968#) & U (16#96F#) & " "
-             & U (16#968#) & U (16#967#) & ":" & U (16#969#)
-             & U (16#966#) & ":" & U (16#966#) & U (16#96D#),
+             U (16#968#) & "/" & U (16#968#) & U (16#96F#) & "/" & U (16#968#) & U (16#966#) & U (16#968#) & U (16#96A#) & ", " & U (16#968#) & U (16#967#) & ":" & U (16#969#) & U (16#966#) & ":" & U (16#966#) & U (16#96D#),
            "numbering-system extension localizes datetime to Devanagari digits");
    Assert (Rendered (Runtime, "en-u-nu-beng", "datetime_skeleton", Args) =
-             U (16#9E8#) & U (16#9E6#) & U (16#9E8#) & U (16#9EA#) & " "
-             & U (16#9E8#) & " " & U (16#9E8#) & U (16#9EF#) & " "
-             & U (16#9E8#) & U (16#9E7#) & ":" & U (16#9E9#)
-             & U (16#9E6#) & ":" & U (16#9E6#) & U (16#9ED#),
+             U (16#9E8#) & "/" & U (16#9E8#) & U (16#9EF#) & "/" & U (16#9E8#) & U (16#9E6#) & U (16#9E8#) & U (16#9EA#) & ", " & U (16#9E8#) & U (16#9E7#) & ":" & U (16#9E9#) & U (16#9E6#) & ":" & U (16#9E6#) & U (16#9ED#),
            "numbering-system extension localizes datetime to Bengali digits");
    Assert (Rendered (Runtime, "bn", "datetime_skeleton", Args) =
-             U (16#9E8#) & U (16#9E6#) & U (16#9E8#) & U (16#9EA#) & " "
-             & U (16#9E8#) & " " & U (16#9E8#) & U (16#9EF#) & " "
-             & U (16#9E8#) & U (16#9E7#) & ":" & U (16#9E9#)
-             & U (16#9E6#) & ":" & U (16#9E6#) & U (16#9ED#),
+             U (16#9E8#) & U (16#9EF#) & "/" & U (16#9E8#) & "/" & U (16#9E8#) & U (16#9E6#) & U (16#9E8#) & U (16#9EA#) & " " & U (16#9E8#) & U (16#9E7#) & ":" & U (16#9E9#) & U (16#9E6#) & ":" & U (16#9E6#) & U (16#9ED#),
            "Bengali locale localizes datetime skeleton digits");
    Assert (Status_Of (Runtime, "en", "bad_zone", Args) =
              Messages.Result.Invalid_Argument,
