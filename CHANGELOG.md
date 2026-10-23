@@ -41,6 +41,10 @@ commits; each of those says in its own message what changed and why.
 
 ### Fixed
 
+- Ordinal words follow CLDR's rules (33 expectations, verified with ICU):
+  Greek "εικοστός πρώτος", Hungarian "huszonegyedik", Portuguese "dois
+  milésimo...", and soft hyphens in German, Dutch and Finnish compounds.
+
 - A plural's `#` shows the count as the locale writes numbers, as ICU
   does: Arabic "٢١", French "1,5", grouping included. A negative number
   spelled out reads "minus forty-two" (CLDR's rule), not "- forty-two".

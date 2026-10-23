@@ -1150,7 +1150,7 @@ begin
            "spellout number skeleton renders signed English words");
    Messages.Arguments.Set (Args, "value", "-21");
    Assert (Rendered (Runtime, "en", "ordinal_words", Args) =
-             "- twenty-first",
+             "minus twenty-first",
            "ordinal-word number skeleton renders signed English words");
    Messages.Arguments.Set (Args, "value", "+42");
    Assert (Rendered (Runtime, "en", "spellout", Args) = "forty-two",
@@ -1179,11 +1179,12 @@ begin
            "spellout number skeleton renders German decimal words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "de", "ordinal_words", Args) =
-             "einundzwanzigste",
+             "ein" & SH & "und" & SH & "zwanzigste",
            "ordinal-word number skeleton renders deterministic German words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "de", "ordinal_words", Args) =
-             "zweitausenddreihundertf" & U (16#FC#) & "nfundvierzigste",
+             "zwei" & SH & "tausend" & SH & "drei" & SH & "hundert" & SH & "f" & U (16#FC#) & "nf" & SH
+             & "und" & SH & "vierzigste",
            "ordinal-word number skeleton renders German compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1200,7 +1201,7 @@ begin
            "spellout number skeleton renders French plural eighty words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "fr", "ordinal_words", Args) =
-             "vingt et uni" & U (16#E8#) & "me",
+             "vingt-et-uni" & U (16#E8#) & "me",
            "ordinal-word number skeleton renders deterministic French words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "fr", "ordinal_words", Args) =
@@ -1284,7 +1285,8 @@ begin
            "ordinal-word number skeleton renders deterministic Spanish words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "es", "ordinal_words", Args) =
-             "dos mil trescientos cuadrag" & U (16#E9#) & "simo quinto",
+             "dos mil" & U (16#E9#) & "simo tricent" & U (16#E9#) & "simo cuadrag" & U (16#E9#)
+             & "simo quinto",
            "ordinal-word number skeleton renders Spanish compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1301,11 +1303,11 @@ begin
            "spellout number skeleton renders accented Italian words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "it", "ordinal_words", Args) =
-             "ventunesimo",
+             "vent" & SH & "unesimo",
            "ordinal-word number skeleton renders deterministic Italian words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "it", "ordinal_words", Args) =
-             "duemilatrecentoquarantacinquesimo",
+             "due" & SH & "mila" & SH & "tre" & SH & "cento" & SH & "quaranta" & SH & "cinquesimo",
            "ordinal-word number skeleton renders Italian compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1326,7 +1328,8 @@ begin
            "ordinal-word number skeleton renders deterministic Portuguese words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "pt", "ordinal_words", Args) =
-             "dois mil trezentos quadrag" & U (16#E9#) & "simo quinto",
+             "dois mil" & U (16#E9#) & "simo tricent" & U (16#E9#) & "simo quadrag" & U (16#E9#)
+             & "simo quinto",
            "ordinal-word number skeleton renders Portuguese compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1343,11 +1346,12 @@ begin
            "spellout number skeleton renders accented Dutch words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "nl", "ordinal_words", Args) =
-             "eenentwintigste",
+             "een" & SH & "en" & SH & "twintigste",
            "ordinal-word number skeleton renders deterministic Dutch words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "nl", "ordinal_words", Args) =
-             "tweeduizend driehonderd vijfenveertigste",
+             "twee" & SH & "duizend" & SH & "drie" & SH & "honderd" & SH & "vijf" & SH & "en" & SH
+             & "veertigste",
            "ordinal-word number skeleton renders Dutch compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1539,7 +1543,7 @@ begin
    Messages.Arguments.Set (Args, "value", "10001");
    Assert (Rendered (Runtime, "zh", "ordinal_words", Args) =
              UTF8
-               ([16#7B2C#, 16#4E00#, 16#4E07#, 16#96F6#, 16#4E00#]),
+               ([16#7B2C#, 16#4E00#, 16#4E07#, 16#3007#, 16#4E00#]),
            "ordinal-word number skeleton renders Chinese section zero");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1607,11 +1611,11 @@ begin
            "spellout number skeleton renders Swedish accented words");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "sv", "ordinal_words", Args) =
-             "tjugo f" & U (16#F6#) & "rsta",
+             "tjugo" & SH & "f" & U (16#F6#) & "rste",
            "ordinal-word number skeleton renders deterministic Swedish words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "sv", "ordinal_words", Args) =
-             "tv" & U (16#E5#) & " tusen tre hundra fyrtio femte",
+             "tv" & U (16#E5#) & SH & "tusen tre" & SH & "hundra fyrtio" & SH & "femte",
            "ordinal-word number skeleton renders Swedish compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1649,7 +1653,7 @@ begin
            "spellout number skeleton renders Norwegian compact tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "no", "ordinal_words", Args) =
-             "tjuef" & U (16#F8#) & "rste",
+             "tjue" & SH & "f" & U (16#F8#) & "rste",
            "ordinal-word number skeleton renders Norwegian words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "nb", "ordinal_words", Args) =
@@ -1671,12 +1675,12 @@ begin
            "spellout number skeleton renders Finnish compound tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "fi", "ordinal_words", Args) =
-             "kahdeskymmenes ensimm" & U (16#E4#) & "inen",
+             "kahdes" & SH & "kymmenes" & SH & "ensimm" & U (16#E4#) & "inen",
            "ordinal-word number skeleton renders Finnish words");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "fi", "ordinal_words", Args) =
-             "kaksituhatta kolmesataa nelj" & U (16#E4#)
-             & "skymmenes viides",
+             "kahdes" & SH & "tuhannes" & SH & "kolmas" & SH & "sadas" & SH & "nelj" & U (16#E4#) & "s" & SH
+             & "kymmenes" & SH & "viides",
            "ordinal-word number skeleton renders Finnish compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1697,7 +1701,7 @@ begin
            "ordinal-word number skeleton renders Indonesian first word");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "id", "ordinal_words", Args) =
-             "ke-dua ribu tiga ratus empat puluh lima",
+             "kedua ribu tiga ratus empat puluh lima",
            "ordinal-word number skeleton renders Indonesian compound words");
 
    Messages.Arguments.Set (Args, "value", "0");
@@ -1718,7 +1722,7 @@ begin
            "ordinal-word number skeleton renders Malay first word");
    Messages.Arguments.Set (Args, "value", "1111");
    Assert (Rendered (Runtime, "ms", "ordinal_words", Args) =
-             "ke-seribu seratus sebelas",
+             "keseribu seratus sebelas",
            "ordinal-word number skeleton renders Malay compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1795,7 +1799,7 @@ begin
            "ordinal-word number skeleton renders Swahili first word");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "sw", "ordinal_words", Args) =
-             "wa elfu mbili mia tatu arobaini na tano",
+             "wa elfu mbili, mia tatu na arobaini na tano",
            "ordinal-word number skeleton renders Swahili compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1812,11 +1816,11 @@ begin
            "spellout number skeleton renders Afrikaans reversed tens");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "af", "ordinal_words", Args) =
-             "een en twintigste",
+             "een-en-twintigste",
            "ordinal-word number skeleton renders Afrikaans reversed tens");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "af", "ordinal_words", Args) =
-             "twee duisend drie honderd vyf en veertigste",
+             "twee duisend drie honderd vyf-en-veertigste",
            "ordinal-word number skeleton renders Afrikaans compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1899,12 +1903,11 @@ begin
            "spellout number skeleton renders Hungarian huszon compounds");
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "hu", "ordinal_words", Args) =
-             "huszonels" & U (16#151#),
+             "huszonegyedik",
            "ordinal-word number skeleton renders Hungarian compound tens");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "hu", "ordinal_words", Args) =
-             "k" & U (16#E9#) & "tezer-h" & U (16#E1#)
-             & "romsz" & U (16#E1#) & "znegyven"
+             "k" & U (16#E9#) & "t" & SH & "ezer" & SH & "h" & U (16#E1#) & "romsz" & U (16#E1#) & "znegyven"
              & U (16#F6#) & "t" & U (16#F6#) & "dik",
            "ordinal-word number skeleton renders Hungarian compound words");
 
@@ -1954,22 +1957,16 @@ begin
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "bg", "ordinal_words", Args) =
              UTF8
-               ([16#434#, 16#432#, 16#430#, 16#434#, 16#435#,
-                 16#441#, 16#435#, 16#442#, 16#20#, 16#438#,
-                 16#20#, 16#43F#, 16#44A#, 16#440#, 16#432#,
-                 16#438#]),
+               ([16#434#, 16#432#, 16#430#, 16#439#, 16#441#, 16#435#, 16#442#, 16#20#, 16#438#,
+                 16#20#, 16#43F#, 16#44A#, 16#440#, 16#432#, 16#438#]),
            "ordinal-word number skeleton renders Bulgarian compound tens");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "bg", "ordinal_words", Args) =
              UTF8
-               ([16#434#, 16#432#, 16#435#, 16#20#, 16#445#,
-                 16#438#, 16#43B#, 16#44F#, 16#434#, 16#438#,
-                 16#20#, 16#442#, 16#440#, 16#438#, 16#441#,
-                 16#442#, 16#430#, 16#20#, 16#447#, 16#435#,
-                 16#442#, 16#438#, 16#440#, 16#438#, 16#434#,
-                 16#435#, 16#441#, 16#435#, 16#442#, 16#20#,
-                 16#438#, 16#20#, 16#43F#, 16#435#, 16#442#,
-                 16#438#]),
+               ([16#434#, 16#432#, 16#435#, 16#20#, 16#445#, 16#438#, 16#43B#, 16#44F#, 16#434#,
+                 16#438#, 16#20#, 16#442#, 16#440#, 16#438#, 16#441#, 16#442#, 16#43E#, 16#20#,
+                 16#447#, 16#435#, 16#442#, 16#438#, 16#440#, 16#435#, 16#441#, 16#435#, 16#442#,
+                 16#20#, 16#438#, 16#20#, 16#43F#, 16#435#, 16#442#, 16#438#]),
            "ordinal-word number skeleton renders Bulgarian compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -1990,9 +1987,8 @@ begin
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "ar", "ordinal_words", Args) =
              UTF8
-               ([16#627#, 16#644#, 16#62D#, 16#627#, 16#62F#,
-                 16#64A#, 16#20#, 16#648#, 16#627#, 16#644#,
-                 16#639#, 16#634#, 16#631#, 16#648#, 16#646#]),
+               ([16#627#, 16#644#, 16#62D#, 16#627#, 16#62F#, 16#64A#, 16#20#, 16#20#, 16#648#,
+                 16#627#, 16#644#, 16#639#, 16#634#, 16#631#, 16#648#, 16#646#]),
            "ordinal-word number skeleton renders Arabic compound tens");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -2046,18 +2042,16 @@ begin
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "th", "ordinal_words", Args) =
              UTF8
-               ([16#E17#, 16#E35#, 16#E48#, 16#E22#, 16#E35#,
-                 16#E48#, 16#E2A#, 16#E34#, 16#E1A#, 16#E40#,
-                 16#E2D#, 16#E47#, 16#E14#]),
+               ([16#E17#, 16#E35#, 16#E48#, 16#200B#, 16#E22#, 16#E35#, 16#E48#, 16#200B#, 16#E2A#,
+                 16#E34#, 16#E1A#, 16#200B#, 16#E40#, 16#E2D#, 16#E47#, 16#E14#]),
            "ordinal-word number skeleton renders Thai compound tens");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "th", "ordinal_words", Args) =
              UTF8
-               ([16#E17#, 16#E35#, 16#E48#, 16#E2A#, 16#E2D#,
-                 16#E07#, 16#E1E#, 16#E31#, 16#E19#, 16#E2A#,
-                 16#E32#, 16#E21#, 16#E23#, 16#E49#, 16#E2D#,
-                 16#E22#, 16#E2A#, 16#E35#, 16#E48#, 16#E2A#,
-                 16#E34#, 16#E1A#, 16#E2B#, 16#E49#, 16#E32#]),
+               ([16#E17#, 16#E35#, 16#E48#, 16#200B#, 16#E2A#, 16#E2D#, 16#E07#, 16#200B#, 16#E1E#,
+                 16#E31#, 16#E19#, 16#200B#, 16#E2A#, 16#E32#, 16#E21#, 16#200B#, 16#E23#, 16#E49#,
+                 16#E2D#, 16#E22#, 16#200B#, 16#E2A#, 16#E35#, 16#E48#, 16#200B#, 16#E2A#, 16#E34#,
+                 16#E1A#, 16#200B#, 16#E2B#, 16#E49#, 16#E32#]),
            "ordinal-word number skeleton renders Thai compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -2082,12 +2076,9 @@ begin
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "hi", "ordinal_words", Args) =
              UTF8
-               ([16#926#, 16#94B#, 16#20#, 16#939#, 16#91C#,
-                 16#93C#, 16#93E#, 16#930#, 16#20#, 16#924#,
-                 16#940#, 16#928#, 16#20#, 16#938#, 16#94C#,
-                 16#20#, 16#91A#, 16#93E#, 16#932#, 16#940#,
-                 16#938#, 16#20#, 16#92A#, 16#93E#, 16#901#,
-                 16#91A#, 16#935#, 16#93E#, 16#901#]),
+               ([16#926#, 16#94B#, 16#20#, 16#939#, 16#91C#, 16#93C#, 16#93E#, 16#930#, 16#20#,
+                 16#924#, 16#940#, 16#928#, 16#20#, 16#938#, 16#94C#, 16#20#, 16#92A#, 16#948#,
+                 16#902#, 16#924#, 16#93E#, 16#932#, 16#940#, 16#938#, 16#935#, 16#93E#, 16#901#]),
            "ordinal-word number skeleton renders Hindi compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -2109,21 +2100,18 @@ begin
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "el", "ordinal_words", Args) =
              UTF8
-               ([16#3B5#, 16#3AF#, 16#3BA#, 16#3BF#, 16#3C3#,
-                 16#3B9#, 16#20#, 16#3C0#, 16#3C1#, 16#3CE#,
-                 16#3C4#, 16#3BF#]),
+               ([16#3B5#, 16#3B9#, 16#3BA#, 16#3BF#, 16#3C3#, 16#3C4#, 16#3CC#, 16#3C2#, 16#20#,
+                 16#3C0#, 16#3C1#, 16#3CE#, 16#3C4#, 16#3BF#, 16#3C2#]),
            "ordinal-word number skeleton renders Greek compound tens");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "el", "ordinal_words", Args) =
              UTF8
-               ([16#3B4#, 16#3CD#, 16#3BF#, 16#20#, 16#3C7#,
-                 16#3B9#, 16#3BB#, 16#3B9#, 16#3AC#, 16#3B4#,
-                 16#3B5#, 16#3C2#, 16#20#, 16#3C4#, 16#3C1#,
-                 16#3B9#, 16#3B1#, 16#3BA#, 16#3CC#, 16#3C3#,
-                 16#3B9#, 16#3B1#, 16#20#, 16#3C3#, 16#3B1#,
-                 16#3C1#, 16#3AC#, 16#3BD#, 16#3C4#, 16#3B1#,
-                 16#20#, 16#3C0#, 16#3AD#, 16#3BC#, 16#3C0#,
-                 16#3C4#, 16#3BF#]),
+               ([16#3B4#, 16#3B9#, 16#3C3#, 16#3C7#, 16#3B9#, 16#3BB#, 16#3B9#, 16#3BF#, 16#3C3#,
+                 16#3C4#, 16#3CC#, 16#3C2#, 16#20#, 16#3C4#, 16#3C1#, 16#3B9#, 16#3B1#, 16#3BA#,
+                 16#3BF#, 16#3C3#, 16#3B9#, 16#3BF#, 16#3C3#, 16#3C4#, 16#3CC#, 16#3C2#, 16#20#,
+                 16#3C4#, 16#3B5#, 16#3C3#, 16#3C3#, 16#3B1#, 16#3C1#, 16#3B1#, 16#3BA#, 16#3BF#,
+                 16#3C3#, 16#3C4#, 16#3CC#, 16#3C2#, 16#20#, 16#3C0#, 16#3AD#, 16#3BC#, 16#3C0#,
+                 16#3C4#, 16#3BF#, 16#3C2#]),
            "ordinal-word number skeleton renders Greek compound words");
 
    Messages.Arguments.Set (Args, "value", "2345");
@@ -2143,18 +2131,15 @@ begin
    Messages.Arguments.Set (Args, "value", "21");
    Assert (Rendered (Runtime, "he", "ordinal_words", Args) =
              UTF8
-               ([16#5E2#, 16#5E9#, 16#5E8#, 16#5D9#, 16#5DD#,
-                 16#20#, 16#5E8#, 16#5D0#, 16#5E9#, 16#5D5#,
-                 16#5DF#]),
+               ([16#5E2#, 16#5E9#, 16#5E8#, 16#5D9#, 16#5DD#, 16#20#, 16#5D5#, 16#5D0#, 16#5D7#,
+                 16#5D3#]),
            "ordinal-word number skeleton renders Hebrew compound tens");
    Messages.Arguments.Set (Args, "value", "2345");
    Assert (Rendered (Runtime, "he", "ordinal_words", Args) =
              UTF8
-               ([16#5D0#, 16#5DC#, 16#5E4#, 16#5D9#, 16#5D9#,
-                 16#5DD#, 16#20#, 16#5E9#, 16#5DC#, 16#5D5#,
-                 16#5E9#, 16#20#, 16#5DE#, 16#5D0#, 16#5D5#,
-                 16#5EA#, 16#20#, 16#5D0#, 16#5E8#, 16#5D1#,
-                 16#5E2#, 16#5D9#, 16#5DD#, 16#20#, 16#5D7#,
-                 16#5DE#, 16#5D9#, 16#5E9#, 16#5D9#]),
+               ([16#5D0#, 16#5DC#, 16#5E4#, 16#5D9#, 16#5D9#, 16#5DD#, 16#20#, 16#5E9#, 16#5DC#,
+                 16#5D5#, 16#5E9#, 16#20#, 16#5DE#, 16#5D0#, 16#5D5#, 16#5EA#, 16#20#, 16#5D0#,
+                 16#5E8#, 16#5D1#, 16#5E2#, 16#5D9#, 16#5DD#, 16#20#, 16#5D5#, 16#5D7#, 16#5DE#,
+                 16#5D9#, 16#5E9#, 16#5D4#]),
            "ordinal-word number skeleton renders Hebrew compound words");
 end Test_Number_Rendering;
