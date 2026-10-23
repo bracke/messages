@@ -91,6 +91,9 @@ begin
       & "ar.percent = ""{value, number, ::percent}""" & ASCII.LF
       & "fa.percent = ""{value, number, ::percent}""" & ASCII.LF
       & "de.percent = ""{value, number, ::percent}""" & ASCII.LF
+      & "tr.percent = ""{value, number, ::percent}""" & ASCII.LF
+      & "tr.percent_short_stem = ""{value, number, ::percent .0#}""" & ASCII.LF
+      & "de.percent_short_stem = ""{value, number, ::percent .0#}""" & ASCII.LF
       & "sv.negative = ""{value, number}""" & ASCII.LF
       & "fa.negative = ""{value, number}""" & ASCII.LF
       & "en.percent_integer = ""{value, number, ::percent precision-integer}"""
@@ -618,6 +621,14 @@ begin
            "Arabic percent skeleton uses CLDR's percent sign, Arabic letter mark included");
    Assert (Rendered (Runtime, "de", "percent", Args) = "12" & U (16#A0#) & "%",
            "German percent keeps the no-break space its CLDR percent pattern puts before the sign");
+   --  As ICU: Turkish writes the sign first ("%12"), and ICU's short fraction
+   --  stem ".0#" keeps one to two digits.
+   Assert (Rendered (Runtime, "tr", "percent", Args) = "%12",
+           "Turkish percent puts the sign before the digits: [" & Rendered (Runtime, "tr", "percent", Args) & "]");
+   Assert (Rendered (Runtime, "tr", "percent_short_stem", Args) = "%12,3",
+           "Turkish short stem: [" & Rendered (Runtime, "tr", "percent_short_stem", Args) & "]");
+   Assert (Rendered (Runtime, "de", "percent_short_stem", Args) = "12,3" & U (16#A0#) & "%",
+           "German short stem: [" & Rendered (Runtime, "de", "percent_short_stem", Args) & "]");
    Assert (Rendered (Runtime, "fa", "percent", Args) =
              U (16#6F1#) & U (16#6F2#) & U (16#66A#),
            "Persian percent skeleton uses localized percent sign");
