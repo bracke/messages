@@ -784,6 +784,16 @@ package body Messages.Extra_Format is
          Compound_Name : constant String :=
            (if Compound = "" or else Has_Runtime_Per_Separator (Locale) then ""
             else Locale_Unit_Name (Locale, Compound, Width, Category));
+         --  CLDR's pattern for the denominator -- "{0}/s", "{0} pro Stunde" --
+         --  takes the numerator's whole text, as ICU composes a rate.
+         Per_Found : Boolean := False;
+         Per_Pattern : constant String :=
+           (if Per_Unit = "" or else Compound_Name /= ""
+              or else Has_Runtime_Per_Separator (Locale)
+            then ""
+            else I18N.Unit_Format.Per_Pattern
+                   (Locale, Option_Base (Per_Unit), Width, Per_Found));
+         Numerator_First : constant Positive := Last + 1;
       begin
          if Compound_Name /= "" then
             --  Some languages seat the value inside the rate's name rather than
@@ -799,7 +809,7 @@ package body Messages.Extra_Format is
                   Unit_Value_Separator (Locale));
                Put (Target, Last, Overflow, Compound_Name);
             end if;
-         elsif Pattern_Found and then Per_Unit = "" then
+         elsif Pattern_Found and then (Per_Unit = "" or else Per_Found) then
             Put_Runtime_Unit_Pattern
               (Target, Last, Overflow, Locale, Pattern, Value);
          else
@@ -810,7 +820,25 @@ package body Messages.Extra_Format is
             Put (Target, Last, Overflow, Text);
          end if;
 
-         if Per_Unit /= "" and then Compound_Name = "" then
+         if Per_Found and then not Overflow then
+            declare
+               Numerator : constant String := Target (Numerator_First .. Last);
+               Marker    : Natural := 0;
+            begin
+               for Index in Per_Pattern'First .. Per_Pattern'Last - 2 loop
+                  if Per_Pattern (Index .. Index + 2) = "{0}" then
+                     Marker := Index;
+                     exit;
+                  end if;
+               end loop;
+               if Marker /= 0 then
+                  Last := Numerator_First - 1;
+                  Put (Target, Last, Overflow, Per_Pattern (Per_Pattern'First .. Marker - 1));
+                  Put (Target, Last, Overflow, Numerator);
+                  Put (Target, Last, Overflow, Per_Pattern (Marker + 3 .. Per_Pattern'Last));
+               end if;
+            end;
+         elsif Per_Unit /= "" and then Compound_Name = "" then
             if Width = "unit-width-short"
               or else Width = "short"
               or else Width = "unit-width-narrow"

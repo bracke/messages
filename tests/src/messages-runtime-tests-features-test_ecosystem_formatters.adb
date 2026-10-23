@@ -1179,6 +1179,9 @@ begin
       & "en.measure_solar_luminosity_short = ""{light, number, "
       & "::measure-unit/light-solar-luminosity unit-width-short}"""
       & ASCII.LF
+      & "und.measure_bit_rate = ""{distance, number, "
+      & "::measure-unit/digital-megabit per-measure-unit/duration-second unit-width-short}"""
+      & ASCII.LF
       & "en.measure_per = ""{distance, number, "
       & "::measure-unit/length-kilometer per-measure-unit/duration-hour}"""
       & ASCII.LF
@@ -2338,6 +2341,14 @@ begin
    Assert (Rendered (Runtime, "it", "measure_per", Args) =
              "1,5 chilometri orari",
            "measure-unit skeleton localizes Italian per-unit output");
+   --  A rate CLDR has no name for takes the denominator's own per pattern,
+   --  as ICU does: "/s", not the short name "/sec".
+   Assert (Rendered (Runtime, "en", "measure_bit_rate", Args) = "1.5 Mb/s",
+           "a rate uses CLDR's per pattern for its denominator");
+   Assert (Rendered (Runtime, "fr", "measure_bit_rate", Args) = "1,5" & U (16#202F#) & "Mbit/s",
+           "a rate's numerator keeps its own unit pattern inside the per pattern");
+   Assert (Rendered (Runtime, "ja", "measure_bit_rate", Args) = "1.5 Mb/" & U (16#79D2#),
+           "a rate localizes the per pattern");
    Assert (Rendered (Runtime, "pt", "measure_per", Args) =
              "1,5 quil" & U (16#F4#) & "metro por hora",
            "measure-unit skeleton localizes Portuguese per-unit output");

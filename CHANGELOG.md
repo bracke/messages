@@ -38,6 +38,11 @@ commits; each of those says in its own message what changed and why.
 
 ### Fixed
 
+- A rate CLDR has no name for (megabit per second) puts the numerator into
+  the denominator's own `perUnitPattern`, as ICU does: "1.5 Mb/s", not
+  "1.5 Mb/sec"; Japanese "Mb/秒". Spell-out goes through CLDR's RBNF rules
+  (48 expectations follow ICU).
+
 - Byte-exact conformance and example data are written with LF on every host,
   and worked-example output is compared with CRLF normalised — two halves of
   the same Windows failure.
