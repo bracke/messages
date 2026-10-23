@@ -5,6 +5,7 @@ with I18N.List_Format;
 with I18N.Number_Format;
 with I18N.Relative_Format;
 with I18N.Unit_Format;
+with I18N.Plural_Ranges;
 with I18N.Plurals;
 with I18N.Runtime_Data;
 
@@ -780,10 +781,8 @@ package body Messages.Extra_Format is
       Overflow : in out Boolean)
    is
       --  A range "low/high" ("1/2" hours): its numbers as the locale writes a
-      --  range, and the unit as for the upper bound -- CLDR's plural ranges
-      --  take the end's category in the common cases -- except an end of
-      --  zero, one or two, which the "other" form counts (Arabic "١–٢ ساعة",
-      --  not the dual "ساعتان").
+      --  range, and the unit in the range's plural category by CLDR's plural
+      --  ranges (Arabic one to two is "other": "١–٢ ساعة", not the dual).
       Slash : Natural := 0;
    begin
       Ok := False;
@@ -808,8 +807,9 @@ package body Messages.Extra_Format is
          High_Category : constant I18N.Plurals.Plural_Category :=
            Unit_Category_For_Value (Locale, High);
          Category : constant I18N.Plurals.Plural_Category :=
-           (if Slash /= 0 and then High_Category in I18N.Plurals.Zero | I18N.Plurals.One | I18N.Plurals.Two
-            then I18N.Plurals.Other else High_Category);
+           (if Slash = 0 then High_Category
+            else I18N.Plural_Ranges.Category
+                   (Locale, Unit_Category_For_Value (Locale, Value (Value'First .. Slash - 1)), High_Category));
          Text : constant String := Localized_Unit_Name (Locale, Option, Category);
          Per_Unit : constant String := Option_Per_Unit (Option);
          Width    : constant String := Option_Width (Option);
