@@ -114,6 +114,9 @@ procedure Check_Messages is
         & Character'Val (16#AC#);
       Yen : constant String :=
         Character'Val (16#C2#) & Character'Val (16#A5#);
+      NBSP : constant String := Character'Val (16#C2#) & Character'Val (16#A0#);
+      NNBSP : constant String :=
+        Character'Val (16#E2#) & Character'Val (16#80#) & Character'Val (16#AF#);
       Per_Mille : constant String :=
         Character'Val (16#E2#) & Character'Val (16#80#)
         & Character'Val (16#B0#);
@@ -140,31 +143,16 @@ procedure Check_Messages is
         & "29" & Character'Val (16#E6#) & Character'Val (16#97#)
         & Character'Val (16#A5#);
       Buddhist_Date : constant String :=
-        Character'Val (16#E0#) & Character'Val (16#B9#)
-        & Character'Val (16#92#) & Character'Val (16#E0#)
-        & Character'Val (16#B9#) & Character'Val (16#99#)
-        & Character'Val (16#20#) & Character'Val (16#E0#)
-        & Character'Val (16#B8#) & Character'Val (16#81#)
-        & Character'Val (16#E0#) & Character'Val (16#B8#)
-        & Character'Val (16#B8#) & Character'Val (16#E0#)
-        & Character'Val (16#B8#) & Character'Val (16#A1#)
-        & Character'Val (16#E0#) & Character'Val (16#B8#)
-        & Character'Val (16#A0#) & Character'Val (16#E0#)
-        & Character'Val (16#B8#) & Character'Val (16#B2#)
-        & Character'Val (16#E0#) & Character'Val (16#B8#)
-        & Character'Val (16#9E#) & Character'Val (16#E0#)
-        & Character'Val (16#B8#) & Character'Val (16#B1#)
-        & Character'Val (16#E0#) & Character'Val (16#B8#)
-        & Character'Val (16#99#) & Character'Val (16#E0#)
-        & Character'Val (16#B8#) & Character'Val (16#98#)
-        & Character'Val (16#E0#) & Character'Val (16#B9#)
-        & Character'Val (16#8C#) & Character'Val (16#20#)
-        & Character'Val (16#E0#) & Character'Val (16#B9#)
-        & Character'Val (16#92#) & Character'Val (16#E0#)
-        & Character'Val (16#B9#) & Character'Val (16#95#)
-        & Character'Val (16#E0#) & Character'Val (16#B9#)
-        & Character'Val (16#96#) & Character'Val (16#E0#)
-        & Character'Val (16#B9#) & Character'Val (16#97#);
+        "29 " & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#81#)
+        & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#B8#)
+        & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#A1#)
+        & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#A0#)
+        & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#B2#)
+        & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#9E#)
+        & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#B1#)
+        & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#99#)
+        & Character'Val (16#E0#) & Character'Val (16#B8#) & Character'Val (16#98#)
+        & Character'Val (16#E0#) & Character'Val (16#B9#) & Character'Val (16#8C#) & " 2567";
 
       procedure Expect_Example
         (Name          : String;
@@ -274,11 +262,11 @@ procedure Check_Messages is
       Expect_Example
         ("currency_formatting",
          "currency en: Total: $1,234.50" & LF
-         & "currency de: Summe: 1.234,50 " & Euro & LF
+         & "currency de: Summe: 1.234,50" & NBSP & Euro & LF
          & "currency name: Name: 1,234.50 US dollars" & LF
          & "currency narrow: Narrow: $1,234.50" & LF
-         & "currency iso: ISO: USD 1,234.50" & LF
-         & "currency cash: Cash: CHF 1.05" & LF
+         & "currency iso: ISO: USD" & NBSP & "1,234.50" & LF
+         & "currency cash: Cash: CHF" & NBSP & "1.05" & LF
          & "currency accounting: Accounting: ($1,234.50)" & LF
          & "currency yen: Yen: " & Yen & "1,234" & LF);
       Expect_Example
@@ -294,18 +282,18 @@ procedure Check_Messages is
          & "date persian calendar: Persian calendar: AP 1403 01 01" & LF);
       Expect_Example
         ("time_formatting",
-         "time short: Time: 09:05" & LF
-         & "time long: Time with seconds: 09:05:07" & LF
+         "time short: Time: 9:05" & NNBSP & "AM" & LF
+         & "time long: Time with seconds: 9:05:07" & NNBSP & "AM UTC" & LF
          & "time skeleton: Time skeleton: 09:05:07 AM" & LF
          & "time fraction: Fractional time: 09:05:07.123" & LF
          & "time zone: Zoned time: 09:05 EST" & LF
          & "time zone widths: Zone widths: "
          & "GMT-04:00|-04:00|-04:00|America/New_York" & LF
          & "time utc widths: UTC widths: Z|+00:00|UTC" & LF
-         & "time datetime long: Long datetime: February 29, 2024 21:30:00"
+         & "time datetime long: Long datetime: February 29, 2024 9:30:00" & NNBSP & "PM EST"
          & LF
          & "time datetime full: Full datetime: Thursday, February 29, 2024 "
-         & "21:30:00" & LF);
+         & "9:30:00" & NNBSP & "PM Eastern Standard Time" & LF);
       Expect_Example
         ("domain_formatting",
          "domain duration: Duration: 1:01:01" & LF

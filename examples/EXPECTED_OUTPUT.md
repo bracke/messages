@@ -111,11 +111,11 @@ number indian grouping: Indian grouping: 12,34,567.89
 
 ```text
 currency en: Total: $1,234.50
-currency de: Summe: 1.234,50 €
+currency de: Summe: 1.234,50 €
 currency name: Name: 1,234.50 US dollars
 currency narrow: Narrow: $1,234.50
-currency iso: ISO: USD 1,234.50
-currency cash: Cash: CHF 1.05
+currency iso: ISO: USD 1,234.50
+currency cash: Cash: CHF 1.05
 currency accounting: Accounting: ($1,234.50)
 currency yen: Yen: ¥1,234
 ```
@@ -130,7 +130,7 @@ date de: Datum: Donnerstag, 29. Februar 2024
 date skeleton: Date skeleton: Feb 29, 2024
 date numeric skeleton: Numeric skeleton: 2024 02 29
 date japanese calendar: Japanese calendar: 令和 6年2月29日
-date buddhist calendar: Buddhist calendar: ๒๙ กุมภาพันธ์ ๒๕๖๗
+date buddhist calendar: Buddhist calendar: 29 กุมภาพันธ์ 2567
 date locale week: Locale week fields: 2016/1/1/2016
 date persian calendar: Persian calendar: AP 1403 01 01
 ```
@@ -140,15 +140,15 @@ date persian calendar: Persian calendar: AP 1403 01 01
 ```
 
 ```text
-time short: Time: 09:05
-time long: Time with seconds: 09:05:07
+time short: Time: 9:05 AM
+time long: Time with seconds: 9:05:07 AM UTC
 time skeleton: Time skeleton: 09:05:07 AM
 time fraction: Fractional time: 09:05:07.123
 time zone: Zoned time: 09:05 EST
 time zone widths: Zone widths: GMT-04:00|-04:00|-04:00|America/New_York
 time utc widths: UTC widths: Z|+00:00|UTC
-time datetime long: Long datetime: February 29, 2024 21:30:00
-time datetime full: Full datetime: Thursday, February 29, 2024 21:30:00
+time datetime long: Long datetime: February 29, 2024 9:30:00 PM EST
+time datetime full: Full datetime: Thursday, February 29, 2024 9:30:00 PM Eastern Standard Time
 ```
 
 ```sh
