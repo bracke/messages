@@ -152,6 +152,12 @@ begin
       & ASCII.LF
       & "en.unit_mile_alias = ""{distance, unit, length-mile}"""
       & ASCII.LF
+      & "ru.unit_week_accusative = ""{distance, unit, week/unit-width-long@accusative}"""
+      & ASCII.LF
+      & "de.unit_year_dative = ""{distance, unit, year/unit-width-long@dative}"""
+      & ASCII.LF
+      & "fr.unit_year_dative = ""{distance, unit, year/unit-width-long@dative}"""
+      & ASCII.LF
       & "en.unit_metre_alias = ""{distance, unit, length-metre}"""
       & ASCII.LF
       & "en.unit_kilometre_alias = ""{distance, unit, length-kilometre}"""
@@ -1527,6 +1533,21 @@ begin
    Assert (Rendered (Runtime, "de", "unit_centimetre_alias", Args) =
              "1,5 Zentimeter",
            "unit formatter accepts British length-centimetre alias");
+   --  A unit in a grammatical case: CLDR's pattern for the case where the
+   --  locale has one, else the nominative.
+   Messages.Arguments.Set (Args, "distance", "1");
+   Assert (Rendered (Runtime, "ru", "unit_week_accusative", Args) =
+             "1 " & Character'Val (16#D0#) & Character'Val (16#BD#) & Character'Val (16#D0#)
+             & Character'Val (16#B5#) & Character'Val (16#D0#) & Character'Val (16#B4#)
+             & Character'Val (16#D0#) & Character'Val (16#B5#) & Character'Val (16#D0#)
+             & Character'Val (16#BB#) & Character'Val (16#D1#) & Character'Val (16#8E#),
+           "Russian accusative week: 1 nedelyu");
+   Messages.Arguments.Set (Args, "distance", "2");
+   Assert (Rendered (Runtime, "de", "unit_year_dative", Args) = "2 Jahren",
+           "German dative years");
+   Assert (Rendered (Runtime, "fr", "unit_year_dative", Args) = "2 ans",
+           "a case French does not decline is the nominative");
+   Messages.Arguments.Set (Args, "distance", "1.5");
    Messages.Arguments.Set (Args, "volume", "2");
    Assert (Rendered (Runtime, "en", "unit_litre_alias", Args) =
              "2 liters",

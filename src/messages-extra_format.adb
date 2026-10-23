@@ -518,7 +518,30 @@ package body Messages.Extra_Format is
         (Locale, Base, Width, Plural_Category_Name (Category), Found);
    end Runtime_Unit_Pattern;
 
+   function Nominative_Unit_Option_Is_Valid (Option : String) return Boolean;
+
+   function Case_Marker (Option : String) return Natural is
+   begin
+      for Index in reverse Option'Range loop
+         if Option (Index) = '@' then
+            return Index;
+         end if;
+      end loop;
+      return 0;
+   end Case_Marker;
+
    function Unit_Option_Is_Valid (Option : String) return Boolean is
+      At_Sign : constant Natural := Case_Marker (Option);
+   begin
+      if At_Sign /= 0 then
+         return At_Sign < Option'Last
+           and then (for all C of Option (At_Sign + 1 .. Option'Last) => C in 'a' .. 'z')
+           and then Unit_Option_Is_Valid (Option (Option'First .. At_Sign - 1));
+      end if;
+      return Nominative_Unit_Option_Is_Valid (Option);
+   end Unit_Option_Is_Valid;
+
+   function Nominative_Unit_Option_Is_Valid (Option : String) return Boolean is
       Per_Unit : constant String := Option_Per_Unit (Option);
       Width    : constant String := Option_Width (Option);
 
@@ -539,7 +562,7 @@ package body Messages.Extra_Format is
         and then
           (Per_Unit = ""
            or else Unit_Name (Per_Unit & "/" & Width, True) /= "");
-   end Unit_Option_Is_Valid;
+   end Nominative_Unit_Option_Is_Valid;
 
    function Localized_Unit_Name
      (Locale   : String;
@@ -758,7 +781,7 @@ package body Messages.Extra_Format is
       I18N.Byte_Size_Format.Format_Into (Value, Locale, Target, Last, Ok, Overflow);
    end Format_Bytes;
 
-   procedure Format_Unit
+   procedure Format_Nominative_Unit
      (Value    : String;
       Locale   : String;
       Option   : String;
@@ -883,6 +906,44 @@ package body Messages.Extra_Format is
       end;
 
       Ok := not Overflow;
+   exception
+      when Constraint_Error =>
+         Ok := False;
+   end Format_Nominative_Unit;
+
+   --  A unit option may name a grammatical case after "@" -- the unit as
+   --  "через" or German "in" govern it: "week/unit-width-long@accusative".
+   --  CLDR's pattern in that case, where it has one; else the nominative.
+   procedure Format_Unit
+     (Value    : String;
+      Locale   : String;
+      Option   : String;
+      Target   : in out String;
+      Last     : in out Natural;
+      Ok       : out Boolean;
+      Overflow : in out Boolean)
+   is
+      At_Sign : constant Natural := Case_Marker (Option);
+      Main    : constant String := (if At_Sign = 0 then Option else Option (Option'First .. At_Sign - 1));
+   begin
+      Ok := False;
+      if At_Sign /= 0 and then Is_Decimal_Text (Value) and then Unit_Option_Is_Valid (Option) then
+         declare
+            Found   : Boolean;
+            Pattern : constant String :=
+              I18N.Unit_Format.Case_Pattern
+                (Locale, Option_Base (Main), Option_Width (Main),
+                 Plural_Category_Name (Unit_Category_For_Value (Locale, Value)),
+                 Option (At_Sign + 1 .. Option'Last), Found);
+         begin
+            if Found and then Option_Per_Unit (Main) = "" then
+               Put_Runtime_Unit_Pattern (Target, Last, Overflow, Locale, Pattern, Value);
+               Ok := not Overflow;
+               return;
+            end if;
+         end;
+      end if;
+      Format_Nominative_Unit (Value, Locale, Main, Target, Last, Ok, Overflow);
    exception
       when Constraint_Error =>
          Ok := False;

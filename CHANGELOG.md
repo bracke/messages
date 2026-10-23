@@ -29,6 +29,10 @@ commits; each of those says in its own message what changed and why.
 
 ### Added
 
+- A unit option may name a grammatical case after `@`:
+  `{n, unit, week/unit-width-long@accusative}` renders CLDR's pattern for
+  that case ("1 неделю"), and the nominative where the locale has none.
+
 - `{items, list, unit-narrow}`: CLDR's narrow unit list, as a compact
   duration joins its parts ("1 h, 30 min und 5 s"; Japanese with nothing).
 
