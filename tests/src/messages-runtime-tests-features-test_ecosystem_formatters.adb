@@ -158,6 +158,10 @@ begin
       & ASCII.LF
       & "zh-Hant.variant = ""hant"""
       & ASCII.LF
+      & "zh-Hant-HK.hk_variant = ""hk"""
+      & ASCII.LF
+      & "zh-Hant.hk_variant = ""hant"""
+      & ASCII.LF
       & "pt.variant = ""br"""
       & ASCII.LF
       & "pt-PT.variant = ""pt"""
@@ -1548,6 +1552,9 @@ begin
    --  Fallback follows CLDR: a region's likely script, then CLDR's parent.
    Assert (Rendered (Runtime, "zh-TW", "variant", Args) = "hant", "zh-TW falls back to zh-Hant");
    Assert (Rendered (Runtime, "zh-HK", "variant", Args) = "hant", "zh-HK falls back to zh-Hant");
+   Assert (Rendered (Runtime, "zh-HK", "hk_variant", Args) = "hk", "zh-HK reaches zh-Hant-HK first");
+   Assert (Rendered (Runtime, "zh-MO", "hk_variant", Args) = "hk", "zh-MO reaches zh-Hant-HK via zh-Hant-MO");
+   Assert (Rendered (Runtime, "zh-TW", "hk_variant", Args) = "hant", "zh-TW does not reach zh-Hant-HK");
    Assert (Rendered (Runtime, "zh-CN", "variant", Args) = "hans", "zh-CN falls back to zh");
    Assert (Rendered (Runtime, "pt-AO", "variant", Args) = "pt", "pt-AO falls back to pt-PT");
    Assert (Rendered (Runtime, "pt-BR", "variant", Args) = "br", "pt-BR falls back to pt");

@@ -14,6 +14,9 @@ commits; each of those says in its own message what changed and why.
 
 ### Changed
 
+- A language-region tag without a script falls back to the same region in
+  its likely script before the bare script: zh-HK reaches a zh-Hant-HK entry
+  (and zh-MO one through zh-Hant-MO), then zh-Hant, as CLDR has it.
 - A message found along the requested locale's fallback chain formats in the
   requested locale (an ar entry renders ar-MA's Latin digits, a de entry
   de-AT's grouping and currency separators, a pt entry pt-PT's plural rules),

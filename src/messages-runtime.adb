@@ -1270,7 +1270,8 @@ package body Messages.Runtime is
       if CLDR'Length > 0 and then CLDR /= "root" then
          return Canonical_Locale (CLDR);
       end if;
-      --  A language-region tag (no script of its own): its likely script.
+      --  A language-region tag (no script of its own): the same region in its
+      --  likely script (zh-HK is zh-Hant-HK, then zh-Hant).
       if Truncated'Length > 0 and then I18N.Locales.Parent (Truncated)'Length = 0
         and then Ada.Strings.Fixed.Count (Current, "-") = 1
         and then Current'Length - Truncated'Length - 1 /= 4
@@ -1283,7 +1284,8 @@ package body Messages.Runtime is
                then Maximized (Maximized'First + 3 .. Maximized'First + 6) else "");
          begin
             if Script (Own) /= "" and then Script (Own) /= Script (Language) then
-               return Canonical_Locale (Truncated & "-" & Script (Own));
+               return Canonical_Locale
+                 (Truncated & "-" & Script (Own) & Current (Current'First + Truncated'Length .. Current'Last));
             end if;
          end;
       end if;
