@@ -14,10 +14,11 @@ is
      U (16#661#) & U (16#66C#) & U (16#662#) & U (16#663#)
      & U (16#664#) & U (16#66C#) & U (16#665#) & U (16#666#)
      & U (16#667#) & U (16#66B#) & U (16#668#) & U (16#669#);
+   --  Arabic-Indic digits with the Arabic system's own separators, as ICU.
    Arabic_Extension_Total : constant String :=
-     U (16#661#) & "," & U (16#662#) & U (16#663#)
-     & U (16#664#) & "," & U (16#665#) & U (16#666#)
-     & U (16#667#) & "." & U (16#668#) & U (16#669#);
+     U (16#661#) & U (16#66C#) & U (16#662#) & U (16#663#)
+     & U (16#664#) & U (16#66C#) & U (16#665#) & U (16#666#)
+     & U (16#667#) & U (16#66B#) & U (16#668#) & U (16#669#);
    Arabic_Decimal : constant String :=
      U (16#664#) & U (16#662#) & U (16#66B#) & U (16#660#);
    Persian_Total : constant String :=
@@ -25,9 +26,9 @@ is
      & U (16#6F4#) & U (16#66C#) & U (16#6F5#) & U (16#6F6#)
      & U (16#6F7#) & U (16#66B#) & U (16#6F8#) & U (16#6F9#);
    Persian_Extension_Total : constant String :=
-     U (16#6F1#) & "," & U (16#6F2#) & U (16#6F3#)
-     & U (16#6F4#) & "," & U (16#6F5#) & U (16#6F6#)
-     & U (16#6F7#) & "." & U (16#6F8#) & U (16#6F9#);
+     U (16#6F1#) & U (16#66C#) & U (16#6F2#) & U (16#6F3#)
+     & U (16#6F4#) & U (16#66C#) & U (16#6F5#) & U (16#6F6#)
+     & U (16#6F7#) & U (16#66B#) & U (16#6F8#) & U (16#6F9#);
    Persian_Decimal : constant String :=
      U (16#6F4#) & U (16#6F2#) & U (16#66B#) & U (16#6F0#);
    Thai_Total : constant String :=
@@ -38,10 +39,11 @@ is
      U (16#967#) & "," & U (16#968#) & U (16#969#)
      & U (16#96A#) & "," & U (16#96B#) & U (16#96C#)
      & U (16#96D#) & "." & U (16#96E#) & U (16#96F#);
+   --  Devanagari digits with the Devanagari system's own separators, as ICU.
    Devanagari_Arabic_Total : constant String :=
-     U (16#967#) & U (16#66C#) & U (16#968#) & U (16#969#)
-     & U (16#96A#) & U (16#66C#) & U (16#96B#) & U (16#96C#)
-     & U (16#96D#) & U (16#66B#) & U (16#96E#) & U (16#96F#);
+     U (16#967#) & "," & U (16#968#) & U (16#969#)
+     & U (16#96A#) & "," & U (16#96B#) & U (16#96C#)
+     & U (16#96D#) & "." & U (16#96E#) & U (16#96F#);
    Bengali_Total : constant String :=
      U (16#9E7#) & "," & U (16#9E8#) & U (16#9E9#)
      & U (16#9EA#) & "," & U (16#9EB#) & U (16#9EC#)
