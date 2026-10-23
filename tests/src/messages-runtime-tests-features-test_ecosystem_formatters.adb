@@ -1347,6 +1347,7 @@ begin
       & "pl.list_or = ""{items, list, or}""" & ASCII.LF
       & "vi.list_or = ""{items, list, or}""" & ASCII.LF
       & "ja.list_unit = ""{items, list, unit}""" & ASCII.LF
+      & "und.list_unit_narrow = ""{items, list, unit-narrow}""" & ASCII.LF
       & "de.list = ""{items, list}""" & ASCII.LF
       & "fr.list = ""{items, list}""" & ASCII.LF
       & "es.list = ""{items, list}""" & ASCII.LF
@@ -3677,6 +3678,17 @@ begin
    Assert (Rendered (Runtime, "ja", "list_unit", Args) =
            "red green blue",
            "list formatter uses generated Japanese unit list separators");
+   --  CLDR's narrow unit lists, as a compact duration joins its parts: German
+   --  ends with "und", Japanese joins with nothing (as ICU does).
+   Assert (Rendered (Runtime, "de", "list_unit_narrow", Args) =
+           "red, green und blue",
+           "list formatter renders German narrow unit lists");
+   Assert (Rendered (Runtime, "ja", "list_unit_narrow", Args) =
+           "redgreenblue",
+           "list formatter joins Japanese narrow unit lists with nothing");
+   Assert (Rendered (Runtime, "en", "list_unit_narrow", Args) =
+           "red green blue",
+           "list formatter renders English narrow unit lists");
    Assert (Rendered (Runtime, "de", "list", Args) =
            "red, green und blue",
            "list formatter localizes German conjunction");

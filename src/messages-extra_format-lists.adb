@@ -163,15 +163,16 @@ package body Lists is
         or else Option = "and"
         or else Option = "or"
         or else Option = "disjunction"
-        or else Option = "unit";
+        or else Option = "unit"
+        or else Option = "unit-narrow";
    end List_Option_Is_Valid;
 
    function List_Type (Option : String) return String is
    begin
       if Option = "or" or else Option = "disjunction" then
          return "or";
-      elsif Option = "unit" then
-         return "unit";
+      elsif Option = "unit" or else Option = "unit-narrow" then
+         return Option;
       else
          return "standard";
       end if;
@@ -204,23 +205,23 @@ package body Lists is
               (Locale, "or", "middle",
                I18N.List_Format.Separator (Locale, "or", "middle"));
          end if;
-      elsif Kind = "unit" then
+      elsif Kind = "unit" or else Kind = "unit-narrow" then
          if Total = 2 then
             return Typed_Runtime_List_Separator
-              (Locale, "unit", "pair", "item",
-               I18N.List_Format.Separator (Locale, "unit", "pair"));
+              (Locale, Kind, "pair", "item",
+               I18N.List_Format.Separator (Locale, Kind, "pair"));
          elsif Count = 2 then
             return Typed_Runtime_List_Separator
-              (Locale, "unit", "start", "item",
-               I18N.List_Format.Separator (Locale, "unit", "start"));
+              (Locale, Kind, "start", "item",
+               I18N.List_Format.Separator (Locale, Kind, "start"));
          elsif Count = Total then
             return Typed_Runtime_List_Separator
-              (Locale, "unit", "final", "middle", "item",
-               I18N.List_Format.Separator (Locale, "unit", "final"));
+              (Locale, Kind, "final", "middle", "item",
+               I18N.List_Format.Separator (Locale, Kind, "final"));
          else
             return Typed_Runtime_List_Separator
-              (Locale, "unit", "middle", "item",
-               I18N.List_Format.Separator (Locale, "unit", "middle"));
+              (Locale, Kind, "middle", "item",
+               I18N.List_Format.Separator (Locale, Kind, "middle"));
          end if;
       elsif Total = 2 then
          return List_Pair_Separator (Locale);

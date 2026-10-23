@@ -29,6 +29,9 @@ commits; each of those says in its own message what changed and why.
 
 ### Added
 
+- `{items, list, unit-narrow}`: CLDR's narrow unit list, as a compact
+  duration joins its parts ("1 h, 30 min und 5 s"; Japanese with nothing).
+
 - A catalogue check a project can run **without writing Ada**, so a consumer
   keeps its catalogue honest without building a tool of its own first.
 - A translation is checked against the message it translates, including the
