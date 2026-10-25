@@ -115,7 +115,7 @@ package body Messages.Runtime is
       end if;
 
       Ada.Text_IO.Open
-        (File => File, Mode => Ada.Text_IO.In_File, Name => Path);
+        (File => File, Mode => Ada.Text_IO.In_File, Name => Path, Form => "shared=no");
 
       while not Ada.Text_IO.End_Of_File (File) loop
          Lines.Append (To_Unbounded_String (Ada.Text_IO.Get_Line (File)));

@@ -672,7 +672,7 @@ package body Messages.Consistency is
                Identical => 0);
 
       begin
-         Ada.Text_IO.Open (File, Ada.Text_IO.In_File, Path);
+         Ada.Text_IO.Open (File, Ada.Text_IO.In_File, Path, Form => "shared=no");
       exception
          when others =>
             Note (Into, Missing_Original, "", "",

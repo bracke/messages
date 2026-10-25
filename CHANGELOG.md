@@ -68,6 +68,15 @@ commits; each of those says in its own message what changed and why.
 
 ### Fixed
 
+- A catalog another task has open loads all the same: GNAT's default open
+  form refuses a file the program already has open (`Use_Error: reopening
+  shared file`), so `Load_File` -- and the consistency check's reads --
+  failed while another task of the program read the same catalog. Both opens
+  now say `shared=no`.
+- A failing suite now exits non-zero: the test driver set its exit status
+  among the statements of its exception handler, where it ran only when
+  something raised, so `alr test` passed over failed tests.
+
 - A catalog with `unit` entries loads when i18n's data directory is missing:
   the unit identifier's shape decides validity there, instead of every unit
   counting as unknown and the whole catalog being rejected. Rendering such a

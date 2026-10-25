@@ -1,4 +1,5 @@
 with Ada.Strings.Fixed;
+with Ada.Text_IO;
 with AUnit.Assertions;
 
 with Project_Tools.Files;
@@ -165,6 +166,20 @@ package body Messages.Runtime.Tests.Features is
       Assert (Rendered (Runtime, "en", "a", Args) = "A", "base entry preserved");
       Assert (Rendered (Runtime, "en", "b", Args) = "B", "shard entry added");
       Assert (Rendered (Runtime, "de", "a", Args) = "DA", "shard de entry added");
+
+      --  Held open elsewhere in the program -- another task reading it --
+      --  the shard loads all the same: the run time refuses a second open
+      --  of a file under its default form.
+      declare
+         Held  : Ada.Text_IO.File_Type;
+         Again : Messages.Runtime.Instance;
+      begin
+         Messages.Runtime.Initialize (Again, Base);
+         Ada.Text_IO.Open (Held, Ada.Text_IO.In_File, Shard);
+         Messages.Runtime.Load_File (Again, Shard, Result);
+         Ada.Text_IO.Close (Held);
+         Assert (Result.Status = Messages.Runtime.Loaded, "a shard held open elsewhere should load");
+      end;
    end Test_Load_File_Layers_Shards;
 
    procedure Test_Load_File_Missing_Is_Reported

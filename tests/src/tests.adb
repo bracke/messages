@@ -149,14 +149,15 @@ begin
    Parse_Arguments;
    if Should_Run then
       Status := Runner (Reporter);
+      --  Here, not after the handler's statements, where it was: there it
+      --  ran only when something raised, and a failing suite exited 0.
+      if Status /= AUnit.Success then
+         Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+      end if;
    end if;
 exception
    when E : others =>
       Ada.Text_IO.Put_Line
         (Ada.Text_IO.Standard_Error, Ada.Exceptions.Exception_Message (E));
       Ada.Command_Line.Set_Exit_Status (1);
-
-   if Status /= AUnit.Success then
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-   end if;
 end Tests;
