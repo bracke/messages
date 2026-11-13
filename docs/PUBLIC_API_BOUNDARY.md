@@ -14,9 +14,11 @@ with Messages.Arguments;
 with I18N.Locales;
 with I18N.Plurals;
 with Messages.Diagnostics;
+with Messages.Program_Catalog;
+with Messages.Program_Locale;
 ```
 
-`Messages.Runtime` is the catalog-backed facade (loading, validation, resolution, rendering). `Messages.Arguments` is the stable argument-map facade. `Messages.Result` is the frozen render-status/result model. `I18N.Locales` defines locale identifiers and fallback helpers. `I18N.Plurals` classifies integer and explicit fractional CLDR operands into plural categories. `Messages.Diagnostics` exposes optional non-interfering trace/diagnostic hooks.
+`Messages.Runtime` is the catalog-backed facade (loading, validation, resolution, rendering). `Messages.Arguments` is the stable argument-map facade. `Messages.Result` is the frozen render-status/result model. `I18N.Locales` defines locale identifiers and fallback helpers. `I18N.Plurals` classifies integer and explicit fractional CLDR operands into plural categories. `Messages.Diagnostics` exposes optional non-interfering trace/diagnostic hooks. `Messages.Program_Catalog` is a generic convenience over `Messages.Runtime` for a program's own catalogue (render a key with no arguments in the user's language, or hand the key back), and `Messages.Program_Locale` picks that language from the POSIX variables and a host locale the caller supplies.
 
 ## Stable runtime surface
 

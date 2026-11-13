@@ -49,6 +49,14 @@ commits; each of those says in its own message what changed and why.
 
 ### Added
 
+- `Messages.Program_Catalog`, a generic over a catalogue path and the host's
+  native locale: the one-runtime, render-a-key-or-hand-it-back wrapper that
+  launcher and search each carried as a byte-identical copy.
+- `Messages.Program_Locale`: the language that wrapper renders in. LC_ALL,
+  LC_MESSAGES and LANG still decide when one is set; when none is -- a
+  desktop program on Windows or macOS -- the host's own locale, passed in by
+  the caller (Hostkit.Host.Native_Locale), does, where both programs had
+  always come up in English. "en-GB" and "en_GB" are both read as "en".
 - A unit with a range value "low/high" writes the unit once, in the
   locale's range ("1–2 Stunden", "2–5 часов", Arabic "١–٢ ساعة"): the unit
   in the range's plural category by CLDR's plural ranges.
