@@ -57,6 +57,24 @@ package body Messages.Runtime.Tests.Consistency is
          Into => Into);
       Assert (Has (Into, Messages.Consistency.Argument_Dropped),
               "an argument the original takes and the translation does not");
+
+      --  Only the kinds asked for are recorded.
+      Messages.Consistency.Check_Text
+        ("test",
+         Catalog ("de.error.missing_value = ""ein Wert fehlt"""),
+         Into => Into,
+         Only => [Messages.Consistency.Argument_Dropped => True,
+                  others => False]);
+      Assert (Into.Count = 1
+                and then Has (Into, Messages.Consistency.Argument_Dropped),
+              "a check of arguments alone still finds the dropped one");
+      Messages.Consistency.Check_Text
+        ("test",
+         Catalog ("de.error.missing_value = ""ein Wert fehlt"""),
+         Into => Into,
+         Only => [Messages.Consistency.Argument_Dropped => False,
+                  others => True]);
+      Assert (Into.Count = 0, "a kind left out is not recorded");
    end Test_A_Dropped_Argument_Is_Found;
 
    procedure Test_An_Invented_Argument_Is_Found

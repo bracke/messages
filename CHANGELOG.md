@@ -12,6 +12,15 @@ commits; each of those says in its own message what changed and why.
 
 ## [Unreleased]
 
+### Added
+
+- `Messages.Consistency.Check_Text` and `Check_File` take `Only`, the kinds
+  of finding to record (`All_Kinds` by default); the rest take no room in
+  the report. `catalog_check` gains `--base=<catalog>`, which checks a locale
+  kept in a file of its own against the catalog holding the default locale,
+  and `--arguments-only`, which records only dropped and invented
+  `{arguments}`.
+
 ### Changed
 
 - Date-time skeletons render as ICU joins a date and a time ("2/29/2024,

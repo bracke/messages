@@ -394,11 +394,25 @@ package body Messages.Consistency is
       Text        : String;
       Verbatim    : Token_Array := No_Tokens;
       Locale_Only : Token_Array := No_Tokens;
-      Into        : out Report)
+      Into        : out Report;
+      Only        : Kind_Set := All_Kinds)
    is
       pragma Unreferenced (Source_Name);
 
       Default : Unbounded_String := To_Unbounded_String ("en");
+
+      --  The package's Note, for the kinds the caller asked for.
+      procedure Note
+        (Into   : in out Report;
+         Kind   : Finding_Kind;
+         Locale : String;
+         Key    : String;
+         Detail : String) is
+      begin
+         if Only (Kind) then
+            Consistency.Note (Into, Kind, Locale, Key, Detail);
+         end if;
+      end Note;
 
       --  The default locale's entries, as LF & key & HT & value & LF. Held as
       --  text rather than a container: this is one pass over a file, and a
@@ -663,7 +677,8 @@ package body Messages.Consistency is
      (Path        : String;
       Verbatim    : Token_Array := No_Tokens;
       Locale_Only : Token_Array := No_Tokens;
-      Into        : out Report)
+      Into        : out Report;
+      Only        : Kind_Set := All_Kinds)
    is
       File : Ada.Text_IO.File_Type;
       Body_Text : Unbounded_String;
@@ -685,7 +700,8 @@ package body Messages.Consistency is
       end loop;
       Ada.Text_IO.Close (File);
 
-      Check_Text (Path, To_String (Body_Text), Verbatim, Locale_Only, Into);
+      Check_Text
+        (Path, To_String (Body_Text), Verbatim, Locale_Only, Into, Only);
    exception
       when others =>
          if Ada.Text_IO.Is_Open (File) then

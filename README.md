@@ -142,6 +142,20 @@ names key prefixes a locale may carry without the default locale having them,
 for catalogs that record something about a translation itself -- who wrote it,
 when it was last touched.
 
+A locale kept in a file of its own is checked against the catalog that holds
+the default locale with `--base`, and `--arguments-only` narrows the check to
+the `{name}` arguments each message takes -- the rule a project can hold every
+locale to before its translations are otherwise reviewed:
+
+```sh
+catalog_check share/locales/app-de.catalog \
+  --base=share/app.catalog --arguments-only
+```
+
+`Check_Text` and `Check_File` take the same narrowing as `Only`, a set of
+finding kinds; the kinds left out are not recorded and take no room in the
+report.
+
 A marker saying how far a translation is to be trusted is a different thing, and
 worth less than it looks: it is a claim, and nothing here verifies it. A catalog
 where every locale is machine-translated should say that once, in prose, rather

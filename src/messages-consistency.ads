@@ -89,6 +89,12 @@ package Messages.Consistency is
 
    No_Tokens : constant Token_Array (1 .. 0) := [others => <>];
 
+   --  Which kinds of finding a check records; the rest it passes over, so
+   --  they neither show in the report nor take its room.
+   type Kind_Set is array (Finding_Kind) of Boolean;
+
+   All_Kinds : constant Kind_Set := [others => True];
+
    --  Check a catalog's translations against its default locale.
    --
    --  @param Source_Name Logical name used in findings.
@@ -105,12 +111,16 @@ package Messages.Consistency is
    --                       to be trusted is a claim, and a claim nothing
    --                       verifies is worth less than no claim at all.
    --  @param Into The findings, emptied first.
+   --  @param Only The kinds of finding to record; All_Kinds records every
+   --              one. Strings identical to the original are counted either
+   --              way.
    procedure Check_Text
      (Source_Name : String;
       Text        : String;
       Verbatim    : Token_Array := No_Tokens;
       Locale_Only : Token_Array := No_Tokens;
-      Into        : out Report);
+      Into        : out Report;
+      Only        : Kind_Set := All_Kinds);
 
    --  The same, over a file. A file that cannot be read is one finding saying
    --  so, rather than an exception.
@@ -118,7 +128,8 @@ package Messages.Consistency is
      (Path        : String;
       Verbatim    : Token_Array := No_Tokens;
       Locale_Only : Token_Array := No_Tokens;
-      Into        : out Report);
+      Into        : out Report;
+      Only        : Kind_Set := All_Kinds);
 
    --  One line a person can read, of the form
    --  "de.error.missing_value: the argument {value} is dropped".
