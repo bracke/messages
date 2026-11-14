@@ -58,6 +58,8 @@ package body Messages.Errors is
             return "output buffer overflow";
          when Unbalanced_Braces =>
             return "unbalanced braces";
+         when Nesting_Too_Deep =>
+            return "plural or selectordinal nested too deeply";
       end case;
    end Diagnostic_Message;
 
@@ -69,7 +71,7 @@ package body Messages.Errors is
       case Error is
          when Parse_Error | Unbalanced_Braces =>
             return Messages.Diagnostics.Parse_Error;
-         when Validation_Error =>
+         when Validation_Error | Nesting_Too_Deep =>
             return Messages.Diagnostics.Validation_Error;
          when Missing_Branch =>
             return Messages.Diagnostics.Missing_Branch;

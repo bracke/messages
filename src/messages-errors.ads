@@ -13,7 +13,8 @@ private package Messages.Errors is
       Invalid_Selector,
       Invalid_Ordinal,
       Buffer_Overflow,
-      Unbalanced_Braces);
+      Unbalanced_Braces,
+      Nesting_Too_Deep);
 
    --  Allocation-free render status. Used by strict fixed-buffer render paths
    --  that write only into caller-owned buffers.

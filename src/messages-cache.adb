@@ -66,6 +66,13 @@ package body Messages.Cache is
          end if;
       end;
 
+      --  Refused here, by name, rather than compiled into a message that
+      --  fails every render with a Parse_Error it cannot explain.
+      if Messages.Compiler.Number_Depth (Root) > Messages.Compiled.Max_Number_Depth then
+         Messages.AST.Free (Root);
+         return Messages.Errors.Failure (Messages.Errors.Nesting_Too_Deep);
+      end if;
+
       begin
          declare
             Compiled : constant Messages.Compiled.Compiled_Message :=

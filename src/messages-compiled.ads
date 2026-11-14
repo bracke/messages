@@ -2,6 +2,16 @@ with Ada.Containers;
 with Ada.Containers.Vectors;
 
 private package Messages.Compiled is
+   --  The deepest plural and selectordinal blocks may nest in a compiled
+   --  message: each one entered keeps its enclosing number text aside for
+   --  '#' until its branch ends, in a stack Fast_Render holds in its frame
+   --  (one Messages.Buffer.Default_Capacity string per level), so the stack
+   --  has a fixed height. Select blocks between them do not count. A message
+   --  nested deeper is refused when it is compiled -- Messages.Compiler.
+   --  Number_Depth, and Messages.Errors.Nesting_Too_Deep from the cache --
+   --  never when it is rendered.
+   Max_Number_Depth : constant := 16;
+
    --  Linear operation kind.
    type Op_Kind is
      (Text,

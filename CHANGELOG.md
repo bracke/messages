@@ -21,7 +21,12 @@ commits; each of those says in its own message what changed and why.
 - Rendering keeps 16 nested plural/selectordinal number texts (was 128) and
   no longer clears them first: Render_Into's frame drops from 538 KB to
   80 KB -- half of Windows' 1 MiB main stack before -- and each render
-  skips a 512 KiB zero fill. Deeper nesting fails with Parse_Error.
+  skips a 512 KiB zero fill. Deeper nesting is refused when the message is
+  compiled, not when it renders: `Messages.Compiled.Max_Number_Depth` (16)
+  is the one limit, `Messages.Compiler.Number_Depth` measures a message
+  against it, and the cache answers the new `Errors.Nesting_Too_Deep` (a
+  Validation_Error diagnostic) instead of compiling a message whose every
+  render failed with Parse_Error. Select blocks between plurals do not count.
 - A language-region tag without a script falls back to the same region in
   its likely script before the bare script: zh-HK reaches a zh-Hant-HK entry
   (and zh-MO one through zh-Hant-MO), then zh-Hant, as CLDR has it.

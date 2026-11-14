@@ -384,6 +384,61 @@ package body Messages.Compiler is
       end loop;
    end Compile_Nodes;
 
+   function Number_Depth
+     (N : Messages.AST.Node_Access)
+      return Natural
+   is
+      function Branches_Depth (Branches : Messages.AST.Branch_Access) return Natural is
+         Branch : Messages.AST.Branch_Access := Branches;
+         Result : Natural := 0;
+      begin
+         while Branch /= null loop
+            Result := Natural'Max (Result, Number_Depth (Branch.Body_Root));
+            Branch := Branch.Next;
+         end loop;
+         return Result;
+      end Branches_Depth;
+
+      Current : Messages.AST.Node_Access := N;
+      Result  : Natural := 0;
+   begin
+      while Current /= null loop
+         case Current.Kind is
+            when Messages.AST.Plural =>
+               Result := Natural'Max
+                 (Result,
+                  1 + Natural'Max
+                        (Branches_Depth (Current.Plural_Exact),
+                         Natural'Max
+                           (Natural'Max (Number_Depth (Current.Plural_Zero), Number_Depth (Current.One)),
+                            Natural'Max
+                              (Natural'Max (Number_Depth (Current.Plural_Two), Number_Depth (Current.Plural_Few)),
+                               Natural'Max (Number_Depth (Current.Plural_Many), Number_Depth (Current.Other))))));
+
+            when Messages.AST.SelectOrdinal =>
+               Result := Natural'Max
+                 (Result,
+                  1 + Natural'Max
+                        (Branches_Depth (Current.Ord_Exact),
+                         Natural'Max
+                           (Natural'Max (Number_Depth (Current.Ord_Zero), Number_Depth (Current.Ord_One)),
+                            Natural'Max
+                              (Natural'Max (Number_Depth (Current.Ord_Two), Number_Depth (Current.Ord_Few)),
+                               Natural'Max (Number_Depth (Current.Ord_Many), Number_Depth (Current.Ord_Other))))));
+
+            when Messages.AST.Select_Node =>
+               Result := Natural'Max (Result, Branches_Depth (Current.Branches));
+
+            when others =>
+               null;
+         end case;
+
+         Current := Current.Next;
+      end loop;
+
+      return Result;
+   end Number_Depth;
+
    function Compile
      (N : Messages.AST.Node_Access)
       return Messages.Compiled.Compiled_Message
@@ -394,6 +449,9 @@ package body Messages.Compiler is
    begin
       if not Validation_Result.Ok then
          raise Constraint_Error with "cannot compile invalid ICU AST";
+      elsif Number_Depth (N) > Messages.Compiled.Max_Number_Depth then
+         --  Fast_Render could not hold the number texts it would need.
+         raise Constraint_Error with "plural or selectordinal nested too deeply to compile";
       end if;
 
       Compile_Nodes (N, Build, Substitute => False);

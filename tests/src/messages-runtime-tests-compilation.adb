@@ -452,6 +452,95 @@ package body Messages.Runtime.Tests.Compilation is
       Messages.Runtime.Finalize (Runtime);
    end Test_Nested_Number_Context_Is_Restored;
 
+   procedure Test_Number_Nesting_Limit_Is_A_Compile_Error
+     (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      Limit : constant Positive := Messages.Compiled.Max_Number_Depth;
+
+      --  Depth plurals, each the only branch of the one around it, with
+      --  the innermost number at the bottom.
+      function Nested (Depth : Natural) return String is
+        (if Depth = 0 then "#"
+         else "{n, plural, other {" & Nested (Depth - 1) & "}}");
+   begin
+      --  The limit itself compiles and renders.
+      declare
+         Runtime : Messages.Runtime.Runtime;
+         Args    : Messages.Arguments.Arguments;
+      begin
+         Messages.Cache.Clear;
+         Messages.Runtime.Compatibility.Initialize_Message
+           (Runtime, Nested (Limit));
+         Add_Arg (Args, "n", "3");
+         declare
+            Result : constant Messages.Errors.Result :=
+              Messages.Runtime.Compatibility.Render (Runtime, Args);
+         begin
+            AUnit.Assertions.Assert
+              (Condition =>
+                 Result.Ok and then Messages.Errors.Value_Text (Result) = "3",
+               Message   =>
+                 "plurals nested Max_Number_Depth deep compile and render");
+         end;
+         Messages.Runtime.Finalize (Runtime);
+      end;
+
+      --  One deeper is refused when compiled, by name, and never cached.
+      declare
+         Message : Messages.Compiled.Compiled_Message;
+         Root    : Messages.AST.Node_Access :=
+           Messages.Parser.Parse (Nested (Limit + 1));
+      begin
+         AUnit.Assertions.Assert
+           (Condition => Messages.Compiler.Number_Depth (Root) = Limit + 1,
+            Message   => "the nesting depth counts every plural on the path");
+         Messages.AST.Free (Root);
+         Messages.Cache.Clear;
+         declare
+            Result : constant Messages.Errors.Result :=
+              Messages.Cache.Get_Or_Compile (Nested (Limit + 1), Message);
+         begin
+            AUnit.Assertions.Assert
+              (Condition =>
+                 not Result.Ok
+                 and then Result.Error = Messages.Errors.Nesting_Too_Deep,
+               Message   =>
+                 "plurals nested past Max_Number_Depth fail to compile with "
+                 & "Nesting_Too_Deep, not to render with Parse_Error");
+         end;
+         AUnit.Assertions.Assert
+           (Condition => Messages.Cache.Compile_Count = 0,
+            Message   => "a message nested too deeply is not cached");
+      end;
+
+      declare
+         Runtime : Messages.Runtime.Runtime;
+      begin
+         Messages.Runtime.Compatibility.Initialize_Message
+           (Runtime, Nested (Limit + 1));
+         AUnit.Assertions.Assert
+           (Condition =>
+              Messages.Runtime.Compatibility.Last_Error (Runtime)
+                = Messages.Errors.Nesting_Too_Deep,
+            Message   => "the runtime reports the nesting error it was given");
+         Messages.Runtime.Finalize (Runtime);
+      end;
+
+      --  A select between two plurals keeps no number: it does not count.
+      declare
+         Root : Messages.AST.Node_Access :=
+           Messages.Parser.Parse
+             ("{n, plural, other {{g, select, other {"
+              & "{n, plural, other {#}}}}}}");
+      begin
+         AUnit.Assertions.Assert
+           (Condition => Messages.Compiler.Number_Depth (Root) = 2,
+            Message   => "a select between plurals adds no depth");
+         Messages.AST.Free (Root);
+      end;
+   end Test_Number_Nesting_Limit_Is_A_Compile_Error;
+
    overriding
    function Name (T : Test_Case) return AUnit.Message_String is
       pragma Unreferenced (T);
@@ -518,6 +607,10 @@ package body Messages.Runtime.Tests.Compilation is
         (T,
          Test_Nested_Number_Context_Is_Restored'Access,
          "nested plural/selectordinal number context is restored");
+      AUnit.Test_Cases.Registration.Register_Routine
+        (T,
+         Test_Number_Nesting_Limit_Is_A_Compile_Error'Access,
+         "plurals nested past the render stack are refused at compile time");
    end Register_Tests;
 
 end Messages.Runtime.Tests.Compilation;
