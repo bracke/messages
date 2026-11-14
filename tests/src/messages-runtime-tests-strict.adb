@@ -415,6 +415,69 @@ package body Messages.Runtime.Tests.Strict is
          Expected => "#");
    end Test_Number_Sign_Is_Literal_In_Quoted_Apostrophe_Block;
 
+   --  ICU (DOUBLE_OPTIONAL) treats an apostrophe before '#' as quoting only
+   --  where '#' stands for the number. Outside a plural, '#' is plain text and
+   --  the apostrophes around it are ordinary apostrophes that stay.
+   procedure Test_Apostrophe_Before_Number_Sign_Is_Literal_Outside_Plural
+     (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+   begin
+      Assert_Render_OK
+        (Source   => "Press '#' key",
+         Expected => "Press '#' key");
+      Assert_Render_OK
+        (Source   => "{gender, select, other {Press '#' key}}",
+         Key_1    => "gender",
+         Value_1  => "x",
+         Expected => "Press '#' key");
+      Assert_Render_OK
+        (Source   => "{count, number} '#' {count, number}",
+         Key_1    => "count",
+         Value_1  => "3",
+         Expected => "3 '#' 3");
+
+      --  A span quoted by another syntax character still holds '#' as text.
+      Assert_Render_OK
+        (Source   => "'{#}' and #",
+         Expected => "{#} and #");
+   end Test_Apostrophe_Before_Number_Sign_Is_Literal_Outside_Plural;
+
+   --  Where '#' does stand for the number -- plural and selectordinal
+   --  branches, and select branches nested in a plural, which render '#' as
+   --  the number too -- an apostrophe before it still quotes it.
+   procedure Test_Apostrophe_Before_Number_Sign_Quotes_Inside_Plural
+     (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+   begin
+      Assert_Render_OK
+        (Source   => "{count, plural, other {Press '#' key, # times}}",
+         Key_1    => "count",
+         Value_1  => "2",
+         Expected => "Press # key, 2 times");
+      Assert_Render_OK
+        (Source   => "{place, selectordinal, other {'#' is #}}",
+         Key_1    => "place",
+         Value_1  => "4",
+         Expected => "# is 4");
+      Assert_Render_OK
+        (Source   =>
+           "{count, plural, other {{gender, select, other {'#' and #}}}}",
+         Key_1    => "count",
+         Value_1  => "2",
+         Key_2    => "gender",
+         Value_2  => "x",
+         Expected => "# and 2");
+
+      --  The plural ends where its block does: after it, '#' is text again.
+      Assert_Render_OK
+        (Source   => "{count, plural, other {'#'}} '#'",
+         Key_1    => "count",
+         Value_1  => "2",
+         Expected => "# '#'");
+   end Test_Apostrophe_Before_Number_Sign_Quotes_Inside_Plural;
+
    procedure Test_Invalid_Variable_Identifier_Returns_Parse_Error
      (T : in out AUnit.Test_Cases.Test_Case'Class)
    is
@@ -545,6 +608,14 @@ package body Messages.Runtime.Tests.Strict is
         (T,
          Test_Number_Sign_Is_Literal_In_Quoted_Apostrophe_Block'Access,
          "quoted number-sign remains literal in text");
+      AUnit.Test_Cases.Registration.Register_Routine
+        (T,
+         Test_Apostrophe_Before_Number_Sign_Is_Literal_Outside_Plural'Access,
+         "an apostrophe before '#' outside a plural is a literal apostrophe");
+      AUnit.Test_Cases.Registration.Register_Routine
+        (T,
+         Test_Apostrophe_Before_Number_Sign_Quotes_Inside_Plural'Access,
+         "an apostrophe before '#' inside a plural quotes it");
       AUnit.Test_Cases.Registration.Register_Routine
         (T,
          Test_Invalid_Variable_Identifier_Returns_Parse_Error'Access,

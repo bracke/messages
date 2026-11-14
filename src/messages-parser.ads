@@ -29,7 +29,10 @@ private package Messages.Parser is
    --  formats of the form {identifier, currency, USD/accounting}. ICU-style apostrophe escaping is resolved
    --  while parsing: doubled apostrophes render as one apostrophe, quoted
    --  syntax characters render literally, quoted # does not trigger
-   --  plural/selectordinal number substitution, and an unterminated quoted
+   --  plural/selectordinal number substitution, an apostrophe before # quotes
+   --  it only where # stands for the number (plural and selectordinal
+   --  branches and the select branches nested in them; elsewhere, as in ICU,
+   --  "Press '#' key" keeps its apostrophes), and an unterminated quoted
    --  span closes at the current message or branch boundary. Invalid braces, empty
    --  variables, malformed
    --  blocks, duplicate branches, and unaccepted branch names raise

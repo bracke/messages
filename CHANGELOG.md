@@ -76,6 +76,10 @@ commits; each of those says in its own message what changed and why.
 
 ### Fixed
 
+- An apostrophe before `#` quotes it only where `#` stands for the number
+  (plural and selectordinal branches, and select branches nested in them),
+  as ICU's DOUBLE_OPTIONAL mode does. Elsewhere `#` is plain text, so
+  "Press '#' key" keeps its apostrophes instead of rendering "Press # key".
 - A catalog another task has open loads all the same: GNAT's default open
   form refuses a file the program already has open (`Use_Error: reopening
   shared file`), so `Load_File` -- and the consistency check's reads --

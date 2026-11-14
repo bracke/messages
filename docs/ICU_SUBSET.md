@@ -286,7 +286,8 @@ Don''t parse '{name}'
 Rules:
 
 * `''` renders as a single apostrophe;
-* an apostrophe before `{`, `}`, `#`, or another apostrophe starts quoted literal text;
+* an apostrophe before `{`, `}`, or another apostrophe starts quoted literal text;
+* an apostrophe before `#` starts quoted literal text only where `#` stands for the number: in `plural` and `selectordinal` branches and in `select` branches nested in them. Elsewhere `#` is plain text and, as in ICU, the apostrophe stays: `Press '#' key` renders as `Press '#' key`;
 * quoted `{` and `}` are literal braces and do not start or end an argument;
 * quoted `#` is literal and does not trigger plural/selectordinal number substitution;
 * an apostrophe before an ordinary non-syntax character remains a literal apostrophe;

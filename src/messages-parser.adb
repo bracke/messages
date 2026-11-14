@@ -12,16 +12,28 @@ package body Messages.Parser is
    Apostrophe           : constant Character := Character'Val (39);
    Escaped_Number_Sign  : constant Character := Character'Val (1);
 
-   function Is_Quote_Syntax_Character (C : Character) return Boolean is
+   --  Whether an apostrophe before C starts a quoted literal. As in ICU
+   --  (ApostropheMode DOUBLE_OPTIONAL), '#' is pattern syntax only where it
+   --  stands for the number: in a plural or selectordinal branch, and in the
+   --  select branches nested in one, which render '#' as the number too.
+   --  Elsewhere '#' is plain text and an apostrophe before it is literal, so
+   --  "Press '#' key" keeps both apostrophes.
+   function Is_Quote_Syntax_Character
+     (C         : Character;
+      In_Plural : Boolean) return Boolean is
    begin
-      return C = '{' or else C = '}' or else C = '#' or else C = Apostrophe;
+      return C = '{' or else C = '}' or else C = Apostrophe
+        or else (In_Plural and then C = '#');
    end Is_Quote_Syntax_Character;
 
+   --  Append quoted text. Inside a plural, a quoted '#' is marked so it does
+   --  not become the number; outside one it needs no mark and gets none.
    procedure Append_Quoted_Character
-     (Text : in out Unbounded_String;
-      C    : Character) is
+     (Text      : in out Unbounded_String;
+      C         : Character;
+      In_Plural : Boolean) is
    begin
-      if C = '#' then
+      if In_Plural and then C = '#' then
          Append (Source => Text, New_Item => Escaped_Number_Sign);
       else
          Append (Source => Text, New_Item => C);
@@ -325,8 +337,13 @@ package body Messages.Parser is
         or else Is_Skeleton (Style_Only);
    end Is_Date_Time_Style;
 
+   --  In_Plural: the sequence is a branch where '#' stands for the number
+   --  (see Is_Quote_Syntax_Character).
    function Parse_Sequence
-     (Source : String; Pos : in out Positive; Stop_On_Close : Boolean)
+     (Source        : String;
+      Pos           : in out Positive;
+      Stop_On_Close : Boolean;
+      In_Plural     : Boolean)
       return Messages.AST.Node_Access;
 
    function Empty_Branch_AST return Messages.AST.Node_Access is
@@ -400,7 +417,9 @@ package body Messages.Parser is
    end Read_Exact_Selector;
 
    function Parse_Branch_Message
-     (Source : String; Pos : in out Positive) return Messages.AST.Node_Access
+     (Source    : String;
+      Pos       : in out Positive;
+      In_Plural : Boolean) return Messages.AST.Node_Access
    is
       Branch_AST : Messages.AST.Node_Access := null;
    begin
@@ -412,7 +431,11 @@ package body Messages.Parser is
 
       Pos := Pos + 1;
       Branch_AST :=
-        Parse_Sequence (Source => Source, Pos => Pos, Stop_On_Close => True);
+        Parse_Sequence
+          (Source        => Source,
+           Pos           => Pos,
+           Stop_On_Close => True,
+           In_Plural     => In_Plural);
 
       if Pos > Source'Last or else Source (Pos) /= '}' then
          Messages.AST.Free (Branch_AST);
@@ -545,7 +568,9 @@ package body Messages.Parser is
                raise Parse_Error with "Expected zero, one, two, few, many, or other plural branch";
             end if;
 
-            Branch_AST := Parse_Branch_Message (Source => Source, Pos => Pos);
+            Branch_AST :=
+              Parse_Branch_Message
+                (Source => Source, Pos => Pos, In_Plural => True);
 
             if Is_Exact then
                Messages.AST.Append_Branch
@@ -637,12 +662,15 @@ package body Messages.Parser is
          raise;
    end Parse_Plural;
 
+   --  In_Plural: the select sits in a plural branch, whose number its own
+   --  branches render for '#' as well.
    procedure Parse_Select
-     (Source : String;
-      Pos    : in out Positive;
-      Name   : String;
-      Head   : in out Messages.AST.Node_Access;
-      Tail   : in out Messages.AST.Node_Access)
+     (Source    : String;
+      Pos       : in out Positive;
+      Name      : String;
+      Head      : in out Messages.AST.Node_Access;
+      Tail      : in out Messages.AST.Node_Access;
+      In_Plural : Boolean)
    is
       Branches      : Messages.AST.Branch_Access := null;
       Branches_Tail : Messages.AST.Branch_Access := null;
@@ -676,7 +704,9 @@ package body Messages.Parser is
                raise Parse_Error with "Duplicate select branch";
             end if;
 
-            Branch_AST := Parse_Branch_Message (Source => Source, Pos => Pos);
+            Branch_AST :=
+              Parse_Branch_Message
+                (Source => Source, Pos => Pos, In_Plural => In_Plural);
 
             Messages.AST.Append_Branch
               (Head      => Branches,
@@ -764,7 +794,9 @@ package body Messages.Parser is
                  with "Expected zero, one, two, few, many, or other selectordinal branch";
             end if;
 
-            Branch_AST := Parse_Branch_Message (Source => Source, Pos => Pos);
+            Branch_AST :=
+              Parse_Branch_Message
+                (Source => Source, Pos => Pos, In_Plural => True);
 
             if Is_Exact then
                Messages.AST.Append_Branch
@@ -1012,10 +1044,11 @@ package body Messages.Parser is
    end Parse_Extra_Format;
 
    procedure Parse_Braced
-     (Source : String;
-      Pos    : in out Positive;
-      Head   : in out Messages.AST.Node_Access;
-      Tail   : in out Messages.AST.Node_Access) is
+     (Source    : String;
+      Pos       : in out Positive;
+      Head      : in out Messages.AST.Node_Access;
+      Tail      : in out Messages.AST.Node_Access;
+      In_Plural : Boolean) is
    begin
       if Pos > Source'Last then
          Raise_Unbalanced_Braces ("Unclosed brace before identifier");
@@ -1069,11 +1102,12 @@ package body Messages.Parser is
                   Tail   => Tail);
             elsif Keyword = "select" then
                Parse_Select
-                 (Source => Source,
-                  Pos    => Pos,
-                  Name   => Name,
-                  Head   => Head,
-                  Tail   => Tail);
+                 (Source    => Source,
+                  Pos       => Pos,
+                  Name      => Name,
+                  Head      => Head,
+                  Tail      => Tail,
+                  In_Plural => In_Plural);
             elsif Keyword = "selectordinal" then
                Parse_Select_Ordinal
                  (Source => Source,
@@ -1168,7 +1202,10 @@ package body Messages.Parser is
    end Parse_Braced;
 
    function Parse_Sequence
-     (Source : String; Pos : in out Positive; Stop_On_Close : Boolean)
+     (Source        : String;
+      Pos           : in out Positive;
+      Stop_On_Close : Boolean;
+      In_Plural     : Boolean)
       return Messages.AST.Node_Access
    is
       Head         : Messages.AST.Node_Access := null;
@@ -1204,7 +1241,11 @@ package body Messages.Parser is
 
                Pos := Pos + 1;
                Parse_Braced
-                 (Source => Source, Pos => Pos, Head => Head, Tail => Tail);
+                 (Source    => Source,
+                  Pos       => Pos,
+                  Head      => Head,
+                  Tail      => Tail,
+                  In_Plural => In_Plural);
 
             when '}'    =>
                if Stop_On_Close then
@@ -1223,7 +1264,8 @@ package body Messages.Parser is
                   Append (Source => Pending_Text, New_Item => Apostrophe);
                   Pos := Pos + 2;
                elsif Pos < Source'Last
-                 and then Is_Quote_Syntax_Character (Source (Pos + 1))
+                 and then Is_Quote_Syntax_Character
+                            (Source (Pos + 1), In_Plural)
                then
                   Pos := Pos + 1;
 
@@ -1256,7 +1298,9 @@ package body Messages.Parser is
                            exit;
                         else
                            Append_Quoted_Character
-                             (Text => Pending_Text, C => Source (Pos));
+                             (Text      => Pending_Text,
+                              C         => Source (Pos),
+                              In_Plural => In_Plural);
                            Pos := Pos + 1;
                         end if;
                      end loop;
@@ -1295,7 +1339,11 @@ package body Messages.Parser is
       end if;
 
       Root :=
-        Parse_Sequence (Source => Source, Pos => Pos, Stop_On_Close => False);
+        Parse_Sequence
+          (Source        => Source,
+           Pos           => Pos,
+           Stop_On_Close => False,
+           In_Plural     => False);
 
       return Root;
    exception
